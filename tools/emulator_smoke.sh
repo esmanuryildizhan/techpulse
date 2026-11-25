@@ -91,7 +91,9 @@ shot 01_karsilama 15
 tap_text "Tüm konularla başla" $((W / 2)) $((H * 2235 / 2400))
 shot 02_ana_sayfa 14
 
-# Öne çıkan haberin ayrıntısı
+# Öne çıkan haberin ayrıntısı. (Not: Emülatörün yazılım tabanlı grafik sürücüsü, çok sayıda görselin
+# hızla kaydırıldığı uzun listelerde kendisi çökebiliyor; bu yüzden ana sayfa listesi burada kaydırılmaz.
+# Uzun liste kaydırma, gerçek telefonda kabul testinde denenir.)
 tap $((W / 2)) $((H * 1150 / 2400))
 shot 03_haber_detayi 6
 swipe_up
@@ -102,21 +104,14 @@ shot 05_haber_detayi_kaynak 3
 adb shell input keyevent 4
 sleep 3
 
-swipe_up
-shot 06_ana_sayfa_one_cikanlar 4
-swipe_up
-shot 07_son_gelismeler 4
-
 tap_text "Keşfet" "$(col 1)" "$NAV_Y"
-shot 08_kesfet 6
-swipe_up
-shot 09_kesfet_devami 4
+shot 06_kesfet 6
 
 tap_text "Kaydedilenler" "$(col 2)" "$NAV_Y"
-shot 10_kaydedilenler 4
+shot 07_kaydedilenler 4
 
 tap_text "Profil" "$(col 3)" "$NAV_Y"
-shot 11_profil 4
+shot 08_profil 4
 
 tap_text "Ana Sayfa" "$(col 0)" "$NAV_Y"
 sleep 2
