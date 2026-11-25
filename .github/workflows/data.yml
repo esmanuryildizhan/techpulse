@@ -1,0 +1,86 @@
+name: Veri hattı
+
+# Saatte bir kaynakları toplar, yeni kayıtları GitHub Models ile Türkçeye çevirir ve
+# sonucu GitHub Pages'te statik JSON olarak yayımlar. Uygulama bu dosyaları okur.
+
+on:
+  schedule:
+    - cron: "17 * * * *" # her saatin 17. dakikası (UTC); tam saat başındaki yoğunluktan kaçınmak için
+  workflow_dispatch:
+    inputs:
+      max_requests:
+        description: Bu çalışmadaki en fazla çeviri isteği
+        default: "30"
+  push:
+    branches: [main]
+    paths: ["pipeline/**", ".github/workflows/data.yml"]
+
+concurrency:
+  group: data-pipeline
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Topla, çevir, doğrula
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      models: read # GitHub Models'i hazır GITHUB_TOKEN ile kullanmak için
+    defaults:
+      run:
+        working-directory: pipeline
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: pipeline/package-lock.json
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+      - name: Veriyi topla ve çevir
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAX_TRANSLATION_REQUESTS: ${{ inputs.max_requests || '30' }}
+          OUT_DIR: ${{ github.workspace }}/site
+        run: |
+          export PAGES_URL="https://${GITHUB_REPOSITORY_OWNER,,}.github.io/${GITHUB_REPOSITORY#*/}"
+          echo "Önceki yayın: $PAGES_URL"
+          npm start
+
+      - name: Özet
+        run: |
+          {
+            echo "### Veri hattı sonucu"
+            echo '```json'
+            cat "$GITHUB_WORKSPACE/site/v1/meta.json"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    name: GitHub Pages'e yayımla
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

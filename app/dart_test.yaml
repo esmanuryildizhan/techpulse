@@ -1,0 +1,3 @@
+tags:
+  screenshots:
+    description: Ekran görüntüsü üreten testler; CI'da --update-goldens ile ayrı çalışır.

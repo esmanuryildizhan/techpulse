@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Android Developers Blog</title>
+  <entry>
+    <id>tag:blogger.com,1999:blog-1.post-2</id>
+    <published>2026-11-24T09:30:00.000-08:00</published>
+    <updated>2026-11-24T10:00:00.000-08:00</updated>
+    <title type="text">What&#39;s new in Jetpack Compose 2.0</title>
+    <content type="html">&lt;p&gt;Compose 2.0 brings &lt;b&gt;faster&lt;/b&gt; lists and new APIs.&lt;/p&gt;&lt;img src="x.png"&gt;</content>
+    <link rel="replies" type="text/html" href="https://android-developers.googleblog.com/2026/11/compose.html#comments"/>
+    <link rel="alternate" type="text/html" href="https://android-developers.googleblog.com/2026/11/compose.html"/>
+  </entry>
+  <entry>
+    <id>tag:blogger.com,1999:blog-1.post-1</id>
+    <updated>2026-11-20T09:30:00Z</updated>
+    <title>Second entry</title>
+    <summary>Short summary.</summary>
+    <link href="https://android-developers.googleblog.com/2026/11/second.html"/>
+  </entry>
+</feed>

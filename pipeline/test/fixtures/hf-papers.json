@@ -1,0 +1,5 @@
+[
+ {"paper":{"id":"2611.01234","title":"SegAnything-3D: Promptable 3D Segmentation","summary":"We present SegAnything-3D, a model for promptable segmentation of point clouds. It achieves state-of-the-art results on ScanNet.","upvotes":154,"publishedAt":"2026-11-23T00:00:00.000Z","authors":[{"name":"Ada Lovelace"},{"name":"Alan Turing"}],"githubRepo":"https://github.com/example/seg3d","ai_keywords":["3D segmentation","point clouds"]},"publishedAt":"2026-11-24T00:00:00.000Z","title":"SegAnything-3D: Promptable 3D Segmentation","numComments":7},
+ {"paper":{"id":"2611.05678","title":"Efficient Reasoning with Sparse Attention","summary":"Sparse attention reduces cost.","upvotes":88,"authors":[{"name":"Grace Hopper"}]},"publishedAt":"2026-11-24T00:00:00.000Z","numComments":2},
+ {"paper":{"id":"","title":"Broken"}}
+]

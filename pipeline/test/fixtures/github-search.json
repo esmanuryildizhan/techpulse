@@ -1,0 +1,5 @@
+{"total_count":2,"items":[
+ {"full_name":"example/agent-kit","name":"agent-kit","html_url":"https://github.com/example/agent-kit","description":"A toolkit for building LLM agents with MCP support","language":"Python","stargazers_count":5120,"forks_count":300,"created_at":"2026-11-20T12:00:00Z","topics":["llm","agents"],"owner":{"login":"example"},"fork":false,"archived":false},
+ {"full_name":"someone/terminal-ui","name":"terminal-ui","html_url":"https://github.com/someone/terminal-ui","description":"Beautiful terminal UI components","language":"Go","stargazers_count":2100,"forks_count":80,"created_at":"2026-11-21T12:00:00Z","topics":[],"owner":{"login":"someone"},"fork":false,"archived":false},
+ {"full_name":"fork/fork","name":"fork","html_url":"https://github.com/fork/fork","description":"fork","stargazers_count":10,"fork":true}
+]}

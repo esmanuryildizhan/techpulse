@@ -1,0 +1,5 @@
+{"hits":[
+ {"objectID":"46001","title":"Show HN: A tiny Rust database","url":"https://github.com/example/tinydb?utm_source=hn","points":420,"num_comments":180,"created_at":"2026-11-24T08:00:00Z"},
+ {"objectID":"46002","title":"Ask HN: What are you working on?","url":null,"points":300,"num_comments":500,"created_at":"2026-11-24T07:00:00Z"},
+ {"objectID":"46003","title":"New GPU architecture explained","url":"https://example.org/gpu","points":95,"num_comments":40,"created_at":"2026-11-24T06:00:00Z"}
+]}

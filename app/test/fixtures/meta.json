@@ -1,0 +1,40 @@
+{
+ "schemaVersion": 1,
+ "generatedAt": "2026-11-25T09:00:00Z",
+ "translator": {
+  "model": "openai/gpt-4.1-mini",
+  "requests": 4,
+  "translatedItems": 20,
+  "pendingItems": 1,
+  "note": null
+ },
+ "counts": {
+  "news": 7,
+  "models": 4,
+  "papers": 2,
+  "repos": 2,
+  "security": 2
+ },
+ "sources": [
+  {
+   "id": "openai",
+   "name": "OpenAI",
+   "kind": "official",
+   "homepage": "https://openai.com/news",
+   "ok": true,
+   "count": 5,
+   "error": null,
+   "checkedAt": "2026-11-25T09:00:00Z"
+  },
+  {
+   "id": "the-verge",
+   "name": "The Verge",
+   "kind": "news",
+   "homepage": "https://www.theverge.com/",
+   "ok": false,
+   "count": 0,
+   "error": "HTTP 403",
+   "checkedAt": "2026-11-25T09:00:00Z"
+  }
+ ]
+}

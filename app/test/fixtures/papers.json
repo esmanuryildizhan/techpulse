@@ -1,0 +1,50 @@
+{
+ "schemaVersion": 1,
+ "generatedAt": "2026-11-25T09:00:00Z",
+ "items": [
+  {
+   "id": "2611.01234",
+   "url": "https://huggingface.co/papers/2611.01234",
+   "arxivUrl": "https://arxiv.org/abs/2611.01234",
+   "titleOriginal": "SegAnything-3D: Promptable 3D Segmentation",
+   "abstractOriginal": "We present SegAnything-3D, a model for promptable segmentation of point clouds.",
+   "titleTr": "SegAnything-3D: Komutla yönlendirilebilen 3B bölütleme",
+   "summaryTr": "Çalışma, nokta bulutlarında komutla nesne bölütleme yapan bir model öneriyor. Yöntem 2B bölütleme modellerinin bilgisini 3B'ye aktarıyor ve ScanNet üzerinde en iyi sonuçları bildiriyor.",
+   "upvotes": 154,
+   "comments": 7,
+   "publishedAt": "2026-11-25T09:00:00Z",
+   "authors": [
+    "Ada Lovelace",
+    "Alan Turing",
+    "Grace Hopper"
+   ],
+   "githubUrl": "https://github.com/example/seg3d",
+   "tags": [
+    "3B bölütleme",
+    "Nokta bulutu"
+   ],
+   "translated": true
+  },
+  {
+   "id": "2611.05678",
+   "url": "https://huggingface.co/papers/2611.05678",
+   "arxivUrl": "https://arxiv.org/abs/2611.05678",
+   "titleOriginal": "Efficient Reasoning with Sparse Attention",
+   "abstractOriginal": "Sparse attention reduces cost.",
+   "titleTr": "Seyrek dikkat ile verimli akıl yürütme",
+   "summaryTr": "Makale, uzun akıl yürütme zincirlerinde dikkat hesaplamasını seyrekleştirerek çıkarım maliyetini düşüren bir yöntem sunuyor.",
+   "upvotes": 88,
+   "comments": 2,
+   "publishedAt": "2026-11-24T09:00:00Z",
+   "authors": [
+    "Grace Hopper"
+   ],
+   "githubUrl": null,
+   "tags": [
+    "LLM",
+    "Verimlilik"
+   ],
+   "translated": true
+  }
+ ]
+}

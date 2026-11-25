@@ -1,0 +1,173 @@
+{
+ "schemaVersion": 1,
+ "generatedAt": "2026-11-25T09:00:00Z",
+ "items": [
+  {
+   "id": "n1",
+   "url": "https://openai.com/news/example-model",
+   "sourceId": "openai",
+   "sourceName": "OpenAI",
+   "sourceKind": "official",
+   "publishedAt": "2026-11-25T07:00:00Z",
+   "firstSeenAt": "2026-11-25T08:00:00Z",
+   "titleOriginal": "Introducing a faster reasoning model for developers",
+   "excerptOriginal": "We are releasing a new model...",
+   "titleTr": "Geliştiriciler için daha hızlı bir akıl yürütme modeli tanıtıldı",
+   "summaryTr": "OpenAI, kod yazma ve matematik görevlerinde daha hızlı yanıt veren yeni bir akıl yürütme modelini API üzerinden kullanıma açtı. Model, önceki sürüme göre daha düşük maliyetle sunuluyor.",
+   "category": "ai",
+   "tags": [
+    "OpenAI",
+    "API"
+   ],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null
+  },
+  {
+   "id": "n2",
+   "url": "https://www.bleepingcomputer.com/news/security/example",
+   "sourceId": "bleepingcomputer",
+   "sourceName": "BleepingComputer",
+   "sourceKind": "news",
+   "publishedAt": "2026-11-25T06:00:00Z",
+   "firstSeenAt": "2026-11-25T06:00:00Z",
+   "titleOriginal": "Hackers exploit critical flaw in popular VPN appliances",
+   "excerptOriginal": "Threat actors are exploiting...",
+   "titleTr": "Saldırganlar popüler VPN cihazlarındaki kritik açığı istismar ediyor",
+   "summaryTr": "Araştırmacılar, kimlik doğrulaması gerektirmeyen bir güvenlik açığının yaygın kullanılan VPN cihazlarına karşı aktif olarak istismar edildiğini bildirdi. Üretici acil yama yayımladı.",
+   "category": "security",
+   "tags": [
+    "VPN",
+    "Yama"
+   ],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null
+  },
+  {
+   "id": "n3",
+   "url": "https://github.com/example/tiny-db",
+   "sourceId": "hacker-news",
+   "sourceName": "Hacker News",
+   "sourceKind": "community",
+   "publishedAt": "2026-11-25T04:00:00Z",
+   "firstSeenAt": "2026-11-25T04:00:00Z",
+   "titleOriginal": "Show HN: A tiny embedded database written in Rust",
+   "excerptOriginal": "",
+   "titleTr": "Show HN: Rust ile yazılmış küçük, gömülü bir veritabanı",
+   "summaryTr": null,
+   "category": "software",
+   "tags": [
+    "Rust"
+   ],
+   "translated": true,
+   "points": 412,
+   "comments": 187,
+   "discussionUrl": "https://news.ycombinator.com/item?id=1"
+  },
+  {
+   "id": "n4",
+   "url": "https://www.tomshardware.com/pc-components/gpus/example",
+   "sourceId": "toms-hardware",
+   "sourceName": "Tom's Hardware",
+   "sourceKind": "news",
+   "publishedAt": "2026-11-25T01:00:00Z",
+   "firstSeenAt": "2026-11-25T01:00:00Z",
+   "titleOriginal": "New desktop GPU benchmarks show big gains in ray tracing",
+   "excerptOriginal": "Our tests show...",
+   "titleTr": "Yeni masaüstü ekran kartı testleri ışın izlemede büyük artış gösteriyor",
+   "summaryTr": "Yapılan testlerde yeni nesil ekran kartı, ışın izleme açık oyunlarda önceki nesle göre belirgin şekilde daha yüksek kare hızı elde etti.",
+   "category": "hardware",
+   "tags": [
+    "GPU"
+   ],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null
+  },
+  {
+   "id": "n5",
+   "url": "https://huggingface.co/blog/example",
+   "sourceId": "huggingface-blog",
+   "sourceName": "Hugging Face Blog",
+   "sourceKind": "official",
+   "publishedAt": "2026-11-24T21:00:00Z",
+   "firstSeenAt": "2026-11-24T21:00:00Z",
+   "titleOriginal": "Fine-tuning vision-language models on a single GPU",
+   "excerptOriginal": "In this post we show...",
+   "titleTr": "Görsel dil modellerini tek bir GPU üzerinde ince ayarlamak",
+   "summaryTr": "Yazı, görsel dil modellerinin düşük bellekli tek bir ekran kartında LoRA ile nasıl ince ayarlanabileceğini adım adım anlatıyor.",
+   "category": "ai",
+   "tags": [
+    "LoRA",
+    "VLM"
+   ],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null
+  },
+  {
+   "id": "n6",
+   "url": "https://techcrunch.com/2026/11/24/example",
+   "sourceId": "techcrunch",
+   "sourceName": "TechCrunch",
+   "sourceKind": "news",
+   "publishedAt": "2026-11-24T13:00:00Z",
+   "firstSeenAt": "2026-11-24T13:00:00Z",
+   "titleOriginal": "AI startup raises $200M to build developer tools",
+   "excerptOriginal": "The company said...",
+   "titleTr": "Yapay zekâ girişimi geliştirici araçları için 200 milyon dolar yatırım aldı",
+   "summaryTr": "Şirket, yeni yatırımı kod inceleme ve test otomasyonu araçlarını geliştirmek için kullanacağını açıkladı.",
+   "category": "industry",
+   "tags": [
+    "Yatırım"
+   ],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null
+  },
+  {
+   "id": "n7",
+   "url": "https://android-developers.googleblog.com/2026/11/example.html",
+   "sourceId": "android-developers",
+   "sourceName": "Android Developers",
+   "sourceKind": "official",
+   "publishedAt": "2026-11-24T03:00:00Z",
+   "firstSeenAt": "2026-11-24T03:00:00Z",
+   "titleOriginal": "What's new in Jetpack Compose",
+   "excerptOriginal": "Compose brings faster lists and new APIs.",
+   "titleTr": null,
+   "summaryTr": null,
+   "category": "software",
+   "tags": [],
+   "translated": false,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null
+  },
+  {
+   "id": "bad",
+   "url": "http://insecure.example.com",
+   "sourceId": "x",
+   "sourceName": "X",
+   "sourceKind": "news",
+   "publishedAt": "2026-11-25T08:00:00Z",
+   "firstSeenAt": "2026-11-25T08:00:00Z",
+   "titleOriginal": "Should be skipped",
+   "excerptOriginal": "",
+   "titleTr": null,
+   "summaryTr": null,
+   "category": "ai",
+   "tags": [],
+   "translated": false,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null
+  }
+ ]
+}
