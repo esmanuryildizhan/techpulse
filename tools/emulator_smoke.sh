@@ -16,6 +16,18 @@ adb shell settings put global hide_error_dialogs 1 || true
 sleep 20 # açılıştan sonra sistem uygulamalarının yerleşmesini bekle
 adb install -r "$APK"
 adb logcat -c
+# Sistem kayıtları test boyunca dosyaya akar; emülatör beklenmedik biçimde kapanırsa son kayıtlar elde kalır.
+adb logcat -v time > "$OUT/logcat-akis.txt" 2>/dev/null &
+LOGCAT_PID=$!
+on_exit() {
+  local code=$?
+  kill "$LOGCAT_PID" 2> /dev/null || true
+  if [ "$code" -ne 0 ]; then
+    echo "--- son sistem kayıtları (uygulama ve grafik) ---"
+    grep -E "techpulse|flutter|FATAL|AndroidRuntime|Impeller|vulkan|Vulkan|lowmemory|ActivityManager: (Kill|Process)" "$OUT/logcat-akis.txt" | tail -60 || true
+  fi
+}
+trap on_exit EXIT
 
 # Emülatörde bazen sistemin kendi uygulamaları (ör. Pixel Launcher) "yanıt vermiyor" penceresi açar ve
 # dokunuşları yutar. Böyle bir pencere varsa "Wait" ile kapatılır; uygulamamızla ilgisi yoktur.
@@ -71,29 +83,29 @@ tap_text() {
     echo "yedek koordinata dokunuldu: $text"
   fi
 }
-swipe_up() { dismiss_system_dialog; adb shell input swipe $((W / 2)) $((H * 75 / 100)) $((W / 2)) $((H * 30 / 100)) 450; }
+swipe_up() { dismiss_system_dialog; adb shell input swipe $((W / 2)) $((H * 72 / 100)) $((W / 2)) $((H * 38 / 100)) 900; sleep 1; }
 
 adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 > /dev/null
 shot 01_karsilama 15
 
 tap_text "Tüm konularla başla" $((W / 2)) $((H * 2235 / 2400))
 shot 02_ana_sayfa 14
-swipe_up
-shot 03_ana_sayfa_devami 4
-swipe_up
-shot 04_son_gelismeler 4
-adb shell input swipe $((W / 2)) $((H * 25 / 100)) $((W / 2)) $((H * 90 / 100)) 300
-adb shell input swipe $((W / 2)) $((H * 25 / 100)) $((W / 2)) $((H * 90 / 100)) 300
-sleep 2
 
-tap $((W / 2)) $((H * 800 / 2400))
-shot 05_haber_detayi 5
+# Öne çıkan haberin ayrıntısı
+tap $((W / 2)) $((H * 1150 / 2400))
+shot 03_haber_detayi 6
 swipe_up
-shot 06_haber_detayi_devami 3
+shot 04_haber_detayi_devami 3
 swipe_up
-shot 07_haber_detayi_kaynak 3
+swipe_up
+shot 05_haber_detayi_kaynak 3
 adb shell input keyevent 4
-sleep 2
+sleep 3
+
+swipe_up
+shot 06_ana_sayfa_one_cikanlar 4
+swipe_up
+shot 07_son_gelismeler 4
 
 tap_text "Keşfet" "$(col 1)" "$NAV_Y"
 shot 08_kesfet 6
