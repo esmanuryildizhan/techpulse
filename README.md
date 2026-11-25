@@ -11,6 +11,8 @@ Ders sorumlusu: Fuat Candan · Geliştirenler: Esma Nur Yıldızhan, Zeynep Yare
 2. `TechPulse.apk` dosyasını indirin ve açın.
 3. Telefon "bilinmeyen kaynaklardan yükleme" izni isterse tarayıcınıza bu izni verin.
 
+Ayrıntılı kurulum, bilgisayarda çalıştırma ve sorun giderme: [docs/KURULUM.md](docs/KURULUM.md)
+
 ## Ne yapar?
 
 | Bölüm | İçerik | Kaynak |
@@ -49,7 +51,8 @@ Flutter uygulaması: app/ (Riverpod 3, dio, sqflite)
 |---|---|
 | `app/` | Flutter uygulaması (`lib/`, `test/`) |
 | `pipeline/` | Veri hattı (`src/`, `test/`) |
-| `tools/` | Android ayar betiği ve emülatör denemesi |
+| `tools/` | Android ayar betiği, emülatör denemesi, CI çıktı betiği |
+| `docs/` | Kurulum ve kullanım rehberi |
 | `.github/workflows/` | `data.yml` (saatlik veri), `app.yml` (derleme, test, APK) |
 
 ## Geliştirme
