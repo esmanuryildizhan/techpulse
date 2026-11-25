@@ -57,7 +57,7 @@ Future<Widget> buildTestApp({
 }) async {
   // Testlerde ağdan görsel indirilmez; konuya özel kapaklar çizilir.
   AppConfig.networkImages = false;
-  Fmt.clock = () => testNow;
+  Fmt.now = () => testNow;
   SharedPreferences.setMockInitialValues({if (onboarded) 'profile.onboarded': true, ...prefs});
   final preferences = await SharedPreferences.getInstance();
   return ProviderScope(

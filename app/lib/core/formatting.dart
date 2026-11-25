@@ -11,11 +11,11 @@ abstract final class Fmt {
   static final NumberFormat _decimal = NumberFormat.decimalPattern('tr');
 
   /// Göreli zamanların hesaplandığı saat. Testler sabit bir "şimdi" verir ki ekran görüntüleri tutarlı olsun.
-  static DateTime Function() clock = DateTime.now;
+  static DateTime Function() now = DateTime.now;
 
   /// "az önce", "5 dk önce", "3 sa önce", "dün", "4 gün önce", "12 Kas".
   static String relative(DateTime time, {DateTime? now}) {
-    final current = (now ?? clock()).toLocal();
+    final current = (now ?? Fmt.now()).toLocal();
     final local = time.toLocal();
     final diff = current.difference(local);
     if (diff.isNegative || diff.inMinutes < 1) return 'az önce';
