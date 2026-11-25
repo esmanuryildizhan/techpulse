@@ -232,8 +232,7 @@ class ProfileController extends Notifier<Profile> {
       name: prefs.getString(_name) ?? '',
       colorIndex: prefs.getInt(_color) ?? 0,
       interests: [
-        for (final key in prefs.getStringList(_interests) ?? const <String>[])
-          if (TechCategory.tryKey(key) case final category?) category,
+        for (final key in prefs.getStringList(_interests) ?? const <String>[]) ?TechCategory.tryKey(key),
       ],
       onboarded: prefs.getBool(_onboarded) ?? false,
       notifyInterests: prefs.getBool(_nInterests) ?? true,
