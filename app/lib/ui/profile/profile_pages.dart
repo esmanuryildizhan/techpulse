@@ -621,6 +621,24 @@ class AboutScreen extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 12),
+          TpCard(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('İçerik ve teşekkür', style: context.text.titleSmall),
+                const SizedBox(height: 6),
+                Text(
+                  'Haberlerin Türkçe anlatımı, kaynak metne dayanarak Anthropic\'in Claude Haiku 5.5 modeliyle yazılır. '
+                  'Editörün henüz yazmadığı bazı kısa metinler Helsinki Üniversitesinin OPUS-MT modeliyle '
+                  '(opus-mt-tc-big-en-tr, CC BY 4.0) makine çevirisidir. Haberlerin ve görsellerin tüm hakları '
+                  'yayımlayan kaynağa aittir.',
+                  style: context.text.bodyMedium,
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: () => openLink(context, AppConfig.repositoryUrl),
