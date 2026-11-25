@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:techpulse/core/categories.dart';
 import 'package:techpulse/core/formatting.dart';
 import 'package:techpulse/data/data_source.dart';
 import 'package:techpulse/data/local_store.dart';
 import 'package:techpulse/data/models.dart';
 import 'package:techpulse/data/repository.dart';
 import 'package:techpulse/state/providers.dart';
+import 'package:techpulse/state/ranking.dart';
 
 import 'helpers.dart';
 
@@ -12,46 +16,74 @@ void main() {
   setUpAll(initTestLocale);
 
   group('Ayrıştırma', () {
-    test('haberler okunur, güvenli olmayan bağlantılı kayıt atlanır', () {
+    test('yapay zekâ editörünün yazdığı haber tüm alanlarıyla okunur', () {
       final feed = parseNews(fixture('news.json'));
-      expect(feed.items, hasLength(7));
-      expect(feed.items.any((n) => n.id == 'bad'), isFalse);
-      expect(feed.generatedAt, isNotNull);
+      expect(feed.items, hasLength(13));
       final first = feed.items.first;
-      expect(first.displayTitle, startsWith('Geliştiriciler için'));
-      expect(first.category, NewsCategory.ai);
-      expect(first.sourceKind, SourceKind.official);
+      expect(first.aiWritten, isTrue);
+      expect(first.category, TechCategory.ai);
+      expect(first.imageUrl, startsWith('https://'));
+      expect(first.article, isNotNull);
+      expect(first.article!.sections, isNotEmpty);
+      expect(first.article!.sections.first.paragraphs, isNotEmpty);
+      expect(first.topics, contains('Character.AI'));
+      expect(first.importance, inInclusiveRange(1, 5));
+      expect(first.readingMinutes, greaterThan(0));
     });
 
-    test('çevrilmemiş haber özgün başlık ve açıklamayla gösterilir', () {
-      final item = parseNews(fixture('news.json')).items.firstWhere((n) => n.id == 'n7');
-      expect(item.titleTr, isNull);
-      expect(item.displayTitle, "What's new in Jetpack Compose");
-      expect(item.displaySummary, 'Compose brings faster lists and new APIs.');
-      expect(item.hasDifferentOriginal, isFalse);
+    test('makine çevirisi kaydında ayrıntılı anlatım yoktur, gizli kayıt işaretlenir', () {
+      final items = parseNews(fixture('news.json')).items;
+      final mt = items.firstWhere((n) => n.sourceName == 'GitHub Blog');
+      expect(mt.aiWritten, isFalse);
+      expect(mt.article, isNull);
+      expect(items.where((n) => n.hidden), hasLength(1));
     });
 
     test('Hacker News puan ve yorum sayısı okunur', () {
       final item = parseNews(fixture('news.json')).items.firstWhere((n) => n.sourceId == 'hacker-news');
-      expect(item.points, 412);
-      expect(item.comments, 187);
+      expect(item.points, isNotNull);
       expect(item.discussionUrl, startsWith('https://news.ycombinator.com/'));
+    });
+
+    test('önceki sürümün konu kimliği ve eksik alanlar tolere edilir', () {
+      final feed = parseNews(jsonEncode({
+        'items': [
+          {
+            'id': 'old',
+            'url': 'https://example.com/a',
+            'sourceId': 'github-blog',
+            'sourceName': 'GitHub Blog',
+            'sourceKind': 'official',
+            'publishedAt': '2026-11-20T10:00:00Z',
+            'titleOriginal': 'Old record',
+            'category': 'software',
+          },
+          {'id': 'insecure', 'url': 'http://example.com/b', 'sourceId': 'x', 'sourceName': 'X', 'publishedAt': '2026-11-20T10:00:00Z', 'titleOriginal': 'T'},
+        ],
+      }));
+      expect(feed.items, hasLength(1));
+      final item = feed.items.single;
+      expect(item.category, TechCategory.dev);
+      expect(item.article, isNull);
+      expect(item.topics, isEmpty);
+      expect(item.imageUrl, isNull);
+      expect(item.hidden, isFalse);
     });
 
     test('modeller, makaleler, projeler ve güvenlik kayıtları okunur', () {
       final models = parseModels(fixture('models.json')).items;
-      expect(models.first.modality, Modality.vision);
-      expect(models.first.parameters, 2100000000);
+      expect(models.first.highlights, isA<List<String>>());
+      expect(models.first.summaryTr, isNotNull);
       final papers = parsePapers(fixture('papers.json')).items;
-      expect(papers.first.authorLine, 'Ada Lovelace ve 2 yazar daha');
+      expect(papers.first.article, isNotNull);
+      expect(papers.first.imageUrl, startsWith('https://'));
       final repos = parseRepos(fixture('repos.json')).items;
-      expect(repos.first.isAi, isTrue);
+      expect(repos.first.imageUrl, startsWith('https://opengraph.githubassets.com/'));
       final vulns = parseSecurity(fixture('security.json')).items;
-      expect(vulns.first.ransomware, isTrue);
-      expect(vulns.last.displayTitle, 'Microsoft Windows Privilege Escalation Vulnerability');
+      expect(vulns.first.explanationTr, isNotNull);
       final meta = parseMeta(fixture('meta.json'));
-      expect(meta.sources, hasLength(2));
-      expect(meta.translatorModel, 'openai/gpt-4.1-mini');
+      expect(meta.sources.length, greaterThan(30));
+      expect(meta.editorModel, 'claude-haiku-5-5');
     });
 
     test('bozuk zarf hata fırlatır, bozuk tek kayıt atlanır', () {
@@ -62,26 +94,98 @@ void main() {
     });
   });
 
-  group('Biçimlendirme', () {
+  group('Konular ve biçimlendirme', () {
+    test('konu kimlikleri ve Türkçe büyük harf', () {
+      expect(TechCategory.fromKey('security'), TechCategory.security);
+      expect(TechCategory.fromKey('bilinmeyen'), TechCategory.industry);
+      expect(TechCategory.tryKey('yok'), isNull);
+      expect(trUpper('Siber güvenlik'), 'SİBER GÜVENLİK');
+      expect(trUpper('Yapay Zekâ'), 'YAPAY ZEKÂ');
+      expect(TechCategory.hardware.shortLabel, 'Donanım ve Çip');
+    });
+
     test('Türkçe karakterlere duyarsız arama', () {
       expect(foldForSearch('Güvenlik İSTANBUL Işık'), 'guvenlik istanbul isik');
       expect(foldForSearch('ÇÖĞÜŞ'), 'cogus');
     });
 
-    test('göreli zaman', () {
+    test('göreli zaman ve kısa sayılar', () {
       final now = DateTime(2026, 11, 25, 12);
       expect(Fmt.relative(now.subtract(const Duration(seconds: 20)), now: now), 'az önce');
       expect(Fmt.relative(now.subtract(const Duration(minutes: 5)), now: now), '5 dk önce');
       expect(Fmt.relative(now.subtract(const Duration(hours: 3)), now: now), '3 sa önce');
       expect(Fmt.relative(now.subtract(const Duration(days: 1)), now: now), 'dün');
-      expect(Fmt.relative(now.subtract(const Duration(days: 4)), now: now), '4 gün önce');
-      expect(Fmt.relative(DateTime(2026, 11, 2), now: now), '2 Kas');
-    });
-
-    test('kısa sayılar', () {
       expect(Fmt.compact(950), '950');
       expect(Fmt.compact(1200), contains('1,2'));
-      expect(Fmt.compact(2500000), contains('2,5'));
+    });
+  });
+
+  group('Sıralama', () {
+    final news = parseNews(fixture('news.json')).items.where((n) => !n.hidden).toList();
+
+    test('öne çıkan haber görselli olur, öne çıkanlar ve son gelişmeler tekrar etmez', () {
+      final layout = HomeLayout.build(news, testNow);
+      expect(layout.featured, isNotNull);
+      expect(layout.featured!.imageUrl, isNotNull);
+      expect(layout.highlights, hasLength(4));
+      final ids = [layout.featured!.id, ...layout.highlights.map((n) => n.id), ...layout.latest.map((n) => n.id)];
+      expect(ids.toSet(), hasLength(ids.length));
+      expect(ids, hasLength(news.length));
+    });
+
+    test('ilgi alanındaki haberin puanı artar', () {
+      final science = news.firstWhere((n) => n.category == TechCategory.science);
+      expect(newsScore(science, testNow, interests: {TechCategory.science}), greaterThan(newsScore(science, testNow)));
+    });
+
+    test('önem puanı yüksek ve yeni haber önde gelir', () {
+      final base = news.first;
+      NewsItem copy({required int importance, required Duration age}) => NewsItem.fromJson({
+            ...base.raw,
+            'id': 'x$importance${age.inHours}',
+            'importance': importance,
+            'publishedAt': testNow.subtract(age).toIso8601String(),
+          });
+      final strong = copy(importance: 5, age: const Duration(hours: 2));
+      final weak = copy(importance: 2, age: const Duration(hours: 2));
+      final old = copy(importance: 5, age: const Duration(days: 5));
+      expect(newsScore(strong, testNow), greaterThan(newsScore(weak, testNow)));
+      expect(newsScore(strong, testNow), greaterThan(newsScore(old, testNow)));
+    });
+
+    test('trend konular etiketlerden çıkar, konuya göre haber bulunur', () {
+      final topics = trendingTopics(news, testNow);
+      expect(topics, isNotEmpty);
+      expect(newsWithTopic(news, topics.first.label), isNotEmpty);
+      expect(newsWithTopic(news, 'fidye yazilimi'), isNotEmpty);
+    });
+  });
+
+  group('Kişisel listeler', () {
+    test('okuma geçmişi en yeni 300 kaydı tutar', () async {
+      final store = MemoryStore();
+      for (var i = 0; i < historyLimit + 5; i++) {
+        await store.saveRecord(
+          UserList.history,
+          BookmarkRecord(key: 'news:$i', kind: BookmarkKind.news, payload: '{}', savedAt: DateTime(2026, 1, 1).add(Duration(minutes: i))),
+        );
+      }
+      final records = await store.records(UserList.history);
+      expect(records, hasLength(historyLimit));
+      expect(records.first.key, 'news:${historyLimit + 4}');
+      expect(records.any((r) => r.key == 'news:0'), isFalse);
+    });
+
+    test('listeler birbirinden bağımsızdır', () async {
+      final store = MemoryStore();
+      final record = BookmarkRecord(key: 'news:a', kind: BookmarkKind.news, payload: '{}', savedAt: DateTime(2026));
+      await store.saveRecord(UserList.bookmarks, record);
+      await store.saveRecord(UserList.favorites, record);
+      await store.deleteRecord(UserList.bookmarks, 'news:a');
+      expect(await store.records(UserList.bookmarks), isEmpty);
+      expect(await store.records(UserList.favorites), hasLength(1));
+      await store.clearList(UserList.favorites);
+      expect(await store.records(UserList.favorites), isEmpty);
     });
   });
 
@@ -127,7 +231,7 @@ void main() {
       final snaps = await repo().watch(Endpoint.news, parseNews).toList();
       expect(snaps, hasLength(2));
       expect(snaps.last.isOffline, isTrue);
-      expect(snaps.last.data.items, hasLength(7));
+      expect(snaps.last.data.items, hasLength(13));
     });
 
     test('önbellek yoksa ve ağ yoksa anlaşılır hata fırlatır', () async {

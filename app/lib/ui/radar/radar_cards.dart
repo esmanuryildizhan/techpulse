@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/categories.dart';
 import '../../core/formatting.dart';
 import '../../core/theme.dart';
 import '../../data/local_store.dart';
@@ -8,7 +11,60 @@ import '../../data/models.dart';
 import '../../state/providers.dart';
 import '../widgets/actions.dart';
 import '../widgets/common.dart';
-import 'paper_detail_screen.dart';
+import '../widgets/news_image.dart';
+
+/// Model türlerinin rengi.
+Color modalityColor(Modality modality, Brightness brightness) => switch (modality) {
+      Modality.text => TechCategory.dev.tone(brightness),
+      Modality.vision => TechCategory.science.tone(brightness),
+      Modality.audio => TechCategory.hardware.tone(brightness),
+      Modality.multimodal => TechCategory.ai.tone(brightness),
+      Modality.other => TechCategory.industry.tone(brightness),
+    };
+
+class _Stat extends StatelessWidget {
+  const _Stat(this.icon, this.text, {this.tooltip});
+
+  final IconData icon;
+  final String text;
+  final String? tooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    final row = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 15, color: context.tp.textMuted),
+        const SizedBox(width: 4),
+        Text(text, style: context.text.bodySmall?.copyWith(color: context.tp.textSecondary, fontWeight: FontWeight.w600)),
+      ],
+    );
+    return tooltip == null ? row : Tooltip(message: tooltip, child: row);
+  }
+}
+
+class _Pill extends StatelessWidget {
+  const _Pill(this.text, this.color, {this.icon});
+
+  final String text;
+  final Color color;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(999)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[Icon(icon, size: 13, color: color), const SizedBox(width: 4)],
+          Text(text, style: TextStyle(fontFamily: 'Inter', fontSize: 11.5, fontWeight: FontWeight.w600, color: color)),
+        ],
+      ),
+    );
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Modeller
@@ -21,96 +77,63 @@ class ModelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final color = modalityColor(model.modality, theme.brightness);
-    return SurfaceCard(
+    final tone = modalityColor(model.modality, context.brightness);
+    return TpCard(
       onTap: () => showModelSheet(context, model),
-      padding: const EdgeInsets.fromLTRB(14, 14, 6, 10),
-      child: Row(
+      semanticLabel: '${model.rank}. ${model.name}',
+      padding: const EdgeInsets.all(16),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 30,
-            child: Text(
-              '${model.rank}',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: model.rank <= 3 ? scheme.primary : scheme.onSurfaceVariant,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: tone.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(11)),
+                child: Text('${model.rank}', style: context.text.titleMedium?.copyWith(color: tone, fontWeight: FontWeight.w800)),
               ),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(model.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: context.text.titleMedium?.copyWith(fontFamily: Tp.monoFont, fontSize: 15)),
+                    const SizedBox(height: 2),
+                    Text(
+                      [model.author, if (model.createdAt != null) Fmt.relative(model.createdAt!)].join(' · '),
+                      style: context.text.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+              BookmarkButton(kind: BookmarkKind.model, entry: model, size: 21),
+            ],
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    SourceAvatar(id: model.author, name: model.author, size: 20),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: Text(
-                        model.author,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant),
-                      ),
-                    ),
-                    if (model.isNew()) ...[
-                      const SizedBox(width: 6),
-                      Pill(label: 'Yeni', color: scheme.primary, filled: true),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  model.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleMedium?.copyWith(fontFamily: AppTheme.monoFont, fontSize: 15.5),
-                ),
-                const SizedBox(height: 8),
-                Pill(label: model.task, icon: model.modality.icon, color: color),
-                if (model.summaryTr != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    model.summaryTr!,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-                  ),
-                ],
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Wrap(
-                        spacing: 12,
-                        runSpacing: 4,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Stat(
-                            icon: Icons.favorite_border,
-                            value: Fmt.compact(model.likes),
-                            semanticsLabel: '${model.likes} beğeni',
-                          ),
-                          Stat(
-                            icon: Icons.download_outlined,
-                            value: Fmt.compact(model.downloads),
-                            semanticsLabel: '${model.downloads} indirme',
-                          ),
-                          if (model.parameters != null)
-                            Stat(icon: Icons.memory, value: Fmt.parameters(model.parameters!), semanticsLabel: 'parametre'),
-                        ],
-                      ),
-                    ),
-                    BookmarkButton(kind: BookmarkKind.model, entry: model, compact: true),
-                  ],
-                ),
-              ],
-            ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              _Pill(model.task, tone, icon: model.modality.icon),
+              if (model.isNew()) _Pill('Yeni', context.tp.success),
+            ],
+          ),
+          if (model.summaryTr != null) ...[
+            const SizedBox(height: 10),
+            Text(model.summaryTr!, maxLines: 3, overflow: TextOverflow.ellipsis, style: context.text.bodyMedium),
+          ],
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 14,
+            runSpacing: 6,
+            children: [
+              _Stat(Icons.favorite_border_rounded, Fmt.compact(model.likes), tooltip: 'Beğeni'),
+              _Stat(Icons.download_rounded, Fmt.compact(model.downloads), tooltip: 'İndirme'),
+              if (model.parameters != null) _Stat(Icons.memory_rounded, '${Fmt.parameters(model.parameters!)} parametre'),
+            ],
           ),
         ],
       ),
@@ -122,126 +145,98 @@ Future<void> showModelSheet(BuildContext context, AiModel model) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    showDragHandle: true,
-    useSafeArea: true,
-    builder: (context) => _ModelSheet(model: model),
-  );
-}
-
-class _ModelSheet extends StatelessWidget {
-  const _ModelSheet({required this.model});
-
-  final AiModel model;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final color = modalityColor(model.modality, theme.brightness);
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(model.author, style: theme.textTheme.labelLarge?.copyWith(color: scheme.onSurfaceVariant)),
-          const SizedBox(height: 4),
-          Text(model.name, style: theme.textTheme.headlineSmall?.copyWith(fontFamily: AppTheme.monoFont, fontSize: 22)),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              Pill(label: model.task, icon: model.modality.icon, color: color),
-              Pill(label: 'Trend #${model.rank}', icon: Icons.trending_up, color: scheme.primary),
-              if (model.isNew()) Pill(label: 'Son 2 haftada yayımlandı', color: scheme.tertiary),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            model.summaryTr ?? 'Bu model için Türkçe özet henüz hazırlanmadı. Ayrıntılar Hugging Face sayfasındaki model kartında.',
-            style: theme.textTheme.bodyLarge?.copyWith(color: model.summaryTr == null ? scheme.onSurfaceVariant : null),
-          ),
-          const SizedBox(height: 16),
-          _FactGrid(
-            facts: [
-              ('Beğeni', Fmt.decimal(model.likes)),
-              ('İndirme (30 gün)', Fmt.decimal(model.downloads)),
-              if (model.parameters != null) ('Parametre', Fmt.parameters(model.parameters!)),
-              if (model.createdAt != null) ('Yayımlanma', Fmt.date(model.createdAt!)),
-              if (model.library != null) ('Kütüphane', model.library!),
-              if (model.license != null) ('Lisans', model.license!),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton.icon(
-                  style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-                  onPressed: () => openLink(context, model.url),
-                  icon: const Icon(Icons.open_in_new),
-                  label: const Text("Hugging Face'te aç"),
-                ),
-              ),
-              const SizedBox(width: 8),
-              BookmarkButton(kind: BookmarkKind.model, entry: model),
-            ],
-          ),
-          const SizedBox(height: 12),
-          if (model.summaryTr != null)
-            const InfoNote(
-              icon: Icons.translate,
-              text: 'Açıklama, model kartının ilk cümlelerinin makine çevirisidir (açık kaynaklı OPUS-MT modeli).',
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FactGrid extends StatelessWidget {
-  const _FactGrid({required this.facts});
-
-  final List<(String, String)> facts;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = (constraints.maxWidth - 10) / 2;
-        return Wrap(
-          spacing: 10,
-          runSpacing: 10,
+    builder: (context) {
+      final tone = modalityColor(model.modality, context.brightness);
+      return DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.7,
+        maxChildSize: 0.92,
+        builder: (context, controller) => ListView(
+          controller: controller,
+          padding: const EdgeInsets.fromLTRB(Tp.page, 0, Tp.page, 32),
           children: [
-            for (final (label, value) in facts)
-              Container(
-                width: width,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: scheme.surfaceContainerHigh,
-                  borderRadius: BorderRadius.circular(14),
-                ),
+            Text(model.author, style: context.text.bodySmall),
+            const SizedBox(height: 4),
+            Text(model.name, style: context.text.headlineSmall?.copyWith(fontFamily: Tp.monoFont, fontSize: 22)),
+            const SizedBox(height: 12),
+            Wrap(spacing: 6, runSpacing: 6, children: [_Pill(model.task, tone, icon: model.modality.icon), _Pill('Trend sırası ${model.rank}', context.tp.primary)]),
+            const SizedBox(height: 18),
+            if (model.summaryTr != null) Text(model.summaryTr!, style: context.text.bodyLarge),
+            if (model.highlights.isNotEmpty) ...[
+              const SizedBox(height: 18),
+              InfoBox(
+                icon: Icons.star_outline_rounded,
+                title: 'Öne çıkan özellikler',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(label, style: theme.textTheme.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
-                    const SizedBox(height: 4),
-                    Text(value, maxLines: 2, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleSmall),
+                    for (final h in model.highlights)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(Icons.check_rounded, size: 16, color: context.tp.primary),
+                            const SizedBox(width: 8),
+                            Expanded(child: Text(h, style: context.text.bodyMedium?.copyWith(color: context.tp.textPrimary))),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),
+            ],
+            const SizedBox(height: 18),
+            TpCard(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                children: [
+                  _row(context, 'Beğeni', Fmt.decimal(model.likes)),
+                  _row(context, 'İndirme (son 30 gün)', Fmt.decimal(model.downloads)),
+                  if (model.parameters != null) _row(context, 'Parametre', Fmt.parameters(model.parameters!)),
+                  if (model.license != null) _row(context, 'Lisans', model.license!),
+                  if (model.library != null) _row(context, 'Kütüphane', model.library!),
+                  if (model.createdAt != null) _row(context, 'Yayın', Fmt.date(model.createdAt!)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              onPressed: () => openLink(context, model.url),
+              icon: const Icon(Icons.open_in_new_rounded, size: 18),
+              label: const Text("Hugging Face'te aç"),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              model.summaryTr == null ? 'Model kartında açıklama bulunmuyor.' : 'Açıklama, model kartından yapay zekâ desteğiyle Türkçe hazırlandı.',
+              textAlign: TextAlign.center,
+              style: context.text.bodySmall,
+            ),
           ],
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
 }
+
+Widget _row(BuildContext context, String label, String value) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Expanded(child: Text(label, style: context.text.bodyMedium)),
+          Flexible(child: Text(value, textAlign: TextAlign.end, style: context.text.titleSmall)),
+        ],
+      ),
+    );
 
 // ---------------------------------------------------------------------------
 // Makaleler
 // ---------------------------------------------------------------------------
+
+void openPaper(BuildContext context, WidgetRef ref, Paper paper) {
+  unawaited(ref.read(historyProvider.notifier).add(BookmarkKind.paper, paper));
+  Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => PaperDetailScreen(paper: paper)));
+}
 
 class PaperCard extends ConsumerWidget {
   const PaperCard({super.key, required this.paper});
@@ -250,67 +245,46 @@ class PaperCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final showOriginal = ref.watch(settingsProvider.select((s) => s.showOriginalTitles));
-    return SurfaceCard(
-      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => PaperDetailScreen(paper: paper))),
-      padding: const EdgeInsets.fromLTRB(14, 14, 6, 8),
-      child: Row(
+    return TpCard(
+      onTap: () => openPaper(context, ref, paper),
+      semanticLabel: paper.displayTitle,
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _UpvoteBox(count: paper.upvotes),
-          const SizedBox(width: 12),
-          Expanded(
+          AspectRatio(
+            aspectRatio: 2.2,
+            child: NewsImage(url: paper.imageUrl, seed: paper.id, category: TechCategory.ai, icon: Icons.article_outlined, label: 'arXiv ${paper.id}'),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  paper.displayTitle,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleMedium,
-                ),
-                if (showOriginal && paper.titleTr != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    paper.titleOriginal,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic, color: scheme.onSurfaceVariant),
-                  ),
-                ],
-                if (paper.summaryTr != null) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    paper.summaryTr!,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-                  ),
-                ],
-                const SizedBox(height: 8),
-                if (paper.tags.isNotEmpty)
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: [
-                      for (final tag in paper.tags.take(3))
-                        Pill(label: tag, color: categoryColor(NewsCategory.ai, theme.brightness)),
-                    ],
-                  ),
                 Row(
                   children: [
-                    Expanded(
-                      child: Text(
-                        [Fmt.shortDate(paper.publishedAt), if (paper.authorLine.isNotEmpty) paper.authorLine].join(' · '),
+                    Expanded(child: Text(trUpper('Günün makalesi · ${paper.upvotes} oy'), style: context.text.labelSmall?.copyWith(color: TechCategory.data.tone(context.brightness)))),
+                    BookmarkButton(kind: BookmarkKind.paper, entry: paper, size: 21),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(paper.displayTitle, maxLines: 3, overflow: TextOverflow.ellipsis, style: context.text.titleMedium),
+                      if (paper.summaryTr != null) ...[
+                        const SizedBox(height: 8),
+                        Text(paper.summaryTr!, maxLines: 3, overflow: TextOverflow.ellipsis, style: context.text.bodyMedium),
+                      ],
+                      const SizedBox(height: 10),
+                      Text(
+                        [if (paper.authorLine.isNotEmpty) paper.authorLine, Fmt.shortDate(paper.publishedAt)].join(' · '),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant),
+                        style: context.text.bodySmall,
                       ),
-                    ),
-                    BookmarkButton(kind: BookmarkKind.paper, entry: paper, compact: true),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -321,33 +295,112 @@ class PaperCard extends ConsumerWidget {
   }
 }
 
-class _UpvoteBox extends StatelessWidget {
-  const _UpvoteBox({required this.count});
+class PaperDetailScreen extends StatelessWidget {
+  const PaperDetailScreen({super.key, required this.paper});
 
-  final int count;
+  final Paper paper;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Semantics(
-      label: '$count oy',
-      excludeSemantics: true,
-      child: Container(
-        width: 48,
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: scheme.primaryContainer.withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Column(
-          children: [
-            Icon(Icons.arrow_drop_up_rounded, size: 24, color: scheme.onPrimaryContainer),
-            Text(
-              Fmt.compact(count),
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: scheme.onPrimaryContainer),
+    final article = paper.article;
+    final body = context.text.bodyLarge?.copyWith(fontSize: 16.5, height: 1.7);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Makale'),
+        actions: [
+          FavoriteButton(kind: BookmarkKind.paper, entry: paper),
+          BookmarkButton(kind: BookmarkKind.paper, entry: paper),
+          Builder(
+            builder: (c) => IconButton(
+              tooltip: 'Paylaş',
+              icon: const Icon(Icons.ios_share_rounded),
+              onPressed: () => shareLink(c, title: paper.displayTitle, url: paper.url),
+            ),
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(Tp.page, 4, Tp.page, 40),
+        children: [
+          SizedBox(
+            height: 180,
+            child: NewsImage(
+              url: paper.imageUrl,
+              seed: paper.id,
+              category: TechCategory.ai,
+              icon: Icons.article_outlined,
+              borderRadius: BorderRadius.circular(Tp.radius),
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(trUpper('Günün makalesi · ${paper.upvotes} oy'), style: context.text.labelSmall?.copyWith(color: TechCategory.data.tone(context.brightness))),
+          const SizedBox(height: 8),
+          Text(paper.displayTitle, style: context.text.headlineSmall),
+          if (paper.titleTr != null && paper.titleTr != paper.titleOriginal) ...[
+            const SizedBox(height: 8),
+            Text(paper.titleOriginal, style: context.text.bodyMedium?.copyWith(fontStyle: FontStyle.italic)),
+          ],
+          const SizedBox(height: 10),
+          Text([if (paper.authors.isNotEmpty) paper.authors.join(', '), Fmt.date(paper.publishedAt)].join(' · '), style: context.text.bodySmall),
+          const SizedBox(height: 20),
+          if (article != null) ...[
+            Text(article.intro, style: body?.copyWith(fontWeight: FontWeight.w500, fontSize: 17)),
+            if (article.primer.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              InfoBox(
+                icon: Icons.lightbulb_outline_rounded,
+                title: 'Önce bunu bil',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final p in article.primer) ...[
+                      Text(p.term, style: context.text.titleSmall),
+                      const SizedBox(height: 4),
+                      Text(p.explanation, style: context.text.bodyMedium),
+                      const SizedBox(height: 10),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+            for (final section in article.sections) ...[
+              const SizedBox(height: 24),
+              Text(section.heading, style: context.text.titleLarge),
+              for (final paragraph in section.paragraphs) ...[const SizedBox(height: 10), Text(paragraph, style: body)],
+            ],
+          ] else ...[
+            if (paper.summaryTr != null) Text(paper.summaryTr!, style: body),
+            const SizedBox(height: 16),
+            Text('Özet (İngilizce)', style: context.text.titleSmall),
+            const SizedBox(height: 8),
+            Text(paper.abstractOriginal, style: context.text.bodyMedium),
+          ],
+          const SizedBox(height: 24),
+          Text(
+            'Türkçe anlatım, makalenin özetinden yapay zekâ desteğiyle hazırlanmıştır. Ayrıntılar için makalenin kendisine başvurun.',
+            style: context.text.bodySmall,
+          ),
+          const SizedBox(height: 16),
+          FilledButton.icon(
+            onPressed: () => openLink(context, paper.arxivUrl),
+            icon: const Icon(Icons.open_in_new_rounded, size: 18),
+            label: const Text("Makaleyi arXiv'de oku"),
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: () => openLink(context, paper.url),
+            icon: const Icon(Icons.forum_outlined, size: 18),
+            label: const Text("Hugging Face'teki tartışma"),
+          ),
+          if (paper.githubUrl != null) ...[
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: () => openLink(context, paper.githubUrl!),
+              icon: const Icon(Icons.code_rounded, size: 18),
+              label: const Text('Kod deposu'),
             ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -364,75 +417,48 @@ class RepoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final description = repo.description;
-    return SurfaceCard(
+    return TpCard(
       onTap: () => openLink(context, repo.url),
-      padding: const EdgeInsets.fromLTRB(16, 14, 6, 8),
+      semanticLabel: repo.id,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: Row(
-              children: [
-                SourceAvatar(id: repo.owner, name: repo.owner, size: 22),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(text: '${repo.owner} / ', style: TextStyle(color: scheme.onSurfaceVariant)),
-                        TextSpan(text: repo.name, style: const TextStyle(fontWeight: FontWeight.w700)),
-                      ],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleSmall?.copyWith(fontFamily: AppTheme.monoFont),
-                  ),
-                ),
-                if (repo.isAi) Pill(label: 'YZ', icon: Icons.auto_awesome, color: categoryColor(NewsCategory.ai, theme.brightness)),
-              ],
-            ),
+          AspectRatio(
+            aspectRatio: 2,
+            child: NewsImage(url: repo.imageUrl, seed: repo.id, category: TechCategory.dev, icon: Icons.code_rounded, label: repo.id),
           ),
-          if (description != null) ...[
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: Text(
-                description,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-              ),
-            ),
-          ],
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              if (repo.language != null) ...[
-                Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(color: sourceColor(repo.language!, theme.brightness), shape: BoxShape.circle),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 8, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(repo.id, maxLines: 1, overflow: TextOverflow.ellipsis, style: context.text.titleSmall?.copyWith(fontFamily: Tp.monoFont)),
+                    ),
+                    BookmarkButton(kind: BookmarkKind.repo, entry: repo, size: 21),
+                  ],
                 ),
-                const SizedBox(width: 5),
-                Text(repo.language!, style: theme.textTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
-                const SizedBox(width: 12),
+                if (repo.description != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Text(repo.description!, maxLines: 3, overflow: TextOverflow.ellipsis, style: context.text.bodyMedium),
+                  ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 14,
+                  runSpacing: 6,
+                  children: [
+                    _Stat(Icons.star_border_rounded, Fmt.compact(repo.stars), tooltip: 'Yıldız'),
+                    _Stat(Icons.call_split_rounded, Fmt.compact(repo.forks), tooltip: 'Çatal'),
+                    if (repo.language != null) _Stat(Icons.code_rounded, repo.language!),
+                    _Stat(Icons.schedule_rounded, Fmt.relative(repo.createdAt), tooltip: 'Oluşturulma'),
+                    if (repo.isAi) _Pill('Yapay zekâ', TechCategory.ai.tone(context.brightness)),
+                  ],
+                ),
               ],
-              Stat(icon: Icons.star_border_rounded, value: Fmt.compact(repo.stars), semanticsLabel: '${repo.stars} yıldız'),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  '${Fmt.relative(repo.createdAt)} açıldı',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant),
-                ),
-              ),
-              BookmarkButton(kind: BookmarkKind.repo, entry: repo, compact: true),
-            ],
+            ),
           ),
         ],
       ),

@@ -2,31 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
+import '../core/categories.dart';
+
 /// Veri hattının ürettiği JSON'un Dart karşılıkları (pipeline/src/types.ts ile aynı alan adları).
 /// Ayrıştırma hoşgörülüdür: eksik veya hatalı bir alan uygulamayı çökertmez, varsayılan değer alır;
 /// zorunlu alanı olmayan kayıt listeden atlanır.
-
-enum NewsCategory {
-  all('Tümü', Icons.dashboard_outlined),
-  ai('Yapay Zekâ', Icons.auto_awesome_outlined),
-  software('Yazılım', Icons.code),
-  hardware('Donanım', Icons.memory),
-  security('Güvenlik', Icons.shield_outlined),
-  industry('Sektör', Icons.business_center_outlined);
-
-  const NewsCategory(this.label, this.icon);
-
-  final String label;
-  final IconData icon;
-
-  static NewsCategory fromKey(Object? key) => switch (key) {
-        'ai' => NewsCategory.ai,
-        'software' => NewsCategory.software,
-        'hardware' => NewsCategory.hardware,
-        'security' => NewsCategory.security,
-        _ => NewsCategory.industry,
-      };
-}
 
 enum SourceKind {
   official('Resmî blog'),
@@ -117,7 +97,60 @@ abstract interface class Entry {
   String get id;
   String get displayTitle;
   String get url;
+
+  /// Kart ve ayrıntı ekranındaki görsel (yoksa konuya özel kapak çizilir).
+  String? get imageUrl;
   Map<String, dynamic> get raw;
+}
+
+/// "Önce bunu bil" kutusundaki terim açıklaması.
+class Primer {
+  const Primer(this.term, this.explanation);
+
+  final String term;
+  final String explanation;
+}
+
+class ArticleSection {
+  const ArticleSection(this.heading, this.body);
+
+  final String heading;
+
+  /// Paragraflar boş satırla ayrılmıştır.
+  final String body;
+
+  List<String> get paragraphs => body.split(RegExp(r'\n\s*\n')).map((p) => p.trim()).where((p) => p.isNotEmpty).toList();
+}
+
+/// Yapay zekâ editörünün kaynak haberden yazdığı özgün Türkçe anlatım.
+class Article {
+  const Article({required this.intro, required this.primer, required this.sections});
+
+  final String intro;
+  final List<Primer> primer;
+  final List<ArticleSection> sections;
+
+  static Article? fromJson(Object? value) {
+    if (value is! Map<String, dynamic>) return null;
+    final intro = _strOrNull(value['intro']);
+    final sections = <ArticleSection>[
+      if (value['sections'] case final List<dynamic> list)
+        for (final s in list)
+          if (s is Map<String, dynamic> && _strOrNull(s['heading']) != null && _strOrNull(s['body']) != null)
+            ArticleSection(_strOrNull(s['heading'])!, _strOrNull(s['body'])!),
+    ];
+    if (intro == null || sections.isEmpty) return null;
+    return Article(
+      intro: intro,
+      sections: sections,
+      primer: [
+        if (value['primer'] case final List<dynamic> list)
+          for (final p in list)
+            if (p is Map<String, dynamic> && _strOrNull(p['term']) != null && _strOrNull(p['explanation']) != null)
+              Primer(_strOrNull(p['term'])!, _strOrNull(p['explanation'])!),
+      ],
+    );
+  }
 }
 
 class NewsItem implements Entry {
@@ -138,6 +171,13 @@ class NewsItem implements Entry {
     required this.points,
     required this.comments,
     required this.discussionUrl,
+    required this.imageUrl,
+    required this.article,
+    required this.topics,
+    required this.importance,
+    required this.readingMinutes,
+    required this.aiWritten,
+    required this.hidden,
     required this.raw,
   });
 
@@ -152,12 +192,19 @@ class NewsItem implements Entry {
         excerptOriginal: _str(json['excerptOriginal']),
         titleTr: _strOrNull(json['titleTr']),
         summaryTr: _strOrNull(json['summaryTr']),
-        category: NewsCategory.fromKey(json['category']),
+        category: TechCategory.fromKey(json['category']),
         tags: _strings(json['tags']),
         translated: json['translated'] == true,
         points: _intOrNull(json['points']),
         comments: _intOrNull(json['comments']),
         discussionUrl: _httpsOrNull(json['discussionUrl']),
+        imageUrl: _httpsOrNull(json['imageUrl']),
+        article: Article.fromJson(json['article']),
+        topics: _strings(json['topics']),
+        importance: _intOrNull(json['importance']),
+        readingMinutes: _intOrNull(json['readingMinutes']),
+        aiWritten: json['writer'] == 'ai',
+        hidden: json['hidden'] == true,
         raw: json,
       );
 
@@ -173,17 +220,32 @@ class NewsItem implements Entry {
   final String excerptOriginal;
   final String? titleTr;
   final String? summaryTr;
-  final NewsCategory category;
+  final TechCategory category;
   final List<String> tags;
   final bool translated;
   final int? points;
   final int? comments;
   final String? discussionUrl;
   @override
+  final String? imageUrl;
+  final Article? article;
+  final List<String> topics;
+  final int? importance;
+  final int? readingMinutes;
+
+  /// Türkçe metni yapay zekâ editörü mü yazdı (yoksa makine çevirisi ya da henüz çevrilmemiş)?
+  final bool aiWritten;
+
+  /// Editör teknolojiyle ilgisiz bulduysa gösterilmez.
+  final bool hidden;
+  @override
   final Map<String, dynamic> raw;
 
   @override
   String get displayTitle => titleTr ?? titleOriginal;
+
+  /// Okuma süresi: editörün verdiği değer, yoksa metin uzunluğundan tahmin.
+  int get minutes => readingMinutes ?? 1;
 
   /// Türkçe özet; yoksa kaynağın İngilizce açıklaması; o da yoksa null.
   String? get displaySummary => summaryTr ?? (excerptOriginal.isEmpty ? null : excerptOriginal);
@@ -208,6 +270,7 @@ class AiModel implements Entry {
     required this.license,
     required this.parameters,
     required this.summaryTr,
+    required this.highlights,
     required this.raw,
   });
 
@@ -227,6 +290,7 @@ class AiModel implements Entry {
         license: _strOrNull(json['license']),
         parameters: _intOrNull(json['parameters']),
         summaryTr: _strOrNull(json['summaryTr']),
+        highlights: _strings(json['highlights']),
         raw: json,
       );
 
@@ -247,11 +311,15 @@ class AiModel implements Entry {
   final String? license;
   final int? parameters;
   final String? summaryTr;
+  final List<String> highlights;
   @override
   final Map<String, dynamic> raw;
 
   @override
   String get displayTitle => name;
+
+  @override
+  String? get imageUrl => null;
 
   bool isNew([DateTime? now]) =>
       createdAt != null && (now ?? DateTime.now()).difference(createdAt!) < const Duration(days: 14);
@@ -272,6 +340,10 @@ class Paper implements Entry {
     required this.authors,
     required this.githubUrl,
     required this.tags,
+    required this.imageUrl,
+    required this.article,
+    required this.topics,
+    required this.readingMinutes,
     required this.raw,
   });
 
@@ -289,6 +361,10 @@ class Paper implements Entry {
         authors: _strings(json['authors']),
         githubUrl: _httpsOrNull(json['githubUrl']),
         tags: _strings(json['tags']),
+        imageUrl: _httpsOrNull(json['imageUrl']),
+        article: Article.fromJson(json['article']),
+        topics: _strings(json['topics']),
+        readingMinutes: _intOrNull(json['readingMinutes']),
         raw: json,
       );
 
@@ -307,6 +383,11 @@ class Paper implements Entry {
   final List<String> authors;
   final String? githubUrl;
   final List<String> tags;
+  @override
+  final String? imageUrl;
+  final Article? article;
+  final List<String> topics;
+  final int? readingMinutes;
   @override
   final Map<String, dynamic> raw;
 
@@ -334,6 +415,7 @@ class Repo implements Entry {
     required this.createdAt,
     required this.topics,
     required this.isAi,
+    required this.imageUrl,
     required this.raw,
   });
 
@@ -350,6 +432,7 @@ class Repo implements Entry {
         createdAt: _date(json['createdAt']) ?? DateTime.now(),
         topics: _strings(json['topics']),
         isAi: json['isAi'] == true,
+        imageUrl: _httpsOrNull(json['imageUrl']),
         raw: json,
       );
 
@@ -367,6 +450,8 @@ class Repo implements Entry {
   final DateTime createdAt;
   final List<String> topics;
   final bool isAi;
+  @override
+  final String? imageUrl;
   @override
   final Map<String, dynamic> raw;
 
@@ -393,6 +478,7 @@ class Vulnerability implements Entry {
     required this.ransomware,
     required this.cwes,
     required this.url,
+    required this.explanationTr,
     required this.raw,
   });
 
@@ -414,6 +500,7 @@ class Vulnerability implements Entry {
       ransomware: json['ransomware'] == true,
       cwes: _strings(json['cwes']),
       url: _httpsOrNull(json['nvdUrl']) ?? 'https://nvd.nist.gov/vuln/detail/$cve',
+      explanationTr: _strOrNull(json['explanationTr']),
       raw: json,
     );
   }
@@ -435,11 +522,17 @@ class Vulnerability implements Entry {
   final List<String> cwes;
   @override
   final String url;
+
+  /// Açığın sade dille anlatımı (yapay zekâ editörü).
+  final String? explanationTr;
   @override
   final Map<String, dynamic> raw;
 
   @override
   String get displayTitle => nameTr ?? (nameOriginal.isEmpty ? cveId : nameOriginal);
+
+  @override
+  String? get imageUrl => null;
 
   String get description => descriptionTr ?? descriptionOriginal;
 
@@ -480,16 +573,19 @@ class FeedMeta {
   FeedMeta({
     required this.generatedAt,
     required this.translatorModel,
+    required this.editorModel,
     required this.pendingTranslations,
     required this.sources,
   });
 
   factory FeedMeta.fromJson(Map<String, dynamic> json) {
     final translator = json['translator'];
+    final editor = json['editor'];
     final sources = json['sources'];
     return FeedMeta(
       generatedAt: _date(json['generatedAt']),
       translatorModel: translator is Map<String, dynamic> ? _strOrNull(translator['model']) : null,
+      editorModel: editor is Map<String, dynamic> ? _strOrNull(editor['model']) : null,
       pendingTranslations: translator is Map<String, dynamic> ? _int(translator['pendingItems']) : 0,
       sources: sources is List<dynamic>
           ? [
@@ -502,6 +598,7 @@ class FeedMeta {
 
   final DateTime? generatedAt;
   final String? translatorModel;
+  final String? editorModel;
   final int pendingTranslations;
   final List<SourceStatus> sources;
 }

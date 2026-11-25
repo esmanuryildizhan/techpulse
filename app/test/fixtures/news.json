@@ -1,173 +1,704 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-11-25T09:00:00Z",
+ "generatedAt": "2026-11-25T18:03:34.764Z",
  "items": [
   {
-   "id": "n1",
-   "url": "https://openai.com/news/example-model",
-   "sourceId": "openai",
-   "sourceName": "OpenAI",
-   "sourceKind": "official",
-   "publishedAt": "2026-11-25T07:00:00Z",
-   "firstSeenAt": "2026-11-25T08:00:00Z",
-   "titleOriginal": "Introducing a faster reasoning model for developers",
-   "excerptOriginal": "We are releasing a new model...",
-   "titleTr": "Geliştiriciler için daha hızlı bir akıl yürütme modeli tanıtıldı",
-   "summaryTr": "OpenAI, kod yazma ve matematik görevlerinde daha hızlı yanıt veren yeni bir akıl yürütme modelini API üzerinden kullanıma açtı. Model, önceki sürüme göre daha düşük maliyetle sunuluyor.",
-   "category": "ai",
-   "tags": [
-    "OpenAI",
-    "API"
-   ],
-   "translated": true,
-   "points": null,
-   "comments": null,
-   "discussionUrl": null
-  },
-  {
-   "id": "n2",
-   "url": "https://www.bleepingcomputer.com/news/security/example",
-   "sourceId": "bleepingcomputer",
-   "sourceName": "BleepingComputer",
-   "sourceKind": "news",
-   "publishedAt": "2026-11-25T06:00:00Z",
-   "firstSeenAt": "2026-11-25T06:00:00Z",
-   "titleOriginal": "Hackers exploit critical flaw in popular VPN appliances",
-   "excerptOriginal": "Threat actors are exploiting...",
-   "titleTr": "Saldırganlar popüler VPN cihazlarındaki kritik açığı istismar ediyor",
-   "summaryTr": "Araştırmacılar, kimlik doğrulaması gerektirmeyen bir güvenlik açığının yaygın kullanılan VPN cihazlarına karşı aktif olarak istismar edildiğini bildirdi. Üretici acil yama yayımladı.",
-   "category": "security",
-   "tags": [
-    "VPN",
-    "Yama"
-   ],
-   "translated": true,
-   "points": null,
-   "comments": null,
-   "discussionUrl": null
-  },
-  {
-   "id": "n3",
-   "url": "https://github.com/example/tiny-db",
-   "sourceId": "hacker-news",
-   "sourceName": "Hacker News",
-   "sourceKind": "community",
-   "publishedAt": "2026-11-25T04:00:00Z",
-   "firstSeenAt": "2026-11-25T04:00:00Z",
-   "titleOriginal": "Show HN: A tiny embedded database written in Rust",
-   "excerptOriginal": "",
-   "titleTr": "Show HN: Rust ile yazılmış küçük, gömülü bir veritabanı",
-   "summaryTr": null,
-   "category": "software",
-   "tags": [
-    "Rust"
-   ],
-   "translated": true,
-   "points": 412,
-   "comments": 187,
-   "discussionUrl": "https://news.ycombinator.com/item?id=1"
-  },
-  {
-   "id": "n4",
-   "url": "https://www.tomshardware.com/pc-components/gpus/example",
-   "sourceId": "toms-hardware",
-   "sourceName": "Tom's Hardware",
-   "sourceKind": "news",
-   "publishedAt": "2026-11-25T01:00:00Z",
-   "firstSeenAt": "2026-11-25T01:00:00Z",
-   "titleOriginal": "New desktop GPU benchmarks show big gains in ray tracing",
-   "excerptOriginal": "Our tests show...",
-   "titleTr": "Yeni masaüstü ekran kartı testleri ışın izlemede büyük artış gösteriyor",
-   "summaryTr": "Yapılan testlerde yeni nesil ekran kartı, ışın izleme açık oyunlarda önceki nesle göre belirgin şekilde daha yüksek kare hızı elde etti.",
-   "category": "hardware",
-   "tags": [
-    "GPU"
-   ],
-   "translated": true,
-   "points": null,
-   "comments": null,
-   "discussionUrl": null
-  },
-  {
-   "id": "n5",
-   "url": "https://huggingface.co/blog/example",
-   "sourceId": "huggingface-blog",
-   "sourceName": "Hugging Face Blog",
-   "sourceKind": "official",
-   "publishedAt": "2026-11-24T21:00:00Z",
-   "firstSeenAt": "2026-11-24T21:00:00Z",
-   "titleOriginal": "Fine-tuning vision-language models on a single GPU",
-   "excerptOriginal": "In this post we show...",
-   "titleTr": "Görsel dil modellerini tek bir GPU üzerinde ince ayarlamak",
-   "summaryTr": "Yazı, görsel dil modellerinin düşük bellekli tek bir ekran kartında LoRA ile nasıl ince ayarlanabileceğini adım adım anlatıyor.",
-   "category": "ai",
-   "tags": [
-    "LoRA",
-    "VLM"
-   ],
-   "translated": true,
-   "points": null,
-   "comments": null,
-   "discussionUrl": null
-  },
-  {
-   "id": "n6",
-   "url": "https://techcrunch.com/2026/11/24/example",
+   "id": "628d3c512960bc42def6d56a",
+   "url": "https://techcrunch.com/2026/11/25/state-ags-fight-character-ais-plan-to-auction-off-users-private-chats",
    "sourceId": "techcrunch",
    "sourceName": "TechCrunch",
    "sourceKind": "news",
-   "publishedAt": "2026-11-24T13:00:00Z",
-   "firstSeenAt": "2026-11-24T13:00:00Z",
-   "titleOriginal": "AI startup raises $200M to build developer tools",
-   "excerptOriginal": "The company said...",
-   "titleTr": "Yapay zekâ girişimi geliştirici araçları için 200 milyon dolar yatırım aldı",
-   "summaryTr": "Şirket, yeni yatırımı kod inceleme ve test otomasyonu araçlarını geliştirmek için kullanacağını açıkladı.",
-   "category": "industry",
-   "tags": [
-    "Yatırım"
-   ],
+   "publishedAt": "2026-11-25T17:35:58.000Z",
+   "firstSeenAt": "2026-11-25T17:52:20.283Z",
+   "titleOriginal": "State AGs fight Character AI’s plan to auction off users’ private chats",
+   "excerptOriginal": "The proposed Character.ai bankruptcy sale includes sensitive personal data from more than 21 million U.S. accounts, including 2.1 million registered to minors, the state AGs said.",
+   "titleTr": "Character.AI'ın iflas sürecinde kullanıcı sohbetleri açık artırmaya çıkarılıyor, 42 eyalet karşı çıktı",
+   "summaryTr": "42 eyalet Başsavcısı, Character.AI'ın iflas satışında 21 milyondan fazla ABD hesabına ait özel sohbet kayıtlarının satılmasını durdurmak için mahkemeye müdahale etti.",
+   "category": "ai",
+   "tags": [],
    "translated": true,
    "points": null,
    "comments": null,
-   "discussionUrl": null
+   "discussionUrl": null,
+   "imageUrl": "https://techcrunch.com/wp-content/uploads/2024/06/Character-Calls-Image-feat.jpg?resize=1200,675",
+   "article": {
+    "intro": "Yapay zekâ sohbet botu şirketi Character.AI, Ekim ayında Chapter 11 iflas koruması başvurusunda bulundu. Şirketin iflas sürecinde, kullanıcıların özel sohbet geçmişleri ve kişisel verilerinin en yüksek teklifi veren alıcıya açık artırmayla satılması planlanıyor. Yaklaşık 42 eyaletin başsavcısı bu satışı engellemek için harekete geçti.",
+    "primer": [
+     {
+      "term": "Chapter 11 iflas",
+      "explanation": "ABD'de şirketlerin borçlarını yeniden yapılandırarak faaliyetlerini sürdürmesine imkân veren iflas koruması prosedürüdür. Şirket, bu süreçte varlıklarını satabilir."
+     },
+     {
+      "term": "Sohbet geçmişi verisi",
+      "explanation": "Kullanıcıların bir yapay zekâ botuyla yaptığı yazışmaların kayıtlarıdır. Çoğu zaman kişisel ve hassas bilgiler içerir."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Ne oldu?",
+      "body": "Başsavcılar, Character.AI'ın iflas davasına müdahale ederek satışın durdurulmasını istedi. Başsavcıların açıklamalarına göre veri setinde 21 milyondan fazla ABD hesabına ait sohbet geçmişi ve IP adresi gibi diğer kişisel veriler bulunuyor. Bunların 2,1 milyondan fazlası reşit olmayan kullanıcılara ait. Şirket daha önce kullanıcılarına kişisel bilgilerinin satılmayacağını söylemişti. Açık artırma 1 Aralık'ta yapılacak ve şimdiye kadar tek teklif veren, Delaware'de 13 Kasım'da kurulan Smirks and Pangs Acquisition LLC adlı anonim bir alıcı açıklandı."
+     },
+     {
+      "heading": "Başsavcılar neden karşı çıkıyor?",
+      "body": "Başsavcılara göre satışta kullanıcılar için hiçbir koruma yok. Veriyi satın alan taraf istediğini yapabilir, bbilgiyi açıklamadan yeniden satabilir ve Character.AI'ın gizlilik politikasına uymak zorunda değildir. Başsavcılar ayrıca şirketin mahkemeye, teklif verenlere sunduğu kadar olası güvenlik ve hukuki sorun bilgisi sunmadığını savunuyor. Kaliforniya, Colorado, New York ve Connecticut gibi eyaletlerin 1 Ocak 2027'de yürürlüğe girecek sohbet botu güvenlik yasalarını da hatırlatıyorlar."
+     },
+     {
+      "heading": "Bu neden önemli?",
+      "body": "Haber, bir yapay zekâ şirketinin iflasında kullanıcı verilerinin nasıl ele alınacağına dair önemli bir emsal oluşturuyor. Kaliforniya Başsavcısı Rob Bonta, bu tür satışın federal ve Kaliforniya hukukuna göre yasa dışı olduğunu belirtti. Connecticut Başsavcısı William Tong ise şirketin savunmasız gençleri duygusal olarak riskli ve cinsel içerikli sohbetlere yönlendirdiğini ileri sürdü. Benzer bir itiraz, Disney'in Character.AI'ın fikri mülkiyetini lisanslama anlaşmasına karşı da yapılmıştı; o anlaşma 20 milyon dolarlık bir bedel içeriyor ve kullanıcı sohbetlerini kapsamıyor."
+     },
+     {
+      "heading": "Arka plan",
+      "body": "Character.AI, kurucu ortakları Noam Shazeer ve Daniel De Freitas'ın Google'a dönmesinin ardından zor bir döneme girdi. Şirket, çocuk güvenliğiyle ilgili davalarla da karşı karşıya. Bunlardan biri, platformdaki bir sohbet botuna takıntılı hale geldiği öne sürülen 14 yaşındaki bir Florida'lı çocuğun intiharıyla ilgili. Mahkemenin satış kararı henüz kesinleşmedi."
+     }
+    ]
+   },
+   "topics": [
+    "Character.AI",
+    "Veri gizliliği",
+    "İflas",
+    "Yapay zekâ sohbet botları"
+   ],
+   "importance": 4,
+   "readingMinutes": 2,
+   "writer": "ai",
+   "writerVersion": 1,
+   "hidden": false
   },
   {
-   "id": "n7",
-   "url": "https://android-developers.googleblog.com/2026/11/example.html",
-   "sourceId": "android-developers",
-   "sourceName": "Android Developers",
-   "sourceKind": "official",
-   "publishedAt": "2026-11-24T03:00:00Z",
-   "firstSeenAt": "2026-11-24T03:00:00Z",
-   "titleOriginal": "What's new in Jetpack Compose",
-   "excerptOriginal": "Compose brings faster lists and new APIs.",
-   "titleTr": null,
-   "summaryTr": null,
-   "category": "software",
+   "id": "f57028a3c9a21999f273637e",
+   "url": "https://techcrunch.com/2026/11/25/doj-accuses-former-cyber-executive-of-defrauding-ransomware-victims-by-secretly-paying-hackers",
+   "sourceId": "techcrunch",
+   "sourceName": "TechCrunch",
+   "sourceKind": "news",
+   "publishedAt": "2026-11-25T17:36:51.000Z",
+   "firstSeenAt": "2026-11-25T17:52:20.283Z",
+   "titleOriginal": "DOJ accuses former cyber executive of defrauding ransomware victims by secretly paying hackers",
+   "excerptOriginal": "U.S. prosecutors accused the former executive of defrauding victims of ransomware by paying the hackers, charging victims more, and pocketing the difference.",
+   "titleTr": "Fidye yazılımı kurtarma firmasının eski CTO'su, kurbanları dolandırmakla suçlanıyor",
+   "summaryTr": "ABD Adalet Bakanlığı, bir fidye yazılımı kurtarma firmasının eski teknoloji yöneticisini, saldırı mağdurlarına şifreli verilerini geri alabileceğini vaat edip fidye ödeyerek aradaki farkı cebe indirmekle suçluyor.",
+   "category": "security",
    "tags": [],
-   "translated": false,
+   "translated": true,
    "points": null,
    "comments": null,
-   "discussionUrl": null
+   "discussionUrl": null,
+   "imageUrl": "https://techcrunch.com/wp-content/uploads/2026/11/ransomware-screen-1186403530.jpg?resize=1200,749",
+   "article": {
+    "intro": "ABD Adalet Bakanlığı, fidye yazılımı saldırılarına uğrayan kurumlara veri kurtarma hizmeti sunduğunu iddia eden RansomwareHelp firmasının eski teknoloji yöneticisi Juan Ricardo Palacio Escobar'ı iddianameyle suçladı. Savcılara göre firma, verilerin çözülmesini sağlayamadığı halde hizmet ücretini mağdurlardan tahsil ederek fark üzerinden kazanç sağladı.",
+    "primer": [
+     {
+      "term": "Fidye yazılımı",
+      "explanation": "Bilgisayardaki dosyaları şifreleyerek erişimi engelleyen ve kurtarmak için para talep eden kötü amaçlı yazılım türüdür."
+     },
+     {
+      "term": "Kablolu dolandırıcılık (wire fraud)",
+      "explanation": "Telefon, e-posta veya internet gibi elektronik iletişim araçlarıyla aldatarak haksız kazanç sağlama suçudur."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Ne oldu?",
+      "body": "Adalet Bakanlığı'nın açıklamasına göre RansomwareHelp, fidye yazılımı kurbanlarına özel teknolojisiyle verileri çözebileceğini ve yüzde 99'un üzerinde başarı oranı sunduğunu iddia ediyordu. Savcılar ise firmanın verileri çözecek teknik kapasitesi olmadığını, bunun yerine saldırganlarla pazarlık yapıp fidye ödediğini ve mağdurdan daha yüksek bir bedel alarak farkı kendisine ayırdığını öne sürüyor. İddiaya göre Palacio Escobar bu parayla Florida'da birkaç mülk satın aldı."
+     },
+     {
+      "heading": "Operasyon nasıl yürütüldü?",
+      "body": "Adalet Bakanlığı'na göre FBI, bu yıl haziran ayında gizli bir operasyon düzenledi. Ajanlar, fidye yazılımı saldırısına uğradığını söyleyen bir şirket rolüne girdi. Şirket, saldırganlarla hiç pazarlık yapmadığını ve fidye ödemediğini belirtti. Buna rağmen Palacio Escobar, aynı anda FBI ajanlarının saldırgan kılığında olduğunu bilmeden yaklaşık 6 bin dolarlık kripto parayı bu kişilere ödedi."
+     },
+     {
+      "heading": "Bu neden önemli?",
+      "body": "Olay, fidye yazılımı kurtarma sektöründeki güven sorununa dikkat çekiyor. Mağdurlar, zor durumdaki kurumlara sunulan kurtarma vaatlerine güvenerek ek ücret ödemiş olabilir. Haberde ayrıca siber güvenlik profesyonellerinin suç işlediği benzer davalara da değiniliyor: Bu yıl, güvenlik firmalarında çalışan iki fidye yazılımı müzakerecisi, soruşturdukları gruplarla iş birliği yaptıkları için hapse atıldı; bir üçüncü müzakereci ise şirketlere karşı fidye yazılımı saldırılarında hackerlara yardım etmekten mahkum edildi."
+     },
+     {
+      "heading": "Sırada ne var?",
+      "body": "Palacio Escobar'a kablolu dolandırıcılık suçlamasıyla üç ayrı dava açıldı. Suçlamaların her biri için 20 yıla kadar hapis cezası öngörülüyor."
+     }
+    ]
+   },
+   "topics": [
+    "Fidye yazılımı",
+    "Dolandırıcılık",
+    "Siber güvenlik",
+    "ABD Adalet Bakanlığı"
+   ],
+   "importance": 4,
+   "readingMinutes": 2,
+   "writer": "ai",
+   "writerVersion": 1,
+   "hidden": false
   },
   {
-   "id": "bad",
-   "url": "http://insecure.example.com",
-   "sourceId": "x",
-   "sourceName": "X",
+   "id": "9dbab71e1cebbd691986a718",
+   "url": "https://www.kdnuggets.com/2026/11/vibe-coding-for-business-analytics-custom-crm-dashboards-reporting-apps-and-ai-agents",
+   "sourceId": "kdnuggets",
+   "sourceName": "KDnuggets",
    "sourceKind": "news",
-   "publishedAt": "2026-11-25T08:00:00Z",
-   "firstSeenAt": "2026-11-25T08:00:00Z",
-   "titleOriginal": "Should be skipped",
+   "publishedAt": "2026-11-25T18:00:33.000Z",
+   "firstSeenAt": "2026-11-25T18:03:34.764Z",
+   "titleOriginal": "Vibe Coding for Business Analytics: Custom CRM Dashboards, Reporting Apps, and AI Agents",
+   "excerptOriginal": "Discover how Alaio Vibecode, an AI app builder for Bitrix24, helps teams create custom CRM analytics dashboards, reporting tools, lead scoring apps, and AI agents.",
+   "titleTr": "Yapay zekâyla Bitrix24 için özel CRM panoları ve raporlama uygulamaları nasıl geliştirilir",
+   "summaryTr": "Alaio Vibecode, doğal dille tarif edilen yazılımlarla Bitrix24 verilerini analiz eden özel paneller, puanlama araçları ve yapay zekâ ajanları oluşturmayı vaat ediyor.",
+   "category": "dev",
+   "tags": [],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null,
+   "imageUrl": "https://www.kdnuggets.com/wp-content/uploads/Bitrix24_Alaio_Vibecode_Article_Banner.png",
+   "article": {
+    "intro": "Şirketlerin en değerli analitik bilgisi çoğu zaman yazılımlarda değil; tablolarda, iç belgelerde ya da çalışanların yıllar içinde geliştirdiği hesaplamalarda yaşar. Alaio Vibecode, bu bilginin yazılıma dönüştürülmesini sağlayan ve Bitrix24 için geliştirilmiş bir yapay zekâ uygulama oluşturma platformu. Kaynak metne göre platform, ekiplerin ihtiyaçlarını doğal dille anlatıp yapay zekâ destekli geliştirme ile CRM analitik panoları, raporlama uygulamaları ve puanlama araçları üretmesine olanak tanıyor.",
+    "primer": [
+     {
+      "term": "CRM",
+      "explanation": "Müşteri ilişkileri yönetimi; satış fırsatları, müşteri kayıtları ve iletişim geçmişinin tutulduğu sistemler."
+     },
+     {
+      "term": "Vibe coding",
+      "explanation": "Kodu ayrıntılı yazmak yerine, ne istendiğini doğal dille anlatarak yapay zekâ destekli geliştirme yapma yaklaşımı."
+     },
+     {
+      "term": "Lead scoring",
+      "explanation": "Potansiyel müşterilerin ya da satış fırsatlarının, belirlenmiş kurallara göre puanlanıp önceliklendirilmesi."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Ne oldu?",
+      "body": "Alaio Vibecode, Bitrix24 kullanan ekiplerin kendi hesaplama kurallarını ve iş süreçlerini içeren uygulamalar geliştirmesini sağlayan bir araç olarak tanıtılıyor. Platform; Claude Code, Cursor ve OpenAI Codex gibi yapay zekâ kodlama ajanlarıyla çalışıyor ve kullanıcının talimatlarını Bitrix24 çalışma alanına bağlanan bir uygulamaya dönüştürüyor. Kaynak, bu yaklaşımla bir satış ekibinin kendi puanlama modelini doğrudan CRM verisiyle çalışan bir uygulamaya çevirebileceğini örnekliyor."
+     },
+     {
+      "heading": "Nasıl çalışıyor?",
+      "body": "Ekip, örneğin açık fırsatları kendi puanlama modeline göre sıralayan bir pano isteyebilir; etkileşime %40, hesap uyumuna %30 ve kapanma potansiyeline %30 ağırlık verilebilir. Kaynağa göre uygulama bu puanları hesaplayıp sıralı bir tablo sunar ve çalışanlar ilgili CRM kaydını doğrudan açabilir. Platformda ayrıca Daily CRM Digest (günlük özet), Lead Scoring Board (fırsatları Sıcak, Ilık ve Soğuk olarak sınıflandıran pano) ve Deal Radar (CRM kayıtlarını dış kaynaklı sinyallerle birleştiren brifing aracı) gibi hazır uygulamalar yer alıyor. Kaynak, yapay zekânın hesapları değil, açıklamaları üstlenmesi gerektiğini savunuyor: pasif fırsatların sayımı kesin kayıtlardan yapılmalı, yapay zekâ ise bulguları özetleyip incelenmesi gereken kayıtları öne çıkarmalı."
+     },
+     {
+      "heading": "Yeni bir uygulamayı nasıl test etmeli?",
+      "body": "Kaynakta önerilen yöntem, geçmiş CRM verileriyle bir karar tekrarı testi yapmak: başarıyla kapanmış, kaybedilmiş ve durmuş üç fırsat seçilip yalnızca o dönemde bilinen bilgilerle puanlama kuralları çalıştırılıyor. Sonuçların ekibin önceliklendirme kararlarına gerçekten yardımcı olup olmadığı değerlendiriliyor. Bu ilk kontrolden sonra, daha geniş bir kayıt kümesiyle ağırlıklar, filtreler ve sonuçların gösterimi ayarlanabilir."
+     },
+     {
+      "heading": "Bu neden önemli?",
+      "body": "Kaynağın vurguladığına göre, daha önce ayrı bir geliştirme projesi gerektiren analitik fikirler artık hızlıca prototiplenip değerlendirilebiliyor. Ayrıca canlı API bağlantısı sayesinde uygulama, dışa aktarılmış bir raporun aksine her çalıştığında güncel verilerle tutarlı hesap yapabiliyor. Öte yandan kaynak bu tür araçların doğrulama gerektirdiğini de belirtiyor: dış kaynaklı sinyaller her zaman kontrol edilmeli ve bir haber, bir fırsatı otomatik olarak daha değerli yapmaz."
+     }
+    ]
+   },
+   "topics": [
+    "Yapay zekâ destekli geliştirme",
+    "Bitrix24",
+    "CRM analitiği",
+    "Lead scoring"
+   ],
+   "importance": 2,
+   "readingMinutes": 2,
+   "writer": "ai",
+   "writerVersion": 1,
+   "hidden": false
+  },
+  {
+   "id": "9cda4f8e682c33e0bbe8ac46",
+   "url": "https://www.kdnuggets.com/why-data-job-candidates-freeze-on-questions-they-already-know",
+   "sourceId": "kdnuggets",
+   "sourceName": "KDnuggets",
+   "sourceKind": "news",
+   "publishedAt": "2026-11-25T15:00:00.000Z",
+   "firstSeenAt": "2026-11-25T18:03:34.764Z",
+   "titleOriginal": "Why Data Job Candidates Freeze on Questions They Already Know",
+   "excerptOriginal": "Pressure disrupts recall in interviews. Timed mock interviews let you rehearse it.",
+   "titleTr": "Veri mülakatlarında bilinen sorularda donup kalmanın nedenleri ve prova yöntemi",
+   "summaryTr": "KDnuggets'in analizine göre, adaylar çoğu zaman bildikleri SQL sorularında mülakat baskısı altında takılıyor; zamanlı simüle mülakatlar bu durumu çalışmanın bir yolu.",
+   "category": "data",
+   "tags": [],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null,
+   "imageUrl": "https://www.kdnuggets.com/wp-content/uploads/kdn-why-data-job-candidates-freeze-on-questions-they-already-know-feature.webp",
+   "article": {
+    "intro": "Pencere fonksiyonunu yüzlerce kez yazmış bir veri adayı, mülakatta bu tür bir soruyla karşılaştığında sözdizimini birden unutabiliyor. KDnuggets'te yayımlanan bir yazıya göre bu donma, bilgi eksikliğinden değil, mülakatın yarattığı beş farklı koşuldan kaynaklanıyor ve bu koşullar prova edilebiliyor.",
+    "primer": [
+     {
+      "term": "Pencere fonksiyonu (window function)",
+      "explanation": "Satırları sıralayıp gruplandırarak her satır için hesap yapabilen SQL fonksiyonları. Satırları tek satıra indirgemez, sonuçların her satırda kalmasını sağlar."
+     },
+     {
+      "term": "DENSE_RANK",
+      "explanation": "Eşit değerleri aynı sırada gösteren ve sıralamada boşluk bırakmayan bir sıralama fonksiyonu. Örneğin 1, 1, 2 şeklinde ilerler."
+     },
+     {
+      "term": "Simüle mülakat (mock interview)",
+      "explanation": "Gerçek mülakat koşullarını taklit eden, zamanlı ve bir dinleyicinin bulunduğu deneme oturumu."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Ne oldu?",
+      "body": "Yazarlar, adayların masa başında kolayca çözdükleri sorularda mülakatta takılmalarının nedenlerini inceledi. Yazıya göre bu durum beş koşuldan kaynaklanıyor: baskı, referans olmadan hatırlama, aynı anda anlatma, belirsiz soru ifadeleri ve sessiz düşünme. Yazarlar ayrıca bu koşulların tek tek çalışılabileceğini savunuyor."
+     },
+     {
+      "heading": "Simüle mülakat neden işe yarıyor?",
+      "body": "Yalnız çalışmak zamanlayıcı ve dinleyici olmadığı için baskıyı ve iletişim zorluğunu büyük ölçüde ortadan kaldırıyor. Simüle mülakatlar ise geri sayım sayacı, yapay zekâ mülakatçı paneli ve eksik bilgi içeren sorularla bu koşulları yeniden oluşturuyor. Yazarlar oturumu 60 dakikalık, orta zorlukta iki SQL sorusuyla denedi."
+     },
+     {
+      "heading": "Örnek soru ve çözüm yaklaşımı",
+      "body": "Yazıda kütüphane verileri üzerinden, kitap başına ödünç süreleri toplanıp ilk üç sırayı veren bir sorgu ele alınıyor. Sorguda, 10 kopyası olan kitabın \"10'dan fazla\" kuralı gereği dışarıda kaldığı ve sıralama için eşit değerlerde boşluk bırakmayan DENSE_RANK'in kullanıldığı belirtiliyor. Yazarlara göre yazmadan önce kuralları sesli söylemek, sorgunun doğru yazılmasına yardımcı oluyor."
+     }
+    ]
+   },
+   "topics": [
+    "SQL",
+    "Mülakat hazırlığı",
+    "Pencere fonksiyonları",
+    "Veri bilimi kariyeri"
+   ],
+   "importance": 2,
+   "readingMinutes": 1,
+   "writer": "ai",
+   "writerVersion": 1,
+   "hidden": false
+  },
+  {
+   "id": "927dd6b10beb1b9592b8a7f1",
+   "url": "https://www.theverge.com/gadgets/1042162/nothing-ear-note-ai-earbuds-reveal",
+   "sourceId": "the-verge",
+   "sourceName": "The Verge",
+   "sourceKind": "news",
+   "publishedAt": "2026-11-25T16:00:59.000Z",
+   "firstSeenAt": "2026-11-25T16:21:28.431Z",
+   "titleOriginal": "Nothing offers a full look at its AI earbuds and charging case",
+   "excerptOriginal": "Nothing is showing off a much more detailed look at its upcoming AI earbuds ahead of their December 8th release. The Ear Note buds can record your calls, while their charging case can record, transcribe, and summarize your conversations. Like the Ear 3, the Ear Note's microphone-equipped case comes with a \"Talk\" button that you",
+   "titleTr": "Nothing'in yapay zekâlı Ear Note kulaklığı ve şarj kutusu ayrıntılı görüntülendi",
+   "summaryTr": "Nothing, 8 Aralık'ta satışa çıkacak Ear Note kulaklıklarını ve kayıt özellikli şarj kutusunu daha ayrıntılı tanıttı.",
+   "category": "hardware",
+   "tags": [],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null,
+   "imageUrl": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/ear-note-nothing.jpeg?quality=90&strip=all&crop=0,0,100,100",
+   "article": {
+    "intro": "Nothing, yapay zekâ destekli yeni kulaklığı Ear Note'un ayrıntılarını paylaştı. Kulaklıklar telefon görüşmelerini kaydedebiliyor, şarj kutusu ise konuşmaları kaydedip yazıya dökebiliyor ve özetleyebiliyor. Cihaz, 8 Aralık'ta satışa çıkacak.",
+    "primer": [
+     {
+      "term": "Yapay zekâ destekli not alma cihazları",
+      "explanation": "Konuşmaları kaydeden, yazıya döken ve yapay zekâyla özetleyen taşınabilir cihazlardır. Bu tür ürünler son dönemde hızla yaygınlaşıyor."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Ne oldu?",
+      "body": "Nothing, yaklaşan yapay zekâlı kulaklığı Ear Note'un daha ayrıntılı görünümünü paylaştı. Kulaklıklar, telefon görüşmelerini kaydedebiliyor. Mikrofon içeren şarj kutusunda ise yüz yüze ya da toplantı konuşmalarını kaydetmek, yazıya dökmek ve özetlemek mümkün olacak.\n\nŞirket kurucusu Carl Pei'nin X üzerinden yaptığı paylaşıma göre, kutudaki yeni \"Kayıt\" düğmesi toplantıları kaydedebilecek. Pei bunu \"yapay zekâ için donanım bağlam katmanına doğru ilk adım\" olarak tanımladı."
+     },
+     {
+      "heading": "Uygulama ve yapay zekâ özellikleri",
+      "body": "Bloomberg'ün daha önce aktardığına göre, kulaklıklar bir uygulamaya bağlanacak. Bu uygulamadan kayıtlar, yazıya dökülmüş metinler ve yapay zekâ özetleri yönetilebilecek. Kulaklıklar ayrıca çeşitli yapay zekâ ajanlarıyla etkileşime de destek verecek. Bunların arasında Nothing'in geliştirdiği daha temel bir sesli kontrol sistemi de yer alıyor ve kullanıcılar bu sistemle karşılıklı sohbet edebilecek."
+     },
+     {
+      "heading": "Bu neden önemli?",
+      "body": "Ear Note'un tasarımı Ear 3 ve Ear 3A modellerine benziyor, ancak Nothing bu modelin kulak içi ses kalitesinin şimdiye kadarki en iyisi olduğunu belirtiyor. Ürün, Amazon Bee ve Plaud Note Pro gibi son dönemde çıkan yapay zekâ destekli not alma cihazlarının arasına katılıyor. Apple da Watch Series 12 ile Siri'nin konuşmaları dinleyip özet çıkarabilmesini sağladı."
+     }
+    ]
+   },
+   "topics": [
+    "Yapay zekâ",
+    "Akıllı kulaklık",
+    "Not alma cihazları",
+    "Nothing"
+   ],
+   "importance": 3,
+   "readingMinutes": 1,
+   "writer": "ai",
+   "writerVersion": 1,
+   "hidden": false
+  },
+  {
+   "id": "e0d965bae52b987512695e47",
+   "url": "https://arstechnica.com/gadgets/2026/11/ars-live-recap-dont-expect-military-attacks-on-data-centers-to-stop",
+   "sourceId": "ars-technica",
+   "sourceName": "Ars Technica",
+   "sourceKind": "news",
+   "publishedAt": "2026-11-25T16:47:14.000Z",
+   "firstSeenAt": "2026-11-25T17:52:20.283Z",
+   "titleOriginal": "Ars Live recap: Don’t expect military attacks on data centers to stop",
+   "excerptOriginal": "Militaries have many reasons to target data centers and the cloud in wartime.",
+   "titleTr": "Veri merkezlerine askeri saldırılar artıyor: Bulut hizmetleri hedef haline geliyor",
+   "summaryTr": "Amazon'un Orta Doğu'daki veri merkezleri 2026'da ilk kez askeri saldırıya uğradı; uzmanlar bu tür saldırıların artacağını düşünüyor.",
+   "category": "cloud",
+   "tags": [],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null,
+   "imageUrl": "https://cdn.arstechnica.net/wp-content/uploads/2026/10/yandex-data-center_sasovo-ryazan-russia.jpg",
+   "article": {
+    "intro": "2026 yılında Amazon'un Orta Doğu'daki veri merkezleri ilk kez askeri bir saldırının hedefi oldu. Rusya ile Ukrayna da birbirlerinin veri merkezlerine benzeri görülmemiş sayıda dron saldırısı düzenledi. Royal United Services Institute'tan Joseph Jarnecki, Ars Technica'nın canlı yayınındaki konuşmasında bu saldırıların neden arttığını ve bulut hizmetleri için ne anlama geldiğini anlattı.",
+    "primer": [
+     {
+      "term": "Çift kullanım (dual use)",
+      "explanation": "Hem sivil hem askeri amaçla kullanılabilen altyapı ya da teknoloji anlamına gelir. Bir sivil veri merkezi askeri sistemleri barındırıyorsa çift kullanımlı sayılabilir."
+     },
+     {
+      "term": "Kamikaze dron",
+      "explanation": "Hedefine çarparak patlayan, tek kullanımlık insansız hava aracıdır. İran'ın Shahed dronları bu türe örnektir."
+     },
+     {
+      "term": "Hiperölçekli bulut sağlayıcısı (hyperscaler)",
+      "explanation": "Amazon, Google, Microsoft ve Meta gibi çok büyük veri merkezi ve bulut altyapısı işleten şirketlerdir."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Ne oldu?",
+      "body": "Jarnecki'ye göre halka açık bulut veri merkezleri, 2026 İran savaşı ve Rusya'nın Ukrayna'yı işgali sürecinde giderek daha sık askeri hedef haline geliyor. Bunun nedeni, orduların savaş yönetimi sistemleri, insan kaynakları ve kaynak yönetimi gibi işleri bulut hizmetleri üzerinden yürütmesi. Uluslararası hukuk ve askeri hedefleme ilkelerine göre, askeri kullanıma giren sivil bir altyapı karşı taraf için hedef haline gelebiliyor."
+     },
+     {
+      "heading": "Neden ekonomik olarak cazip?",
+      "body": "Jarnecki, ucuz kamikaze dronların veri merkezlerine yapılan saldırılarla orantısız ekonomik zararlar verebildiğini belirtiyor. Ona göre Körfez'deki AWS ve diğer şirketlerin veri merkezlerine yapılan yatırım, İran'ın Shahed dronlarına harcadığı tutarla kıyaslandığında en az 100 kat fazla. Bu oran saldırgan için oldukça karlı bir denklem oluşturuyor."
+     },
+     {
+      "heading": "Dayanıklılık için dersler",
+      "body": "Tartışmanın bir bölümü, hükümetler ve Amazon, Google, Microsoft ve Meta gibi hiperölçekli şirketler için bulut dayanıklılığı derslerine odaklandı. Jarnecki, Rusya'nın 2022'de Ukrayna'yı işgaline başlamasının ardından Ukrayna'nın bulut altyapısını korumak için attığı adımları örnek olarak gösterdi."
+     }
+    ]
+   },
+   "topics": [
+    "Veri merkezleri",
+    "Bulut bilişim",
+    "Askeri teknoloji",
+    "Siber altyapı"
+   ],
+   "importance": 4,
+   "readingMinutes": 1,
+   "writer": "ai",
+   "writerVersion": 1,
+   "hidden": false
+  },
+  {
+   "id": "98652a11802b96605c4b5a18",
+   "url": "https://9to5google.com/2026/11/25/whatsapp-officially-adds-scheduled-messages-and-the-rollout-is-scheduled-too",
+   "sourceId": "9to5google",
+   "sourceName": "9to5Google",
+   "sourceKind": "news",
+   "publishedAt": "2026-11-25T17:30:00.000Z",
+   "firstSeenAt": "2026-11-25T18:03:34.764Z",
+   "titleOriginal": "WhatsApp officially adds scheduled messages, and the rollout is scheduled too",
+   "excerptOriginal": "It’s about time. WhatsApp announced today that it is finally adding support for scheduled messages in its app. more…",
+   "titleTr": "WhatsApp zamanlanmış mesaj özelliğini resmen ekliyor",
+   "summaryTr": "WhatsApp, kullanıcıların mesajlarını ileri bir tarihte göndermesine olanak tanıyan zamanlanmış mesaj özelliğini duyurdu. Özellik, önümüzdeki haftalarda kademeli olarak tüm kullanıcılara ulaşacak.",
+   "category": "mobile",
+   "tags": [],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null,
+   "imageUrl": "https://9to5google.com/wp-content/uploads/sites/4/2026/03/WhatsApp-logo-3.jpg?quality=82&strip=all&w=1600",
+   "article": {
+    "intro": "WhatsApp, uzun süredir diğer mesajlaşma uygulamalarında bulunan zamanlanmış mesaj özelliğini sonunda kendi uygulamasına eklediğini duyurdu. Özellik sayesinde kullanıcılar bir mesaj yazıp, onu daha sonraki bir zamanda bireysel ya da grup sohbetine gönderilecek şekilde ayarlayabilecek.",
+    "primer": [
+     {
+      "term": "Uçtan uca şifreleme",
+      "explanation": "Mesajın yalnızca gönderen ve alıcı tarafından okunabilmesini sağlayan güvenlik yöntemidir. Aradaki sunucular mesajın içeriğini göremez."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Ne oldu?",
+      "body": "WhatsApp, uygulamasına zamanlanmış mesaj desteği eklediğini açıkladı. Kullanıcılar bir mesaj yazdıktan sonra gönder düğmesine uzun basarak, mesajın hangi tarihte ve saatte gönderileceğini seçebilecek. Mesajlar, taslak oluşturulduktan sonra en fazla 14 gün ileriye planlanabiliyor. Özellik hem bireysel hem de grup sohbetlerinde kullanılabilecek."
+     },
+     {
+      "heading": "Özelliğin ayrıntıları",
+      "body": "WhatsApp'a göre zamanlanmış mesajlar, telefonun pili bitmiş olsa ya da cihaz kapalı olsa bile gönderilecek. Mesajlar uçtan uca şifreli kalmaya devam edecek. Metin, fotoğraf ve videolarda çalışan özellik, sesli notlarda ise desteklenmeyecek. Gönderilmeden önce zamanlanmış mesajlar görüntülenebilecek, böylece kullanıcılar gönderimi iptal edebilecek ya da mesajı düzenleyebilecek."
+     },
+     {
+      "heading": "Ne zaman kullanıma sunulacak?",
+      "body": "Şirket, özelliğin \"önümüzdeki haftalarda\" dünya genelinde kullanıcılara kademeli olarak ulaşacağını belirtti. Yani özelliği hemen görmeyebilirsiniz, birkaç hafta beklemeniz gerekebilir."
+     }
+    ]
+   },
+   "topics": [
+    "WhatsApp",
+    "Mesajlaşma uygulamaları",
+    "Zamanlanmış mesaj"
+   ],
+   "importance": 3,
+   "readingMinutes": 1,
+   "writer": "ai",
+   "writerVersion": 1,
+   "hidden": false
+  },
+  {
+   "id": "89bd132084d4900f861924f0",
+   "url": "https://science.nasa.gov/missions/hubble/nasas-hubble-views-ocean-of-stars-in-groundwork-for-roman",
+   "sourceId": "nasa",
+   "sourceName": "NASA",
+   "sourceKind": "official",
+   "publishedAt": "2026-11-25T14:56:54.000Z",
+   "firstSeenAt": "2026-11-25T18:03:34.764Z",
+   "titleOriginal": "NASA’s Hubble Views Ocean of Stars in Groundwork for Roman",
+   "excerptOriginal": "These Hubble observations are part of a survey that will help researchers better interpret upcoming Nancy Grace Roman Space Telescope observations as they seek to characterize the stars and search for exoplanets in this busy region of our galaxy.",
+   "titleTr": "NASA'nın Hubble'ı Roman teleskobu için Samanyolu'nun merkezini gözlemledi",
+   "summaryTr": "Hubble'ın Samanyolu'nun galaktik çekirdeğine yönelik yeni görüntüleri, yakında çalışmaya başlayacak Roman Uzay Teleskobu'nun verilerini yorumlamaya yardımcı olacak.",
+   "category": "science",
+   "tags": [],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null,
+   "imageUrl": "https://assets.science.nasa.gov/dynamicimage/assets/science/missions/hubble/galaxies/milky-way/Hubble_GalacticBulge_HD70_1_FINAL.jpg?w=1536&h=1536&fit=clip",
+   "article": {
+    "intro": "NASA, Hubble Uzay Teleskobu ile Samanyolu'nun galaktik çekirdeğine yakın bir bölgeden yıldız dolu görüntüler paylaştı. Bu gözlemler, gelecekte Nancy Grace Roman Uzay Teleskobu'nun yapacağı çalışmalara hazırlık niteliği taşıyor.",
+    "primer": [
+     {
+      "term": "Galaktik çekirdek (galactic bulge)",
+      "explanation": "Bir galaksinin disk şeklindeki yapısının merkezini çevreleyen, yoğun yıldızlardan oluşan küresel bölgedir."
+     },
+     {
+      "term": "Mikrolensleme (microlensing)",
+      "explanation": "Uzaktaki bir yıldızdan gelen ışığın, arada kalan daha yakın bir cismin kütlesi nedeniyle büyüyüp bükülmesi olayıdır. Bu yöntemle gezegenler de tespit edilebilir."
+     },
+     {
+      "term": "Ötegezegen (exoplanet)",
+      "explanation": "Güneş dışındaki bir yıldızın etrafında dolanan gezegendir."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Ne oldu?",
+      "body": "NASA, Hubble'ın Samanyolu'nun galaktik çekirdeğine doğru bakan bölgesinden alınan yıldız görüntülerini yayımladı. Görüntüler, Hubble'ın gözlem programı kapsamında, gelecekte Roman Uzay Teleskobu'nun yapacağı gözlemlerle karşılaştırılabilmesi için çekildi. Gözlemlerde, Roman'ın hassas olduğu kırmızı görünür ışık ve yakın kızılötesi dalga boyları kullanıldı."
+     },
+     {
+      "heading": "Bu neden önemli?",
+      "body": "Astronomlar galaktik çekirdeği, galaksinin yıldız kütlesinin yaklaşık dörtte birini barındırdığı ve Dünya'ya göreceli olarak yakın olduğu için inceliyor. Hubble'ın yüksek çözünürlüğü sayesinde yıldızların parlaklığı, yaşı, bileşimi ve hareketleri zaman içinde izlenebiliyor. Bu veriler, ötegezegen araması, kara delik ve karanlık madde konumlarının belirlenmesi ve Samanyolu'nun evriminin anlaşılması açısından değerli."
+     },
+     {
+      "heading": "Roman ile bağlantısı nedir?",
+      "body": "Roman'ın gelecekteki gözlemlerinin önemli bir parçası mikrolensleme olaylarını yakalayarak ötegezegen aramaktır. Hubble'ın, mikrolensleme olayları yaşanmadan önce bölgedeki yıldızları karakterize etmesi, aylar ya da yıllar sonra Roman'ın yakaladığı olayların daha kolay yorumlanmasını sağlayacak. Bu gözlemler, Hubble'ın galaktik çekirdek üzerindeki önceki kapsamlı çalışmalarının da devamı niteliğinde."
+     }
+    ]
+   },
+   "topics": [
+    "Samanyolu",
+    "Hubble Uzay Teleskobu",
+    "Roman Uzay Teleskobu",
+    "Ötegezegen araştırması"
+   ],
+   "importance": 3,
+   "readingMinutes": 1,
+   "writer": "ai",
+   "writerVersion": 1,
+   "hidden": false
+  },
+  {
+   "id": "17929128d139e3d01b22009c",
+   "url": "https://www.theverge.com/science/1042278/spacex-fcc-starmind-ai-space-data-centers",
+   "sourceId": "the-verge",
+   "sourceName": "The Verge",
+   "sourceKind": "news",
+   "publishedAt": "2026-11-25T17:44:51.000Z",
+   "firstSeenAt": "2026-11-25T17:52:20.283Z",
+   "titleOriginal": "FCC signs off on SpaceX’s plan to put up to 1 million data center satellites into space",
+   "excerptOriginal": "In an announcement on Wednesday, the FCC says it authorized SpaceX to deploy up to 1 million AI chip-equipped satellites as part of the Elon Musk-owned company's \"Starmind\" initiative. With several others also pursuing the idea of putting AI data centers in space, including Google and Blue Origin, this is the first approval the agency",
+   "titleTr": "FCC, SpaceX'in uzaya 1 milyon uydu yerleştirme planını onayladı",
+   "summaryTr": "ABD'nin iletişim düzenleyicisi FCC, SpaceX'e yapay zekâ çipli uydulardan oluşan bir takımyıldız kurma izni verdi.",
+   "category": "industry",
+   "tags": [],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null,
+   "imageUrl": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/05/gettyimages-2269580650.jpg?quality=90&strip=all&crop=0,0,100,100",
+   "article": {
+    "intro": "ABD Federal İletişim Komisyonu (FCC), Elon Musk'ın şirketi SpaceX'in \"Starmind\" girişimi kapsamında en fazla 1 milyon yapay zekâ çipi taşıyan uydu yerleştirmesine izin verdi. Google ve Blue Origin gibi şirketler de uzayda yapay zekâ veri merkezleri kurma fikri üzerinde çalışıyor; ancak FCC'nin tam bir yapay zekâ uydu takımyıldızı için verdiği ilk onay bu.",
+    "primer": [
+     {
+      "term": "Takımyıldız (constellation)",
+      "explanation": "Birlikte çalışan çok sayıda uydudan oluşan ağ. Starlink gibi internet hizmetleri bu yapıyla çalışır."
+     },
+     {
+      "term": "Mezarlık yörüngesi",
+      "explanation": "Görevini tamamlamış uyduların atmosfere girip yanmak yerine, aktif yörüngelerden uzaklaştırılıp bırakıldığı yüksek yörünge bölgesi."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Ne oldu?",
+      "body": "FCC'nin açıklamasına göre kurum, SpaceX'in Starmind girişimi kapsamında en fazla 1 milyon uydu yerleştirmesine izin verdi. Onay, şirketin 2033 yılına kadar en az bir uydu yerleştirmesini ve 2040 yılına kadar 1 milyon uydu hedefine ulaşmasını şart koşuyor.\n\nFCC ayrıca SpaceX'in 600 kilometrenin üzerindeki uydularını atmosferde yakmak yerine \"mezarlık yörüngelerine\" göndermek yönündeki talebini ertelediği. Kurum, şirketin bu işlemin nasıl yapılacağına dair yeterli bilgi sunmadığını belirtti."
+     },
+     {
+      "heading": "Bu neden önemli?",
+      "body": "SpaceX, Starmind ile uzaydaki güneş enerjisini yapay zekâ işlemleri için kullanmayı ve elde edilen verileri yüksek hızlı lazerlerle Starlink ağı üzerinden Dünya'ya aktarmayı planlıyor. Şirket ayrıca uyduların çiplerini, ileride açılacak bir Terafab tesisinde üretmeyi hedefliyor.\n\nGoogle de geçen ay \"Project Suncatcher\" adlı bir yapay zekâ sunucu uydusunu fırlattı. Jeff Bezos'un Blue Origin şirketi ise Project Suncatcher için ilk özel ağır yük fırlatmasını 2029 yılında gerçekleştirecek."
+     }
+    ]
+   },
+   "topics": [
+    "SpaceX",
+    "Uzay veri merkezleri",
+    "Starlink",
+    "Düzenleme"
+   ],
+   "importance": 4,
+   "readingMinutes": 1,
+   "writer": "ai",
+   "writerVersion": 1,
+   "hidden": false
+  },
+  {
+   "id": "c13b598bb2c14c80b0f7e037",
+   "url": "https://www.reddit.com/r/singularity/comments/1y59ef1/rumor_that_openai_or_anthropic_found_a_way_to",
+   "sourceId": "hacker-news",
+   "sourceName": "Hacker News",
+   "sourceKind": "community",
+   "publishedAt": "2026-11-25T15:08:44.000Z",
+   "firstSeenAt": "2026-11-25T17:52:20.283Z",
+   "titleOriginal": "Rumors swirling that labs might have cracked Factoring in P",
    "excerptOriginal": "",
-   "titleTr": null,
-   "summaryTr": null,
+   "titleTr": "Laboratuvarların P üzerinde çarpanlara ayırmayı çözdüğüne dair söylentiler dolaşıyor",
+   "summaryTr": "Hacker News topluluğunda, bazı laboratuvarların P sayısı üzerinde çarpanlara ayırma sorununu çözdüğüne dair söylentiler konuşuluyor. Henüz doğrulanmış bir kaynak bulunmuyor.",
+   "category": "science",
+   "tags": [],
+   "translated": true,
+   "points": 211,
+   "comments": 151,
+   "discussionUrl": "https://news.ycombinator.com/item?id=50643065",
+   "imageUrl": null,
+   "article": {
+    "intro": "Geliştirici topluluğu Hacker News'te, bazı laboratuvarların P üzerinde çarpanlara ayırma (factoring) problemini çözmüş olabileceğine dair söylentiler dolaşıyor. Konu 211 puan ve 151 yorum topladı. Ancak haberin kaynak metnine ulaşılamadığı için iddianın ayrıntıları ve kimin söylediği netleşmiş değil.",
+    "primer": [
+     {
+      "term": "Çarpanlara ayırma (factoring)",
+      "explanation": "Bir tam sayıyı, asal sayıların çarpımı olarak yazma işlemidir. Büyük sayılarda bu işlemin çok zor olması, birçok modern şifreleme yönteminin temelini oluşturur."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Ne oldu?",
+      "body": "Hacker News'te paylaşılan bağlantıya göre, bazı laboratuvarların P üzerinde çarpanlara ayırma konusunda bir ilerleme kaydettiği yönünde söylentiler yayılıyor. Haberin orijinal metnine ulaşılamadığı için bu iddianın kaynağı, kapsamı ve doğruluk derecesi hakkında kesin bir bilgi verilemiyor."
+     },
+     {
+      "heading": "Bu neden önemli?",
+      "body": "Büyük sayıları çarpanlarına ayırmanın hızlanması, bugünkü açık anahtarlı şifreleme sistemlerinin güvenliğini doğrudan etkileyebilir. Bu nedenle konu, güvenlik ve bilim çevrelerinde yakından takip ediliyor. Yine de söylentilerin doğrulanmadığını ve ayrıntılarının belirsiz olduğunu unutmamak gerekir."
+     }
+    ]
+   },
+   "topics": [
+    "Çarpanlara ayırma",
+    "Şifreleme",
+    "Kuantum hesaplama"
+   ],
+   "importance": 2,
+   "readingMinutes": 1,
+   "writer": "ai",
+   "writerVersion": 1,
+   "hidden": false
+  },
+  {
+   "id": "ee4762604c18fbb31becafdb",
+   "url": "https://stackoverflow.blog/2026/11/25/when-ai-writes-the-code-what-counts-as-evidence",
+   "sourceId": "stackoverflow-blog",
+   "sourceName": "Stack Overflow Blog",
+   "sourceKind": "official",
+   "publishedAt": "2026-11-25T15:59:41.000Z",
+   "firstSeenAt": "2026-11-25T18:03:34.764Z",
+   "titleOriginal": "When AI Writes the Code, What Counts as Evidence?",
+   "excerptOriginal": "",
+   "titleTr": "Yapay zekâ kod yazarken hata ayıklama bilgisi nasıl korunmalı?",
+   "summaryTr": "Kodlama ajanları hataları kendi başlarına çözüp çalışma geçmişini bırakmadan ilerlediğinde, ekiplerin ortak teknik bilgi birikimi zayıflayabilir.",
    "category": "ai",
    "tags": [],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null,
+   "imageUrl": null,
+   "article": {
+    "intro": "Yazılımcılar hata ayıklarken edindikleri bilgiyi genellikle kod incelemeleri, sorular ve notlar aracılığıyla ekipte paylaşır. Stack Overflow Blog'da yayımlanan bir yazıda, kodlama ajanlarının bu süreci özel oturumlarda yürütmesinin ekiplerin kaybına yol açabileceği tartışılıyor. Yazara göre sorun yalnızca tek bir yapay zekâ kodunun testleri geçip geçmediği değil, hataların ve çözüm yollarının kayıt altında tutulmamasıdır.",
+    "primer": [
+     {
+      "term": "Kodlama ajanı",
+      "explanation": "Geliştiricinin verdiği bir görevi büyük ölçüde kendi başına inceleyip değiştirerek tamamlayabilen yapay zekâ sistemi."
+     },
+     {
+      "term": "Erişim denetimi",
+      "explanation": "Bir kullanıcının hangi verilere ya da işlemlere erişebileceğini belirleyen güvenlik kuralları."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Ne oldu?",
+      "body": "Yazar, kıdemli bir mühendisin ona öğrettiği bir hata ayıklama yöntemini hatırlatarak başlıyor. Yazara göre bu tür bilgiler ekiplerde konuşmalar, kod incelemeleri ve geçmiş sorunların notları yoluyla korunur. Kodlama ajanları araştırmayı giderek daha fazla üstlendikçe, yazar sonucu, yani yamayı alıp öğrenmeyi kaybetme riskinden endişe ediyor. Ajan bir hatayla karşılaşıp çözümler denedikten sonra yalnızca değişen dosyaları ve özet bir raporu geliştiriciye bırakabiliyor; araştırmanın kendisi çoğu zaman kayboluyor.\n\nStack Overflow'un 2026 Geliştirici Anketi'nde katılımcıların %64,1'i basit sorular için siteyi daha az ziyaret ettiğini, %28,9'u ise daha az soru sorduğunu belirtti. Yazar bunların kendi bildirdikleri davranış değişiklikleri olduğunu ve yapay zekâ ajanlarının bilgi kaybına yol açtığının kanıtı olmadığını vurguluyor."
+     },
+     {
+      "heading": "Bu neden önemli?",
+      "body": "Yazılım mühendisliği, başarısızlıkların ortak hafızasına dayanır: neyin yanlış gittiği, hangi teşhislerin yanıltıcı olduğu, neyin işe yaradığı ve farkı yaratan koşulların ne olduğu. Yazara göre bu bilgiler aranabilir biçimde kaydedilmezse, ekipler daha fazla kod üretirken bir sonraki mühendis için daha az faydalı bilgiye sahip olabilir.\n\nYazar, bir örnek olarak genel bir depodaki bir çekme isteğini anlatıyor. Bu örnekte yetkilendirme testi, sipariş kimliği olmayan ve başka bir müşteriye ait siparişler arasındaki farkı ortaya çıkardı; ajan her iki durumda da aynı erişim reddi hatasını döndürecek biçimde değişiklik yaptı. Yazara göre son başarı raporu bu öğretici ayrıntıyı gizleyebilirdi."
+     },
+     {
+      "heading": "Yazarın önerdiği yaklaşım",
+      "body": "Yazar, kodlama ajanlarının oturumlarından alınan hata bilgilerine dayanan bir ürün tasarımı üzerinde çalıştığını belirtiyor. Bu tasarımda tekrar eden hatalar yetkili bilgi kaynaklarında aranacak, uygun eşleşmeler kaynak gösterilerek sunulacak; uygun eşleşme yoksa soru taslağı hazırlanacak. Yazar, benzerliğin tek başına bir sorunun çözüldüğü anlamına gelmediğini, eski ya da başka sürüme ait çözümlerin de dikkatle ayırt edilmesi gerektiğini vurguluyor.\n\nYazara göre sorular hazırlanırken gizli bilgiler, hassas kaynak kodu ve müşteri verileri çıkarılmalı, ne bilindiği ve ne bilinmediği açıkça belirtilmelidir. Doğrulanmış çözümler ise ilerideki benzer hatalarla ilişkilendirilebilir. Yazar ayrıca gözlemlenebilirliğin, bir ajanın önerdiği ile gerçekte çalıştırdığı komutları ayırt etmeye yardımcı olduğunu belirtiyor."
+     }
+    ]
+   },
+   "topics": [
+    "Kodlama ajanları",
+    "Hata ayıklama",
+    "Geliştirici bilgisi",
+    "Stack Overflow"
+   ],
+   "importance": 3,
+   "readingMinutes": 2,
+   "writer": "ai",
+   "writerVersion": 1,
+   "hidden": false
+  },
+  {
+   "id": "bbd93c6708a5734971e35989",
+   "url": "https://github.blog/ai-and-ml/github-copilot/how-to-choose-the-next-safe-step-in-application-modernization",
+   "sourceId": "github-blog",
+   "sourceName": "GitHub Blog",
+   "sourceKind": "official",
+   "publishedAt": "2026-11-25T18:00:00.000Z",
+   "firstSeenAt": "2026-11-25T18:03:34.764Z",
+   "titleOriginal": "How to choose the next safe step in application modernization",
+   "excerptOriginal": "Learn how to assess a legacy application, choose a bounded modernization step, and reuse the method with a GitHub Copilot agent skill.",
+   "titleTr": "Eski uygulamaları güvenli adımlarla modernize etmek için kanıta dayalı bir yöntem",
+   "summaryTr": "GitHub, eski bir uygulamanın hangi kısmının çalıştığını kanıtlayarak modernizasyonun en az riskli adımını seçmenin yöntemini anlatıyor.",
+   "category": "dev",
+   "tags": [],
+   "translated": true,
+   "points": null,
+   "comments": null,
+   "discussionUrl": null,
+   "imageUrl": "https://github.blog/wp-content/uploads/2026/11/38b3dc4817bfb01261d608e093dda2cdf3392f0886a14b95208bc6f1cd49e58d-1920x1080-1.png?fit=1920%2C1080",
+   "article": null,
+   "topics": [],
+   "importance": null,
+   "readingMinutes": null,
+   "writer": "mt",
+   "writerVersion": 1,
+   "hidden": false
+  },
+  {
+   "id": "3c4e73d43c4012fdc394e0dd",
+   "url": "https://www.theverge.com/column/1041761/optimizer-peptide-parties-afterglow",
+   "sourceId": "the-verge",
+   "sourceName": "The Verge",
+   "sourceKind": "news",
+   "publishedAt": "2026-11-25T18:00:00.000Z",
+   "firstSeenAt": "2026-11-25T18:03:34.764Z",
+   "titleOriginal": "The loneliest peptide party in New York",
+   "excerptOriginal": "This is Optimizer, a weekly newsletter sent from Verge senior reviewer Victoria Song that dissects and discusses the latest gizmos and potions that swear they're going to change your life. Opt in for Optimizer here. On a rainy fall evening, an experimental art venue in Chelsea Market had a small line out the door. There",
+   "titleTr": null,
+   "summaryTr": null,
+   "category": "industry",
+   "tags": [],
    "translated": false,
    "points": null,
    "comments": null,
-   "discussionUrl": null
+   "discussionUrl": null,
+   "imageUrl": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/10/268815_Peptide_Party_JCalifano_0019.jpg?quality=90&strip=all&crop=0,0,100,100",
+   "article": null,
+   "topics": [],
+   "importance": null,
+   "readingMinutes": null,
+   "writer": "ai",
+   "writerVersion": 1,
+   "hidden": true
   }
  ]
 }

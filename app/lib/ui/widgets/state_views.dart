@@ -3,25 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/config.dart';
 import '../../core/formatting.dart';
+import '../../core/theme.dart';
 import '../../data/data_source.dart';
 import '../../data/models.dart';
 import '../../data/repository.dart';
+import 'common.dart';
 
-/// İçerik yüklenirken gösterilen iskelet kartlar.
-class LoadingList extends StatefulWidget {
-  const LoadingList({super.key, this.count = 6});
+/// Yanıp sönen iskelet kutuları: içerik yüklenirken boş ekran yerine sayfanın düzeni gösterilir.
+class Skeleton extends StatefulWidget {
+  const Skeleton({super.key, required this.child});
 
-  final int count;
+  final Widget child;
 
   @override
-  State<LoadingList> createState() => _LoadingListState();
+  State<Skeleton> createState() => _SkeletonState();
 }
 
-class _LoadingListState extends State<LoadingList> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 900),
-  )..repeat(reverse: true);
+class _SkeletonState extends State<Skeleton> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))
+    ..repeat(reverse: true);
 
   @override
   void dispose() {
@@ -31,122 +31,115 @@ class _LoadingListState extends State<LoadingList> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.surfaceContainerHighest;
-    Widget bar(double widthFactor, double height) => FractionallySizedBox(
-          widthFactor: widthFactor,
-          alignment: Alignment.centerLeft,
-          child: Container(
-            height: height,
-            decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(6)),
-          ),
-        );
     return Semantics(
       label: 'Yükleniyor',
-      child: FadeTransition(
-        opacity: Tween<double>(begin: 0.45, end: 1).animate(_controller),
-        child: ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: widget.count,
-          itemBuilder: (context, index) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: color),
-              ),
+      child: FadeTransition(opacity: Tween<double>(begin: 0.45, end: 1).animate(_controller), child: widget.child),
+    );
+  }
+}
+
+class SkeletonBox extends StatelessWidget {
+  const SkeletonBox({super.key, this.width, required this.height, this.radius = 8});
+
+  final double? width;
+  final double height;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(color: context.tp.skeleton, borderRadius: BorderRadius.circular(radius)),
+      );
+}
+
+/// Ana sayfanın iskeleti: büyük kart ve liste kartları.
+class FeedSkeleton extends StatelessWidget {
+  const FeedSkeleton({super.key, this.featured = true});
+
+  final bool featured;
+
+  @override
+  Widget build(BuildContext context) {
+    return Skeleton(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (featured)
+            const Padding(
+              padding: EdgeInsets.fromLTRB(Tp.page, 8, Tp.page, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  bar(0.35, 12),
-                  const SizedBox(height: 14),
-                  bar(0.95, 16),
-                  const SizedBox(height: 8),
-                  bar(0.7, 16),
-                  const SizedBox(height: 14),
-                  bar(0.9, 11),
-                  const SizedBox(height: 6),
-                  bar(0.6, 11),
+                  SkeletonBox(height: 200, radius: Tp.radius),
+                  SizedBox(height: 16),
+                  SkeletonBox(width: 120, height: 12),
+                  SizedBox(height: 12),
+                  SkeletonBox(height: 20),
+                  SizedBox(height: 8),
+                  SkeletonBox(width: 240, height: 20),
                 ],
               ),
             ),
-          ),
-        ),
+          for (var i = 0; i < 4; i++)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: Tp.page, vertical: 10),
+              child: Row(
+                children: [
+                  SkeletonBox(width: 96, height: 96, radius: Tp.radiusSmall),
+                  SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SkeletonBox(width: 90, height: 10),
+                        SizedBox(height: 10),
+                        SkeletonBox(height: 15),
+                        SizedBox(height: 6),
+                        SkeletonBox(width: 160, height: 15),
+                        SizedBox(height: 12),
+                        SkeletonBox(width: 120, height: 10),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }
 }
 
-/// Ortada ikon, başlık, açıklama ve isteğe bağlı bir düğme.
-class MessageView extends StatelessWidget {
-  const MessageView({
-    super.key,
-    required this.icon,
-    required this.title,
-    this.message,
-    this.actionLabel,
-    this.onAction,
-  });
+/// Veri akışının hata durumu: çevrimdışıysa anlaşılır bir mesaj ve "Tekrar dene".
+class FeedError extends StatelessWidget {
+  const FeedError({super.key, required this.error, required this.onRetry});
 
-  final IconData icon;
-  final String title;
-  final String? message;
-  final String? actionLabel;
-  final VoidCallback? onAction;
+  final Object error;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.secondaryContainer,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 32, color: theme.colorScheme.onSecondaryContainer),
-            ),
-            const SizedBox(height: 18),
-            Text(title, textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
-            if (message != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                message!,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-              ),
-            ],
-            if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: 20),
-              FilledButton.tonalIcon(
-                onPressed: onAction,
-                icon: const Icon(Icons.refresh),
-                label: Text(actionLabel!),
-              ),
-            ],
-          ],
-        ),
-      ),
+    final appError = AppException.from(error);
+    return EmptyState(
+      icon: appError.offline ? Icons.wifi_off_rounded : Icons.error_outline_rounded,
+      title: appError.offline ? 'İlk kullanım için internet gerekiyor' : 'Veriler alınamadı',
+      message: appError.offline
+          ? 'Haberler bir kez indirildikten sonra internet olmadan da okunabilir.'
+          : '${appError.message} Biraz sonra yeniden deneyin.',
+      actionLabel: 'Tekrar dene',
+      onAction: onRetry,
     );
   }
 }
 
 /// Önbellekten/ağdan gelen veri akışını yükleniyor, hata ve veri durumlarına göre çizer.
 class FeedView<T> extends StatelessWidget {
-  const FeedView({
-    super.key,
-    required this.value,
-    required this.onRetry,
-    required this.builder,
-  });
+  const FeedView({super.key, required this.value, required this.onRetry, required this.builder, this.loading});
 
   final AsyncValue<Snapshot<Feed<T>>> value;
   final VoidCallback onRetry;
+  final Widget? loading;
   final Widget Function(BuildContext context, Snapshot<Feed<T>> snapshot) builder;
 
   @override
@@ -154,19 +147,8 @@ class FeedView<T> extends StatelessWidget {
     return value.when(
       skipLoadingOnRefresh: true,
       skipLoadingOnReload: true,
-      loading: () => const LoadingList(),
-      error: (error, _) {
-        final appError = AppException.from(error);
-        return MessageView(
-          icon: appError.offline ? Icons.wifi_off_rounded : Icons.error_outline,
-          title: appError.offline ? 'İlk kullanım için internet gerekiyor' : 'Veriler alınamadı',
-          message: appError.offline
-              ? 'Haberler bir kez indirildikten sonra internetsiz de okunabilir.'
-              : appError.message,
-          actionLabel: 'Tekrar dene',
-          onAction: onRetry,
-        );
-      },
+      loading: () => loading ?? const SingleChildScrollView(physics: NeverScrollableScrollPhysics(), child: FeedSkeleton()),
+      error: (error, _) => FeedError(error: error, onRetry: onRetry),
       data: (snapshot) => builder(context, snapshot),
     );
   }
@@ -181,63 +163,34 @@ class StatusBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final tp = context.tp;
     final error = snapshot.error;
     final stale = generatedAt != null && DateTime.now().difference(generatedAt!) > AppConfig.staleAfter;
     if (error == null && !stale) return const SizedBox.shrink();
 
     final (IconData icon, String text) = error != null
         ? (
-            error.offline ? Icons.cloud_off_outlined : Icons.sync_problem,
+            error.offline ? Icons.cloud_off_outlined : Icons.sync_problem_rounded,
             error.offline
                 ? 'Çevrimdışısınız. ${snapshot.savedAt == null ? 'Kayıtlı' : '${Fmt.relative(snapshot.savedAt!)} kaydedilen'} veriler gösteriliyor.'
                 : 'Yenilenemedi: ${error.message}',
           )
-        : (Icons.schedule, 'Kaynak verisi ${Fmt.relative(generatedAt!)} güncellendi; yeni veri bekleniyor.');
+        : (Icons.schedule_rounded, 'Haberler ${Fmt.relative(generatedAt!)} güncellendi; yeni veriler bekleniyor.');
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      margin: const EdgeInsets.fromLTRB(Tp.page, 8, Tp.page, 4),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: scheme.tertiaryContainer,
-        borderRadius: BorderRadius.circular(16),
+        color: tp.warning.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(Tp.radiusSmall),
+        border: Border.all(color: tp.warning.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: scheme.onTertiaryContainer),
+          Icon(icon, size: 20, color: tp.warning),
           const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              text,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: scheme.onTertiaryContainer,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-          ),
+          Expanded(child: Text(text, style: context.text.bodySmall?.copyWith(color: tp.textPrimary, fontWeight: FontWeight.w500))),
         ],
-      ),
-    );
-  }
-}
-
-/// "Güncellendi 14:05 · 312 kayıt" satırı.
-class UpdatedLine extends StatelessWidget {
-  const UpdatedLine({super.key, required this.generatedAt, required this.count, required this.noun});
-
-  final DateTime? generatedAt;
-  final int count;
-  final String noun;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final when = generatedAt == null ? '' : 'Güncellendi ${Fmt.relative(generatedAt!)} · ';
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 6, 20, 4),
-      child: Text(
-        '$when$count $noun',
-        style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
       ),
     );
   }

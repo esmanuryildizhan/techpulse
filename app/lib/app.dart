@@ -5,17 +5,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/config.dart';
 import 'core/theme.dart';
 import 'state/providers.dart';
-import 'ui/home_shell.dart';
+import 'ui/onboarding/onboarding_screen.dart';
+import 'ui/shell.dart';
 
 class TechPulseApp extends ConsumerWidget {
   const TechPulseApp({super.key, this.home});
 
-  /// Testlerde belirli bir ekranla başlatmak için.
+  /// Testlerde belirli bir ekranı doğrudan açmak için.
   final Widget? home;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(settingsProvider.select((s) => s.themeMode));
+    final onboarded = ref.watch(profileProvider.select((p) => p.onboarded));
     return MaterialApp(
       title: AppConfig.appName,
       debugShowCheckedModeBanner: false,
@@ -23,13 +25,13 @@ class TechPulseApp extends ConsumerWidget {
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,
       locale: const Locale('tr', 'TR'),
-      supportedLocales: const [Locale('tr', 'TR'), Locale('en', 'US')],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      home: home ?? const HomeShell(),
+      supportedLocales: const [Locale('tr', 'TR')],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      home: home ??
+          AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+            child: onboarded ? const AppShell(key: ValueKey('shell')) : const OnboardingScreen(key: ValueKey('onboarding')),
+          ),
     );
   }
 }

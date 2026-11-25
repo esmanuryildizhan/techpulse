@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Android emülatöründe yayın APK'sını kurar, açar, sekmeleri gezer, ekran görüntüsü alır
+# Android emülatöründe yayın APK'sını kurar, ilk açılış ekranını geçer, sekmeleri ve haber ayrıntısını gezer,
+# ekran görüntüsü alır
 # ve uygulama çöktü mü diye sistem kayıtlarını (logcat) kontrol eder.
 # Kullanım: bash tools/emulator_smoke.sh TechPulse.apk cikti-klasoru
 set -euo pipefail
@@ -23,27 +24,62 @@ tap() { adb shell input tap "$1" "$2"; }
 
 read -r W H < <(adb shell wm size | tr -d '\r' | awk -F'[ x]' '/Physical/ {print $3, $4}')
 echo "ekran: ${W}x${H}"
-NAV_Y=$((H * 2210 / 2400))
+NAV_Y=$((H * 2222 / 2400))
 col() { echo $((W * (2 * $1 + 1) / 8)); }
 
-adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 > /dev/null
-shot 01_gundem 15
+# Ekrandaki yazıyı erişilebilirlik ağacında (uiautomator) bulup ortasına dokunur; bulamazsa verilen koordinata dokunur.
+tap_text() {
+  local text="$1" fx="$2" fy="$3" bounds=""
+  if adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1; then
+    bounds=$(adb shell cat /sdcard/ui.xml | tr -d '\r' | grep -o "<node [^>]*=\"[^\"]*${text}[^\"]*\"[^>]*>" | head -1 \
+      | grep -o 'bounds="\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]"' | head -1 || true)
+  fi
+  if [ -n "$bounds" ]; then
+    read -r x1 y1 x2 y2 < <(echo "$bounds" | grep -o '[0-9]\+' | tr '\n' ' ')
+    tap $(((x1 + x2) / 2)) $(((y1 + y2) / 2))
+    echo "dokunuldu: $text"
+  else
+    tap "$fx" "$fy"
+    echo "yedek koordinata dokunuldu: $text"
+  fi
+}
+swipe_up() { adb shell input swipe $((W / 2)) $((H * 75 / 100)) $((W / 2)) $((H * 30 / 100)) 450; }
 
-tap $((W / 2)) $((H * 650 / 2400))
-shot 02_haber_detayi 4
+adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 > /dev/null
+shot 01_karsilama 15
+
+tap_text "Tüm konularla başla" $((W / 2)) $((H * 2235 / 2400))
+shot 02_ana_sayfa 14
+swipe_up
+shot 03_ana_sayfa_devami 4
+swipe_up
+shot 04_son_gelismeler 4
+adb shell input swipe $((W / 2)) $((H * 25 / 100)) $((W / 2)) $((H * 90 / 100)) 300
+adb shell input swipe $((W / 2)) $((H * 25 / 100)) $((W / 2)) $((H * 90 / 100)) 300
+sleep 2
+
+tap $((W / 2)) $((H * 800 / 2400))
+shot 05_haber_detayi 5
+swipe_up
+shot 06_haber_detayi_devami 3
+swipe_up
+shot 07_haber_detayi_kaynak 3
 adb shell input keyevent 4
 sleep 2
 
-tap "$(col 1)" "$NAV_Y"
-shot 03_yz_radari 8
+tap_text "Keşfet" "$(col 1)" "$NAV_Y"
+shot 08_kesfet 6
+swipe_up
+shot 09_kesfet_devami 4
 
-tap "$(col 2)" "$NAV_Y"
-shot 04_guvenlik 8
+tap_text "Kaydedilenler" "$(col 2)" "$NAV_Y"
+shot 10_kaydedilenler 4
 
-tap "$(col 0)" "$NAV_Y"
+tap_text "Profil" "$(col 3)" "$NAV_Y"
+shot 11_profil 4
+
+tap_text "Ana Sayfa" "$(col 0)" "$NAV_Y"
 sleep 2
-tap "$(col 3)" "$NAV_Y"
-shot 05_kaydedilenler 4
 
 adb logcat -d > "$OUT/logcat.txt"
 if grep -q "FATAL EXCEPTION" "$OUT/logcat.txt"; then

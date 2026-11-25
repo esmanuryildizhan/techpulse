@@ -1,50 +1,361 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-11-25T09:00:00Z",
+ "generatedAt": "2026-11-25T18:03:34.764Z",
  "items": [
   {
-   "id": "2611.01234",
-   "url": "https://huggingface.co/papers/2611.01234",
-   "arxivUrl": "https://arxiv.org/abs/2611.01234",
-   "titleOriginal": "SegAnything-3D: Promptable 3D Segmentation",
-   "abstractOriginal": "We present SegAnything-3D, a model for promptable segmentation of point clouds.",
-   "titleTr": "SegAnything-3D: Komutla yönlendirilebilen 3B bölütleme",
-   "summaryTr": "Çalışma, nokta bulutlarında komutla nesne bölütleme yapan bir model öneriyor. Yöntem 2B bölütleme modellerinin bilgisini 3B'ye aktarıyor ve ScanNet üzerinde en iyi sonuçları bildiriyor.",
-   "upvotes": 154,
-   "comments": 7,
-   "publishedAt": "2026-11-25T09:00:00Z",
+   "id": "2611.32884",
+   "url": "https://huggingface.co/papers/2611.32884",
+   "arxivUrl": "https://arxiv.org/abs/2611.32884",
+   "titleOriginal": "Lazy Agents Answer Against Their Own Beliefs: Reinforcement Learning with Verifiable Beliefs Teaches Them to Act on What They Believe",
+   "abstractOriginal": "AI agents working on long tasks often commit to an answer before they have enough evidence, a behavior called laziness. In our evaluations, they frequently commit even while their stated belief still names several possible answers. An outcome reward at the end of the episode scores only the final answer, so it cannot teach the agent when to commit, because a lucky guess receives the same reward as an answer backed by evidence. During training, however, the simulator can compute the exact posterior over the answer at every step and tell whether the evidence is already enough. We propose Reinforcement Learning with Verifiable Beliefs (RLVB), which rewards the agent for taking further steps while this posterior still allows several answers and for committing once the evidence is sufficient. The reward needs no judge, critic or reward model, and it never reads the belief line the agent writes before each action. We also introduce Pro Worlds, a benchmark of visual puzzles where the agent views a large world through a small window. We evaluate three vision-language models on three benchmarks, two of which are never seen in training. RLVB improves the base model in all nine settings, by 17.1% on average. Under the outcome reward, GRPO and PPO fall below the base model on average. RLVB also outperforms PPO with a process reward from an LLM judge by 9.3% on average while using 1.6 times fewer GPU-hours. The trained agent answers with sufficient evidence in 51%, 12% and 74% of the…",
+   "titleTr": "Tembel Ajanlar: Kendi İnançlarına Aykırı Yanıt Veriyor; RLVB ile İnançlarına Göre Hareket Etmeyi Öğreniyorlar",
+   "summaryTr": "Uzun görevlerde çalışan yapay zekâ ajanları yeterli kanıt toplamadan yanıt veriyor. Makale, bu davranışı ödül sinyaliyle düzelten Reinforcement Learning with Verifiable Beliefs (RLVB) yöntemini tanıtıyor.",
+   "upvotes": 86,
+   "comments": 5,
+   "publishedAt": "2026-11-23T19:00:00.000Z",
    "authors": [
-    "Ada Lovelace",
-    "Alan Turing",
-    "Grace Hopper"
+    "Richmond Sin Jing Xuan",
+    "Peilin Feng",
+    "Wenbin Wang",
+    "Soujanya Poria"
    ],
-   "githubUrl": "https://github.com/example/seg3d",
+   "githubUrl": "https://github.com/declare-lab/RLVB",
    "tags": [
-    "3B bölütleme",
-    "Nokta bulutu"
+    "Reinforcement Learning with Verifiable Beliefs (RLVB)",
+    "outcome reward",
+    "process reward",
+    "reward model"
    ],
-   "translated": true
+   "translated": true,
+   "imageUrl": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2611.32884.png",
+   "article": {
+    "intro": "Yapay zekâ ajanları uzun görevlerde çoğu zaman yeterli kanıt toplamadan bir yanıta bağlanıyor; makaleye göre bu davranış \"tembellik\" olarak adlandırılıyor. Yazarlara göre sorun, görev sonunda yalnızca nihai yanıta ödül veren geleneksel eğitimde ajanın ne zaman yanıt vermesi gerektiğini öğrenememesi. Makalenin ana fikri, eğitim sırasında simülatörün her adımda yanıtın olasılık dağılımını hesaplayabildiği için bu bilgiyle ajanı doğru zamanda karar vermeye yönlendirmek.",
+    "primer": [
+     {
+      "term": "Pekiştirmeli öğrenme",
+      "explanation": "Bir ajanın denemeler yaparak ödül ve ceza sinyallerinden davranışını geliştirdiği eğitim yöntemi."
+     },
+     {
+      "term": "Sonuç ödülü",
+      "explanation": "Yalnızca görevin sonunda verilen ve yalnızca nihai yanıtın doğruluğuna bakan ödül türü."
+     },
+     {
+      "term": "Vizyon-dil modeli",
+      "explanation": "Hem görüntüyü hem de metni işleyebilen, görsel sorular üzerinde çalışan yapay zekâ modeli."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Makale ne yapıyor?",
+      "body": "Makale, yapay zekâ ajanlarının yeterli kanıt olmadan yanıt verme eğiliminin, ödül yapısından kaynaklandığını öne sürüyor. Çünkü görev sonunda yalnızca yanıtın doğruluğuna bakan bir ödül, şans eseri doğru tahmin edilen bir yanıtla kanıta dayanan bir yanıtı ayırt etmiyor.\n\nBu sorunu çözmek için yazarlar Reinforcement Learning with Verifiable Beliefs (RLVB) yöntemini öneriyor. Yönteme göre ajan, olasılık dağılımı hâlâ birden fazla yanıta izin verdiği sürece yeni adımlar atmaya, kanıt yeterli olduğunda ise yanıt vermeye ödüllendiriliyor. Bu ödül için ayrı bir hakem modeli, eleştirmen ya da ödül modeli gerekmiyor."
+     },
+     {
+      "heading": "Nasıl çalışıyor?",
+      "body": "Eğitim sırasında simülatör, her adımda yanıt üzerindeki kesin olasılık dağılımını hesaplayabiliyor. Bu bilgi, ajanın ne kadar kanıta sahip olduğunu ölçmek için kullanılıyor. Yöntem, ajanın her eylemden önce yazdığı inanç satırını okumuyor; ödül yalnızca simülatörün hesapladığı dağılıma dayanıyor.\n\nYazarlar ayrıca Pro Worlds adında bir kıyaslama seti tanıtıyor. Bu görsel bulmacalarda ajan, büyük bir dünyayı küçük bir pencereden görüyor ve bilgi toplamak zorunda kalıyor."
+     },
+     {
+      "heading": "Sonuçlar",
+      "body": "Makalede üç vizyon-dil modeli, üç kıyaslama üzerinde değerlendirilmiş; bunlardan ikisi eğitimde hiç görülmemiş. RLVB, dokuz denemenin tamamında temel modelin performansını iyileştirmiş; ortalama artış %17,1 olarak bildiriliyor.\n\nAynı makaleye göre sonuç ödülü kullanıldığında GRPO ve PPO ortalamada temel modelin altında kalmış. RLVB, bir LLM hakeminden gelen süreç ödülü kullanan PPO'dan ortalama %9,3 daha iyi çıkmış ve bunu 1,6 kat daha az GPU saatiyle yapmış."
+     },
+     {
+      "heading": "Neden önemli?",
+      "body": "Makaleye göre eğitilmiş ajan, üç kıyaslamadan birinde kanıtın yeterli olduğu durumlarda yanıt verme oranını %51, ikincisinde %12, üçüncüsünde %74 olarak göstermiş. Bu sonuçlar, ajanların ne zaman karar vermesi gerektiğini öğretmenin, yalnızca doğru yanıtı ödüllendirmekten farklı bir yaklaşım gerektirdiğini gösteriyor."
+     }
+    ]
+   },
+   "topics": [
+    "Pekiştirmeli öğrenme",
+    "Yapay zekâ ajanları",
+    "Vizyon-dil modelleri",
+    "Ödül tasarımı"
+   ],
+   "readingMinutes": 2,
+   "writer": "ai",
+   "writerVersion": 1
   },
   {
-   "id": "2611.05678",
-   "url": "https://huggingface.co/papers/2611.05678",
-   "arxivUrl": "https://arxiv.org/abs/2611.05678",
-   "titleOriginal": "Efficient Reasoning with Sparse Attention",
-   "abstractOriginal": "Sparse attention reduces cost.",
-   "titleTr": "Seyrek dikkat ile verimli akıl yürütme",
-   "summaryTr": "Makale, uzun akıl yürütme zincirlerinde dikkat hesaplamasını seyrekleştirerek çıkarım maliyetini düşüren bir yöntem sunuyor.",
-   "upvotes": 88,
+   "id": "2611.32554",
+   "url": "https://huggingface.co/papers/2611.32554",
+   "arxivUrl": "https://arxiv.org/abs/2611.32554",
+   "titleOriginal": "PartAgent: Agentic 3D Part Segmentation via Expert Integration and Closed-Loop Refinement",
+   "abstractOriginal": "Segmenting a 3D object into semantically meaningful parts requires joint reasoning about geometric structure and semantic context. Pretrained 3D experts provide spatially grounded region proposals, while 2D experts provide semantic cues for identifying object parts. The challenge is to integrate these complementary capabilities into a framework that can both produce meaningful part segmentations and progressively refine them. We present PartAgent, a training-free agentic framework for 3D part segmentation built upon two complementary modules: (i) Structural-Semantic Expert Integration combines regions predicted by the 3D expert with multiview semantic evidence from the 2D expert through image-to-surface correspondences, constructing compositional part partitions at multiple granularities. (ii) Observation-Driven Closed-Loop Partition Refinement observes the current partition and its supporting evidence to select targeted inspection, evidence repair, composition, or reselection actions. It verifies proposed changes and uses the updated state and action outcomes to guide subsequent decisions. On PartObjaverse-Tiny-WT, PartAgent achieves 68.41 mIoU, outperforming the strongest competing method by 8.53 points. Across 3DCoMPaT200, PartNeXt, PartNetE, and PartObjaverse-Tiny, PartAgent achieves the highest mIoU on each dataset, averaging 69.36 across the four datasets, 7.28 points above the highest mean among competing methods.",
+   "titleTr": "PartAgent: 3D nesneleri anlamlı parçalara ayıran eğitimsiz bir yapay zekâ ajanı",
+   "summaryTr": "PartAgent, 3D bir nesneyi anlamlı parçalara ayırırken hem geometriyi hem de anlamsal bağlamı birlikte kullanan, yeniden eğitim gerektirmeyen bir çerçeve öneriyor.",
+   "upvotes": 32,
    "comments": 2,
-   "publishedAt": "2026-11-24T09:00:00Z",
+   "publishedAt": "2026-11-23T19:00:00.000Z",
    "authors": [
-    "Grace Hopper"
+    "Yang Cao",
+    "Zhe Zhu",
+    "Yiheng Zhang",
+    "Zhengqiang Zhang",
+    "Haoyuan Li",
+    "Le Wan"
    ],
-   "githubUrl": null,
+   "githubUrl": "https://github.com/yangcaoai/PartAgent_Agent_for_3D_Part_Seg",
    "tags": [
-    "LLM",
-    "Verimlilik"
+    "3D part segmentation",
+    "pretrained 3D experts",
+    "2D experts",
+    "region proposals"
    ],
-   "translated": true
+   "translated": true,
+   "imageUrl": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2611.32554.png",
+   "article": {
+    "intro": "3D bir nesneyi kapı, tekerlek ya da kulp gibi anlamlı parçalara ayırmak, hem şeklin yapısını hem de parçaların ne olduğunu bilmeyi gerektiriyor. PartAgent, bu iki bilgiyi bir araya getirip parçalama sonuçlarını adım adım iyileştiren bir yaklaşım sunuyor.",
+    "primer": [
+     {
+      "term": "3D parça bölütleme",
+      "explanation": "Bir üç boyutlu modeli, her yüzeyinin hangi anlamlı parçaya ait olduğunu belirleyerek ayrı bölgelere ayırma işi."
+     },
+     {
+      "term": "Uzman model",
+      "explanation": "Belirli bir görevde önceden eğitilmiş ve o alanda güçlü sonuç veren model. Burada hem 3D hem 2D uzman modeller kullanılıyor."
+     },
+     {
+      "term": "mIoU",
+      "explanation": "Tahmin edilen bölgelerin gerçek bölgelerle ne kadar örtüştüğünü ölçen, 0 ile 100 arasında değer alan bir başarı ölçütü. Yüksek olması daha iyi demek."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Makale ne yapıyor?",
+      "body": "Makalenin yazarları, 3D nesneleri parçalarına ayırmak için PartAgent adını verdikleri bir yapay zekâ ajanı geliştirdi. Bu sistem, yeni bir model eğitmeden mevcut uzman modelleri bir araya getiriyor. Amaç, hem geometrik olarak tutarlı hem de anlamsal olarak doğru parça bölümleri üretmek ve bu bölümleri sonradan iyileştirmek."
+     },
+     {
+      "heading": "Nasıl çalışıyor?",
+      "body": "Sistem iki ana bileşenden oluşuyor. Birincisi, 3D uzmanın önerdiği bölgeleri, 2D uzmanın farklı açılardan sağladığı anlamsal ipuçlarıyla eşleştiriyor. Bu eşleştirme, görüntülerdeki noktaları üç boyutlu yüzeydeki karşılıklarına bağlayarak yapılıyor. Böylece farklı ayrıntı düzeylerinde parça bölümleri oluşturuluyor.\n\nİkinci bileşen ise sonuçları sürekli gözlemleyip kapalı bir döngü içinde düzeltiyor. Sistem mevcut bölümlere bakarak hangi parçanın şüpheli olduğunu saptıyor ve buna göre kanıtları onarma, parçaları birleştirme ya da yeniden seçme gibi işlemler yapıyor. Önerilen değişiklikler doğrulandıktan sonra kabul ediliyor ve bir sonraki kararlar bu güncel durumdan yola çıkarak veriliyor."
+     },
+     {
+      "heading": "Sonuçlar",
+      "body": "Yazarlara göre PartAgent, PartObjaverse-Tiny-WT veri kümesinde %68,41 mIoU değerine ulaşarak en güçlü rakip yönteme göre 8,53 puan daha iyi sonuç verdi. Ayrıca 3DCoMPaT200, PartNeXt, PartNetE ve PartObjaverse-Tiny veri kümelerinin dördünde de en yüksek mIoU değerini elde etti. Bu dört veri kümesindeki ortalama %69,36 olarak bildirildi ve rakiplerin en yüksek ortalamasının 7,28 puan üzerinde kaldı."
+     },
+     {
+      "heading": "Neden önemli?",
+      "body": "Üç boyutlu içeriklerin giderek arttığı oyun, tasarım ve robotik gibi alanlarda nesnelerin parçalarını doğru tanımak önemli bir ihtiyaç. Eğitim gerektirmeyen bir yaklaşımın bu kadar yüksek sonuç vermesi, mevcut uzman modellerin birlikte nasıl daha güçlü kullanılabileceğini gösteriyor. Kodun açık kaynak olarak GitHub'da paylaşılmış olması da yöntemin incelenmesini ve geliştirilmesini kolaylaştırıyor."
+     }
+    ]
+   },
+   "topics": [
+    "3D parça bölütleme",
+    "Yapay zekâ ajanları",
+    "Çok görünümlü görüntü analizi",
+    "Eğitimsiz öğrenme"
+   ],
+   "readingMinutes": 2,
+   "writer": "ai",
+   "writerVersion": 1
+  },
+  {
+   "id": "2611.33010",
+   "url": "https://huggingface.co/papers/2611.33010",
+   "arxivUrl": "https://arxiv.org/abs/2611.33010",
+   "titleOriginal": "Embodied AI Fails the Mirror Test: How a Simple Mirror Breaks Robot Policies",
+   "abstractOriginal": "Can a simple mirror expose the limitations of today's robotic manipulation policies? Inspired by the mirror self-recognition test in animal cognition, we investigate whether robot policies can reliably manipulate physical objects in scenes containing their reflections. We introduce RoboDojo-Mirror, a benchmark built on RoboDojo that preserves task objectives, success criteria, and policy checkpoints while comparing a mirror-free baseline with single-mirror, dual-mirror, and mirrored-tabletop conditions. Across five policies spanning Vision-Language-Action models, World Action Models, and agentic policies, every mirror condition reduces aggregate success rates: averaged over the three conditions, the drop ranges from 10.8 to 56.7 percentage points across policies, and it reaches 62.5 points on the mirrored tabletop. Because a mirror is also a physical obstacle, we compare it against geometrically matched non-reflective panels; 50--88\\% of mirror-specific failures occur without recorded robot--panel contact, so direct collisions alone do not explain the degradation. Trajectory and contact analyses instead reveal recurring behaviors consistent with phantom targeting of reflected objects and spatial mislocalization of real ones. Targeted diagnostics further characterize grasping near reflections, policy-dependent pushing progress, and physical-target interaction under main-camera occlusion. Real-robot experiments with π_{0.5} and FastWAM also show lower overall success rates…",
+   "titleTr": "Bir ayna robot politikalarını bozabilir mi? RoboDojo-Mirror testi",
+   "summaryTr": "Hayvan bilişindeki ayna testinden esinlenen bu çalışma, robotların yansımaları olan sahnelerde fiziksel nesneleri ne kadar güvenilir biçimde işleyebildiğini ölçüyor. Beş politikanın tümünde aynalı koşullarda başarı oranlarının düştüğü bildiriliyor.",
+   "upvotes": 28,
+   "comments": 1,
+   "publishedAt": "2026-11-23T19:00:00.000Z",
+   "authors": [
+    "Xuanchen Liu",
+    "Hejun Zhang",
+    "Boxuan Dong",
+    "Ying Wu",
+    "Heshuai Li",
+    "Wen Gao"
+   ],
+   "githubUrl": "https://github.com/iPPLab/robodojo-mirror",
+   "tags": [
+    "Vision-Language-Action models",
+    "World Action Models",
+    "agentic policies",
+    "policy checkpoints"
+   ],
+   "translated": true,
+   "imageUrl": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2611.33010.png",
+   "article": {
+    "intro": "Robotların nesneleri tutup taşıması için kullanılan politikalar, sahnede bir ayna olduğunda nasıl davranıyor? Araştırmacılar, görsel ve dil bilgisini eylemlere dönüştüren bu politikaların yansımaları ile gerçek nesneleri ayırt edip edemediğini sınamak için yeni bir kıyaslama ortamı tanıtıyor.",
+    "primer": [
+     {
+      "term": "Ayna öz-tanıma testi",
+      "explanation": "Hayvanlarda bilişsel yeteneği ölçmek için kullanılan, bir canlının aynadaki kendi görüntüsünü tanıyıp tanımadığını inceleyen deney."
+     },
+     {
+      "term": "Görme-dil-eylem (VLA) modelleri",
+      "explanation": "Görüntü ve dil girdilerini alıp doğrudan robotun hareketlerine dönüştüren yapay zekâ modelleri."
+     },
+     {
+      "term": "Başarı yüzdesi puanı",
+      "explanation": "Bir koşuldaki başarı oranındaki mutlak fark; örneğin %60'tan %40'a düşüş 20 puanlık düşüş olarak ifade edilir."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Makale ne yapıyor?",
+      "body": "Çalışma, RoboDojo adlı bir kıyaslama ortamının üzerine kurulan RoboDojo-Mirror'ı tanıtıyor. Görev hedefleri, başarı kriterleri ve politika kontrol noktaları korunurken, aynasız temel koşul ile tek ayna, çift ayna ve aynalı masa üstü koşulları karşılaştırılıyor.\n\nAraştırmacılar beş politikayı sınadı. Bunlar görme-dil-eylem modelleri, dünya eylem modelleri ve ajan tabanlı politikaları kapsıyor."
+     },
+     {
+      "heading": "Sonuçlar",
+      "body": "Yazarlara göre her ayna koşulu toplam başarı oranlarını düşürdü. Üç koşulun ortalamasında düşüş politikalara göre 10,8 ile 56,7 puan arasında değişiyor; aynalı masa üstünde bu düşüş 62,5 puana kadar çıkıyor.\n\nAynanın fiziksel bir engel de olduğu düşünülerek, yansıtmayan ama aynı geometride yerleştirilmiş panellerle karşılaştırma yapılmış. Ayna kaynaklı hataların %50 ile %88'i robot ile panel arasında kayıtlı bir temas olmadan gerçekleşmiş. Bu da bozulmanın yalnızca doğrudan çarpışmalardan kaynaklanmadığını gösteriyor."
+     },
+     {
+      "heading": "Neden önemli?",
+      "body": "Yörünge ve temas analizleri, robotların yansıyan nesnelere yönelmesi ve gerçek nesnelerin konumunu yanlış tahmin etmesi gibi tekrarlayan davranışlar ortaya koyuyor. Makaleye göre bu bulgular, robot politikalarının sahne algısında hâlâ kırılgan olduğunu gösteriyor.\n\nAyrıca gerçek robotla yapılan deneylerde de düşük genel başarı oranları gözlenmiş. Çalışma, yansıtıcı yüzeylerin robotik uygulamalarda dikkate alınması gerektiğini ortaya koyuyor."
+     }
+    ]
+   },
+   "topics": [
+    "Robotik manipülasyon",
+    "Görme-dil-eylem modelleri",
+    "Yapay zekâ kıyaslama testleri",
+    "Gömülü yapay zekâ"
+   ],
+   "readingMinutes": 1,
+   "writer": "ai",
+   "writerVersion": 1
+  },
+  {
+   "id": "2611.32183",
+   "url": "https://huggingface.co/papers/2611.32183",
+   "arxivUrl": "https://arxiv.org/abs/2611.32183",
+   "titleOriginal": "ThinkMorph-SSL: Scaling Interleaved Multimodal Reasoning with Pretext Tasks",
+   "abstractOriginal": "People reason with pictures as well as words. Interleaved multimodal reasoning gives models a similar way to solve problems by creating intermediate images and using them to guide further reasoning. Training models with this ability usually relies on task-specific demonstrations, which are difficult to collect. We introduce ThinkMorph-SSL, a two-stage training recipe that uses images themselves as a source of supervision. The first stage, pretext reasoning, converts visual pretext tasks, such as image colorization and denoising, into instruction-free interleaved traces. Models describe a corrupted or transformed image, generate a restored or canonical image, and interpret the result. The second stage uses automatically constructed demonstrations for question-driven instruction tuning. At the same instruction-tuning budget, models trained with pretext reasoning outperform those trained with instruction tuning alone. The full recipe improves over the base model by an average of 11.33 accuracy points across twelve benchmarks. These results show that supervision derived from images can build the visual skills needed for interleaved reasoning and improve learning from task-specific demonstrations.",
+   "titleTr": "ThinkMorph-SSL: Görüntü Kaynaklı Denetimle Karma Çok Kipli Akıl Yürütme",
+   "summaryTr": "Yazarlar, pahalı etiketli veri yerine görüntülerin kendisinden üretilen görevlerle modelin görsel akıl yürütme becerisini geliştiren iki aşamalı bir eğitim yöntemi öneriyor.",
+   "upvotes": 21,
+   "comments": 1,
+   "publishedAt": "2026-11-23T19:00:00.000Z",
+   "authors": [
+    "Jiawei Gu",
+    "Linjie Li",
+    "Yiming Liu",
+    "Yunzhuo Hao",
+    "Huichen Wang",
+    "Guanzheng Chen"
+   ],
+   "githubUrl": "https://github.com/ThinkMorph/ThinkMorph-SSL",
+   "tags": [
+    "ThinkMorph-SSL",
+    "interleaved multimodal reasoning",
+    "intermediate images",
+    "task-specific demonstrations"
+   ],
+   "translated": true,
+   "imageUrl": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2611.32183.png",
+   "article": {
+    "intro": "İnsanlar düşünürken yalnızca kelimelerle değil, resimlerle de akıl yürütür. Karma çok kipli akıl yürütme, modellerin çözüm sırasında ara görüntüler üretip bunları sonraki adımlara yön vermek için kullanmasını hedefler. Ancak bu yeteneği kazandırmak genellikle göreve özel örnekler gerektirir ve bu örnekleri toplamak zordur. ThinkMorph-SSL, bu sorunu görüntülerin kendisini bir denetim kaynağı olarak kullanarak aşmayı önerir.",
+    "primer": [
+     {
+      "term": "Karma çok kipli akıl yürütme",
+      "explanation": "Modelin metin ve görüntü arasında gidip gelerek, çözüm sırasında ara görüntüler üretip bunlara bakarak düşünmesi anlamına gelir."
+     },
+     {
+      "term": "Öncül görevler (pretext tasks)",
+      "explanation": "Etiket gerektirmeyen, verinin kendisinden türetilen yardımcı görevlerdir. Örneğin gürültü giderme veya renklendirme gibi."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Makale ne yapıyor?",
+      "body": "Makale, göreve özel örnek gerektirmeden karma çok kipli akıl yürütme becerisini geliştirmek için ThinkMorph-SSL adlı iki aşamalı bir eğitim yöntemi sunuyor. Yazarlara göre yöntem, görüntülerin kendisinden elde edilen denetimle çalışıyor."
+     },
+     {
+      "heading": "Nasıl çalışıyor?",
+      "body": "İlk aşamada, öncül akıl yürütme adı verilen yaklaşım uygulanıyor. Renklendirme ve gürültü giderme gibi görsel öncül görevler, talimat gerektirmeden karma akıl yürütme izlerine dönüştürülüyor. Model, bozulmuş ya da dönüştürülmüş bir görüntüyü tarif ediyor, onarılmış ya da standart hâle getirilmiş bir görüntü üretiyor ve sonucu yorumluyor. İkinci aşamada ise otomatik olarak oluşturulan örnekler kullanılarak soru odaklı talimat ayarlaması yapılıyor."
+     },
+     {
+      "heading": "Sonuçlar",
+      "body": "Makaleye göre, aynı talimat ayarlaması bütçesinde öncül akıl yürütmeyle eğitilen modeller, yalnızca talimat ayarlamasıyla eğitilenlerden daha iyi performans gösteriyor. Tam yöntem, on iki kıyaslama testinde temel modele göre ortalama 11,33 doğruluk puanı iyileşme sağladığını bildiriyor."
+     },
+     {
+      "heading": "Neden önemli?",
+      "body": "Sonuçlar, görüntülerden türetilen denetimin karma akıl yürütme için gereken görsel becerileri kazandırabileceğini ve göreve özel örneklerden öğrenmeyi de güçlendirebileceğini gösteriyor. Bu, etiketli veri ihtiyacını azaltabileceği için önemli bir yaklaşım olarak öne çıkıyor."
+     }
+    ]
+   },
+   "topics": [
+    "Çok kipli yapay zekâ",
+    "Görsel akıl yürütme",
+    "Kendi kendini denetleyen öğrenme",
+    "Talimat ayarlaması"
+   ],
+   "readingMinutes": 1,
+   "writer": "ai",
+   "writerVersion": 1
+  },
+  {
+   "id": "2611.32649",
+   "url": "https://huggingface.co/papers/2611.32649",
+   "arxivUrl": "https://arxiv.org/abs/2611.32649",
+   "titleOriginal": "ICLWorld: Benchmarking In-Context Learning of Agents from Digital to Physical Worlds",
+   "abstractOriginal": "In-context learning (ICL) lets agents acquire new rules from context and adapt to user-specific requirements at inference time. The same frontier agents now operate both computers and robots, yet their ICL remains insufficiently assessed: existing benchmarks are largely offline, rely on text or static images, and risk training-data contamination, while robot evaluations are limited to method-level ablations. We present ICLWorld, an online benchmark that evaluates the ICL of agents from digital to physical worlds, covering computer use and robot use, together with UIverse, a unified harness that turns every environment into a user interface. We build 30 environments, record 630 demonstration videos (10+ hours), and design 160 tasks with customized, often counter-intuitive rules that cannot be satisfied without learning from the context. Each task comes with three rule versions, given as text or video, and we test generalization at three levels, from replaying the demonstration to new instances and unseen environments. Across six frontier models, the strongest agents, Claude Opus 5.5 and GPT-6 Astra, succeed on 82% and 76% of computer-use runs but only 27% and 26% of robot-use runs, and a no-rule control reduces success to at most 8%. GPT-6 Astra succeeds under all three rule versions on only 38% of computer-use tasks, half its rate under a single rule, and answers 98% of robot rule questions correctly yet completes only 20% of these tasks. Frontier agents learn rules…",
+   "titleTr": "ICLWorld: Dijital ve Fiziksel Dünyalarda Yapay Zekâ Ajanlarının Bağlamdan Öğrenmesini Ölçen Bir Kıyaslama",
+   "summaryTr": "ICLWorld, yapay zekâ ajanlarının bağlamdan yeni kuralları öğrenme yeteneğini bilgisayar kullanımı ve robot kullanımı alanlarında ölçen çevrimiçi bir kıyaslama sistemi tanıtıyor.",
+   "upvotes": 19,
+   "comments": 1,
+   "publishedAt": "2026-11-23T19:00:00.000Z",
+   "authors": [
+    "Qingle Liu",
+    "Jieming Li",
+    "Pei-lin Li",
+    "Shenghan Zheng",
+    "Ruize Yang",
+    "Sunqi Fan"
+   ],
+   "githubUrl": "https://github.com/ICLWorld/ICLWorld",
+   "tags": [
+    "in-context learning",
+    "agents",
+    "inference time",
+    "training-data contamination"
+   ],
+   "translated": true,
+   "imageUrl": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2611.32649.png",
+   "article": {
+    "intro": "Yapay zekâ ajanları, çıkarım sırasında bağlamdan yeni kurallar öğrenip kullanıcıya özel gereksinimlere uyum sağlayabiliyor. Ancak bu yeteneğin ne kadar iyi olduğu yeterince ölçülmüş değil. Mevcut kıyaslamaların çoğu çevrimdışı çalışıyor, metin ya da durağan görüntülere dayanıyor ve eğitim verisi sızıntısı riski taşıyor. Robot değerlendirmeleri ise yalnızca yöntem düzeyindeki ablasyonlarla sınırlı kalıyor. Makale bu boşluğu kapatmayı hedefliyor.",
+    "primer": [
+     {
+      "term": "Bağlamda öğrenme (in-context learning)",
+      "explanation": "Modelin ağırlıklarını değiştirmeden, verilen girdi içindeki örneklerden ya da talimatlardan yeni bir görevi kavrayıp uygulamasıdır."
+     },
+     {
+      "term": "Kıyaslama (benchmark)",
+      "explanation": "Farklı yapay zekâ modellerini aynı görevler üzerinden karşılaştırmak için kullanılan standart test setidir."
+     },
+     {
+      "term": "Veri sızıntısı (training-data contamination)",
+      "explanation": "Test sorularının modelin eğitim verisinde zaten bulunması durumudur; bu da başarı oranlarını gerçekten olduğundan yüksek gösterebilir."
+     }
+    ],
+    "sections": [
+     {
+      "heading": "Makale ne yapıyor?",
+      "body": "Makaleye göre ICLWorld, yapay zekâ ajanlarının bağlamdan öğrenme yeteneğini çevrimiçi olarak ölçen bir kıyaslama sistemi. Dijital ortamdan fiziksel dünyaya kadar uzanan bir yelpazede değerlendirme yapıyor ve bilgisayar kullanımı ile robot kullanımını birlikte kapsıyor. Bu amaçla, ortamların her birini bir kullanıcı arayüzüne dönüştüren birleşik bir altyapı olan UIverse de tanıtılıyor."
+     },
+     {
+      "heading": "Nasıl çalışıyor?",
+      "body": "Araştırmacılar 30 ortam oluşturmuş, 630 gösterim videosu kaydetmiş ve toplamda 10 saatten fazla görüntü üretmiş. Ardından, bağlamdan öğrenilmeden yerine getirilemeyecek, çoğu zaman sezgiye aykırı özel kurallar içeren 160 görev tasarlanmış. Her görev için kural üç farklı biçimde verilebiliyor: metin ya da video olarak. Genelleme üç düzeyde test ediliyor: gösterimi birebir tekrarlamadan, yeni örneklerde ve hiç görülmemiş ortamlarda."
+     },
+     {
+      "heading": "Sonuçlar",
+      "body": "Makalede test edilen altı öncü modelden en güçlüsü olarak Claude Opus 5.5 ve GPT-6 Astra öne çıkıyor. Bu modeller bilgisayar kullanımı görevlerinin sırasıyla %82 ve %76'sını, robot kullanımı görevlerinin ise %27 ve %26'sını başarıyla tamamlıyor. Kural verilmeyen kontrol grubunda başarı en fazla %8'de kalıyor. GPT-6 Astra, bilgisayar kullanımı görevlerinin yalnızca %38'inde üç kural biçiminin hepsinde başarılı oluyor; bu oran tek kuralla elde edilen başarının yaklaşık yarısı. Aynı model robot kuralları hakkındaki soruların %98'ini doğru yanıtlıyor, ancak bu görevlerin yalnızca %20'sini tamamlayabiliyor."
+     },
+     {
+      "heading": "Neden önemli?",
+      "body": "Sonuçlar, yapay zekâ ajanlarının kuralları anlatılabildiğinde bile bunları fiziksel dünyada uygulamakta zorlandığını gösteriyor. Makaleye göre bu fark, özellikle robotik alanında ajanların gerçek dünyada güvenilir çalışması için dikkat edilmesi gereken bir açık olduğunu ortaya koyuyor."
+     }
+    ]
+   },
+   "topics": [
+    "Bağlamda öğrenme",
+    "Yapay zekâ kıyaslamaları",
+    "Robotik",
+    "Bilgisayar kullanımı ajanları"
+   ],
+   "readingMinutes": 2,
+   "writer": "ai",
+   "writerVersion": 1
   }
  ]
 }

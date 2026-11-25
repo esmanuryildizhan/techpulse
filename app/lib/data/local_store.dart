@@ -8,7 +8,7 @@ class CachedBody {
   final DateTime savedAt;
 }
 
-/// Kullanıcının kaydettiği bir içerik (haber, makale, model, proje veya güvenlik açığı).
+/// Telefonda saklanan bir içerik kaydı: kaydedilenler, favoriler ve okuma geçmişi aynı biçimi kullanır.
 class BookmarkRecord {
   const BookmarkRecord({required this.key, required this.kind, required this.payload, required this.savedAt});
 
@@ -25,15 +25,31 @@ class BookmarkRecord {
 
 enum BookmarkKind { news, paper, model, repo, vuln }
 
+/// Kişisel listeler: her biri ayrı bir SQLite tablosudur.
+enum UserList {
+  /// Daha sonra okumak için kaydedilenler.
+  bookmarks,
+
+  /// Beğenilen (favori) içerikler.
+  favorites,
+
+  /// Okunan haberler; en yeni 300 kayıt tutulur.
+  history,
+}
+
 /// Telefondaki kalıcı depolama. Android ve iOS'ta SQLite (sqflite), testlerde bellekte çalışır.
 abstract interface class LocalStore {
   Future<CachedBody?> readCache(String key);
   Future<void> writeCache(String key, String body);
   Future<void> clearCache();
-  Future<List<BookmarkRecord>> bookmarks();
-  Future<void> saveBookmark(BookmarkRecord record);
-  Future<void> deleteBookmark(String key);
+  Future<List<BookmarkRecord>> records(UserList list);
+  Future<void> saveRecord(UserList list, BookmarkRecord record);
+  Future<void> deleteRecord(UserList list, String key);
+  Future<void> clearList(UserList list);
 }
+
+/// Okuma geçmişinde tutulan en fazla kayıt.
+const int historyLimit = 300;
 
 /// Platform deposunu açar; açılamazsa uygulama bellek deposuyla çalışmaya devam eder.
 Future<LocalStore> openLocalStore() async {
@@ -46,7 +62,7 @@ Future<LocalStore> openLocalStore() async {
 
 class MemoryStore implements LocalStore {
   final Map<String, CachedBody> _cache = {};
-  final Map<String, BookmarkRecord> _bookmarks = {};
+  final Map<UserList, Map<String, BookmarkRecord>> _lists = {for (final l in UserList.values) l: {}};
 
   @override
   Future<CachedBody?> readCache(String key) async => _cache[key];
@@ -62,16 +78,26 @@ class MemoryStore implements LocalStore {
   }
 
   @override
-  Future<List<BookmarkRecord>> bookmarks() async =>
-      _bookmarks.values.toList()..sort((a, b) => b.savedAt.compareTo(a.savedAt));
+  Future<List<BookmarkRecord>> records(UserList list) async =>
+      _lists[list]!.values.toList()..sort((a, b) => b.savedAt.compareTo(a.savedAt));
 
   @override
-  Future<void> saveBookmark(BookmarkRecord record) async {
-    _bookmarks[record.key] = record;
+  Future<void> saveRecord(UserList list, BookmarkRecord record) async {
+    final map = _lists[list]!;
+    map[record.key] = record;
+    if (list == UserList.history && map.length > historyLimit) {
+      final oldest = map.values.reduce((a, b) => a.savedAt.isBefore(b.savedAt) ? a : b);
+      map.remove(oldest.key);
+    }
   }
 
   @override
-  Future<void> deleteBookmark(String key) async {
-    _bookmarks.remove(key);
+  Future<void> deleteRecord(UserList list, String key) async {
+    _lists[list]!.remove(key);
+  }
+
+  @override
+  Future<void> clearList(UserList list) async {
+    _lists[list]!.clear();
   }
 }

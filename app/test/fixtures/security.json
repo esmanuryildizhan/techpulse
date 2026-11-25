@@ -1,46 +1,182 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-11-25T09:00:00Z",
+ "generatedAt": "2026-11-25T18:03:34.764Z",
  "items": [
   {
-   "id": "CVE-2026-22222",
-   "cveId": "CVE-2026-22222",
-   "vendor": "Fortinet",
-   "product": "FortiOS",
-   "nameOriginal": "Fortinet FortiOS Out-of-Bounds Write Vulnerability",
-   "descriptionOriginal": "...",
-   "actionOriginal": "...",
-   "nameTr": "Fortinet FortiOS sınır dışı yazma açığı",
-   "descriptionTr": "FortiOS'ta kimliği doğrulanmamış bir saldırganın özel hazırlanmış isteklerle kod çalıştırmasına izin veren sınır dışı yazma açığı bulunuyor.",
-   "actionTr": "Üreticinin talimatlarına göre güncellemeyi uygulayın veya ürünü kullanmayı bırakın.",
-   "dateAdded": "2026-11-24",
-   "dueDate": "2026-12-15",
-   "ransomware": true,
-   "cwes": [
-    "CWE-787"
-   ],
-   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-22222",
-   "translated": true
-  },
-  {
-   "id": "CVE-2026-11111",
-   "cveId": "CVE-2026-11111",
-   "vendor": "Microsoft",
-   "product": "Windows",
-   "nameOriginal": "Microsoft Windows Privilege Escalation Vulnerability",
-   "descriptionOriginal": "Microsoft Windows contains a privilege escalation vulnerability.",
-   "actionOriginal": "Apply mitigations per vendor instructions.",
-   "nameTr": null,
-   "descriptionTr": null,
-   "actionTr": null,
-   "dateAdded": "2026-11-20",
-   "dueDate": "2026-12-11",
+   "id": "CVE-2026-103406",
+   "cveId": "CVE-2026-103406",
+   "vendor": "Hewlett Packard Enterprise (HPE)",
+   "product": "Juniper Session Smart Conductor and Session Smart Router",
+   "nameOriginal": "Hewlett Packard Enterprise (HPE) Juniper Session Smart Conductor and Session Smart Router OS Command Injection Vulnerability",
+   "descriptionOriginal": "Hewlett Packard Enterprise (HPE) Juniper Session Smart Conductor and Session Smart Router contain an OS command injection vulnerability that could allow a remote attacker to execute arbitrary commands as root via a specially crafted salt minion ID.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "HPE Juniper Session Smart Conductor ve Session Smart Router işletim sistemi komut enjeksiyonu açığı",
+   "descriptionTr": "Hewlett Packard Enterprise (HPE) Juniper Session Smart Conductor ve Session Smart Router ürünlerinde, özel hazırlanmış bir salt minion kimliği üzerinden uzaktan bir saldırganın root yetkisiyle rastgele komut çalıştırmasına olanak tanıyan bir işletim sistemi komut enjeksiyonu açığı bulunuyor. Açık, CWE-78 sınıfında yer alıyor.",
+   "actionTr": "Üreticinin talimatlarına göre geçici önlemleri uygulayın ve CISA'nın BOD 26-04 kapsamındaki güvenlik güncellemelerini risk temelinde önceliklendirme yönergesine uyun. Önlem bulunmuyorsa ürünün kullanımını durdurmayı değerlendirin.",
+   "dateAdded": "2026-11-25",
+   "dueDate": "2026-11-28",
    "ransomware": false,
    "cwes": [
-    "CWE-269"
+    "CWE-78"
    ],
-   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-11111",
-   "translated": false
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-103406",
+   "translated": true,
+   "explanationTr": "Saldırgan, hazırlanmış bir kimlik değeriyle sistemde root yetkisiyle komut çalıştırabilir ve cihazın tamamını ele geçirebilir. Kamu kurumlarının 28 Kasım 2026 tarihine kadar bu açığı kapatması gerekiyor; her varlığın internete açık olup olmadığının ayrıca değerlendirilmesi öneriliyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2026-132224",
+   "cveId": "CVE-2026-132224",
+   "vendor": "Optimizely",
+   "product": "Web Experimentation",
+   "nameOriginal": "Optimizely Web Experimentation External Control of Critical State Data Vulnerability",
+   "descriptionOriginal": "Optimizely Web Experimentation contains an external control of critical state data vulnerability in its account signup flow that could allow an attacker to impersonate existing customer users and modify Project JavaScript. Successful exploitation can result in attacker-controlled JavaScript being distributed through Optimizely-hosted assets and executed in browsers visiting affected customer websites.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Optimizely Web Experimentation kritik durum verisi dış kontrolü açığı",
+   "descriptionTr": "Optimizely Web Experimentation ürününün hesap kayıt akışındaki bir güvenlik açığı, bir saldırganın mevcut müşteri kullanıcılarını taklit etmesine ve Project JavaScript kodunu değiştirmesine olanak tanıyabiliyor. Açık, kritik durum verisinin dış kontrolüne izin veren bir zayıflık (CWE-642) olarak sınıflandırılıyor. Başarılı bir istismar, saldırganın kontrolündeki JavaScript kodunun Optimizely tarafından barındırılan varlıklar üzerinden dağıtılmasına ve etkilenen müşteri sitelerini ziyaret eden tarayıcılarda çalıştırılmasına yol açabiliyor.",
+   "actionTr": "Üreticinin talimatlarına uygun olarak önlemleri uygulayın ve CISA'nın BOD 26-04 kapsamındaki risk temelli güncelleme önceliklendirme ile \"Forensics Triage Requirements\" gerekliliklerine uyduğunuzdan emin olun. Önlemler mevcut değilse BOD 26-04 kapsamındaki bulut hizmetlerine ilişkin ilgili talimatları izleyin veya ürünün kullanımını durdurun.",
+   "dateAdded": "2026-11-24",
+   "dueDate": "2026-11-27",
+   "ransomware": false,
+   "cwes": [
+    "CWE-642"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-132224",
+   "translated": true,
+   "explanationTr": "Bu açık, saldırganın sitenize ait kod akışına kendi JavaScript kodunu sokmasını sağlayabiliyor; bu da ziyaretçilerin tarayıcılarında kötü amaçlı kodun çalışması anlamına gelebiliyor. Optimizely kullanan müşteri siteleri ve bu siteleri ziyaret eden kullanıcılar etkilenebilir. CISA, kamu kurumları için 27 Kasım 2026 son tarihini belirlediği için bu açığa öncelik verilmesi gerekiyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2026-132165",
+   "cveId": "CVE-2026-132165",
+   "vendor": "Drupal",
+   "product": "Core",
+   "nameOriginal": "Drupal Core Remote Code Execution Vulnerability",
+   "descriptionOriginal": "Drupal Core contains a not failing securely vulnerability that could allow an unauthenticated attacker to take over an existing site or execute arbitrary code via the Drupal installer. Under specific conditions, the attacker can use install.php to attempt to reinstall Drupal on the site.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Drupal Core uzaktan kod çalıştırma açığı",
+   "descriptionTr": "Drupal Core'da güvenli şekilde başarısız olmayan (not failing securely) bir güvenlik açığı bulunuyor. Kimlik doğrulaması yapılmamış bir saldırgan, Drupal kurulum betiği olan install.php üzerinden belirli koşullar altında siteyi ele geçirebilir veya keyfi kod çalıştırabilir. Saldırgan, bu yolla sitede Drupal'ı yeniden kurmayı deneyebilir. Açık CWE-636 sınıfında yer alıyor ve CVE-2026-132165 kimliğiyle kayıtlı.",
+   "actionTr": "Üreticinin talimatlarına uygun önlemleri hemen uygulayın ve güncellemeyi yayımlandığı anda kurun. Varlıklarınızın internete açıklık düzeyini değerlendirin ve CISA'nın BOD 26-04 kararına uygun hareket edin.",
+   "dateAdded": "2026-11-24",
+   "dueDate": "2026-11-27",
+   "ransomware": false,
+   "cwes": [
+    "CWE-636"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-132165",
+   "translated": true,
+   "explanationTr": "Saldırgan kimlik doğrulaması olmadan siteyi ele geçirebileceği için açık, internete açık Drupal sitelerini doğrudan hedef alıyor. Kamu kurumları için son tarih 27 Kasım 2026 olarak belirlendi; kurumlar kataloğa eklenme tarihi olan 24 Kasım 2026'dan itibaren bu süreyi dikkate almalı. Bu açığın fidye yazılımı saldırılarında kullanıldığına dair bir bilgi bulunmuyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2026-131914",
+   "cveId": "CVE-2026-131914",
+   "vendor": "Idunno",
+   "product": "AntiCsrf",
+   "nameOriginal": "Idunno AntiCsrf Deserialization of Untrusted Data Vulnerability",
+   "descriptionOriginal": "Idunno AntiCsrf contains a deserialization of untrusted data vulnerability that allows an unauthenticated remote attacker to execute arbitrary code via object injection. The impacted product(s) could be end-of-life (EoL) and/or end-of-service (EoS). Users are advised to discontinue use and/or transition to a supported version.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Idunno AntiCsrf güvensiz veri serileştirme çözme açığı",
+   "descriptionTr": "Idunno AntiCsrf, güvenilmeyen verinin serisinden çıkarılması (deserialization) açığı içeriyor. Bu açık, kimlik doğrulaması yapılmamış uzaktan bir saldırganın nesne enjeksiyonu yoluyla keyfi kod çalıştırmasına olanak tanıyor. Etkilenen ürünlerin ömrünün sonuna gelmiş (EoL) ve/veya hizmet desteğinin sonlandırılmış (EoS) olabileceği belirtiliyor.",
+   "actionTr": "Ürünün kullanımına son verin veya desteklenen bir sürüme geçin; üreticinin talimatlarına göre önlemleri uygulayın ve CISA'nın BOD 26-04 kapsamındaki güncelleme önceliklendirme ile adli inceleme (forensics triage) gerekliliklerine uyun.",
+   "dateAdded": "2026-11-24",
+   "dueDate": "2026-11-27",
+   "ransomware": false,
+   "cwes": [
+    "CWE-502"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-131914",
+   "translated": true,
+   "explanationTr": "Kimlik doğrulaması gerektirmeyen bu açık, saldırganın uzaktan kendi kodunu sistemde çalıştırmasına imkân verebilir. Ürünün artık desteklenmediği belirtildiği için düzeltme beklemek yerine kullanımdan çıkarmak gerekebilir. Kamu kurumlarının bu kaydı 27 Kasım 2026'ya kadar ele alması gerekiyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2026-134624",
+   "cveId": "CVE-2026-134624",
+   "vendor": "N-able",
+   "product": "MailAssure",
+   "nameOriginal": "N-able MailAssure (SpamExperts) Server-Side Request Forgery (SSRF) Vulnerability",
+   "descriptionOriginal": "N-able MailAssure (SpamExperts) contains a server-side request forgery vulnerability in the LDAP synchronization connection check that allows an authenticated API user to connect to arbitrary internal hosts and ports, determine which are reachable, and send crafted data to internal services.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "N-able MailAssure (SpamExperts) sunucu tarafı istek sahteciliği (SSRF) açığı",
+   "descriptionTr": "N-able MailAssure (SpamExperts) ürününde, LDAP senkronizasyon bağlantı kontrolünde bulunan sunucu tarafı istek sahteciliği (SSRF) açığı, kimliği doğrulanmış bir API kullanıcısının rastgele iç ana bilgisayarlara ve portlara bağlanmasına, hangilerinin erişilebilir olduğunu belirlemesine ve iç servislere özel hazırlanmış veri göndermesine olanak tanıyor. Açık, CWE-918 sınıfında yer alıyor.",
+   "actionTr": "Üreticinin talimatlarına uygun olarak önlemleri uygulayın ve CISA'nın BOD 26-04 kapsamındaki risk temelli güvenlik güncellemesi önceliklendirme rehberine ve \"Adli Analiz Gereksinimleri\" metnine uyun. Önlemler mevcut değilse ve bulut hizmetleri için geçerli BOD 26-04 talimatları uygulanamıyorsa ürünün kullanımına son verin.",
+   "dateAdded": "2026-11-23",
+   "dueDate": "2026-11-26",
+   "ransomware": false,
+   "cwes": [
+    "CWE-918"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-134624",
+   "translated": true,
+   "explanationTr": "Saldırgan, ele geçirdiği ya da yetkili bir API hesabıyla iç ağdaki sistemleri tarayabilir ve iç servislere istek gönderebilir; bu, saldırının ilerlemesi için kullanılabilecek bir keşif ve yanal hareket kapısı açar. CISA, bu açığın fidye yazılımı saldırılarında kullanılıp kullanılmadığının bilinmediğini belirtiyor; kamu kurumları için son uygulama tarihi 26 Kasım 2026 olarak belirlendi, bu nedenle MailAssure kullanan kurumların bu süreyi beklemeden hareket etmesi gerekiyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2026-133968",
+   "cveId": "CVE-2026-133968",
+   "vendor": "Project MONAI",
+   "product": "MONAI Label",
+   "nameOriginal": "Project MONAI MONAI Label Path Traversal Vulnerability",
+   "descriptionOriginal": "Project MONAI MONAI Label contains a path traversal vulnerability that allows an unauthenticated remote attacker to write arbitrary files outside the intended datastore directory, potentially resulting in remote code execution.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Project MONAI MONAI Label yol geçişi (path traversal) açığı",
+   "descriptionTr": "MONAI Label'da bulunan yol geçişi açığı, kimlik doğrulaması yapılmamış uzaktan bir saldırganın veri deposu dizini dışında kalan rastgele dosyalara yazmasına olanak tanıyor. Bu durum uzaktan kod çalıştırmaya yol açabilir. Açık, CWE-24 kapsamında sınıflandırılmış ve CVE-2026-133968 kimliğiyle kayıtlı.",
+   "actionTr": "Üreticinin talimatlarına göre önlemleri uygulayın ve güncellemeyi hemen yükleyin. Güncelleme yoksa ürünü kullanmaktan vazgeçin; bulut hizmetleri için BOD 26-04 kapsamındaki yönergeleri izleyin.",
+   "dateAdded": "2026-11-23",
+   "dueDate": "2026-11-26",
+   "ransomware": false,
+   "cwes": [
+    "CWE-24"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-133968",
+   "translated": true,
+   "explanationTr": "Saldırgan kimlik doğrulaması olmadan sisteme dosya yazabildiği için sunucuda kod çalıştırabilir. Bu, MONAI Label'ı internete açık olarak çalıştıran kurumları doğrudan etkiliyor. CISA kataloğuna 23 Kasım 2026'da eklenen açık için kamu kurumlarının son tarihi 26 Kasım 2026; açığın fidye yazılımı saldırılarında kullanıldığına dair bir bilgi bulunmuyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2026-76466",
+   "cveId": "CVE-2026-76466",
+   "vendor": "Cisco",
+   "product": "Expressway Series",
+   "nameOriginal": "Cisco Expressway Series Use of Hard-coded Credentials Vulnerability",
+   "descriptionOriginal": "Cisco Expressway Series contains a use of hard-coded credentials vulnerability that allows an unauthenticated, remote attacker with persistent cookies and network access to execute commands as root on a clustered device via the database service.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Cisco Expressway Series sabit kodlanmış kimlik bilgisi açığı",
+   "descriptionTr": "Cisco Expressway Series ürünlerinde sabit kodlanmış kimlik bilgisi kullanımından kaynaklanan bir güvenlik açığı bulunuyor. Açığın CWE-798 sınıfında olduğu belirtiliyor. Açık, kimlik doğrulaması yapılmamış uzak bir saldırganın, kalıcı çerezler ve ağ erişimi ile kümelenmiş bir cihazda veritabanı servisi üzerinden root yetkisiyle komut çalıştırmasına olanak tanıyor.",
+   "actionTr": "Üreticinin Cisco talimatlarına uygun olarak önlemleri uygulayın ve CISA'nın BOD 26-04 kapsamındaki güvenlik güncellemelerine öncelik verme ile adli inceleme gereksinimlerine uyun. Önlem bulunmuyorsa ve bulut hizmeti kapsamındaysa BOD 26-04 rehberini izleyin ya da ürünün kullanımını durdurun.",
+   "dateAdded": "2026-11-20",
+   "dueDate": "2026-11-23",
+   "ransomware": false,
+   "cwes": [
+    "CWE-798"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-76466",
+   "translated": true,
+   "explanationTr": "Saldırgan kimlik doğrulaması olmadan cihazda root yetkisiyle komut çalıştırabilirse, cihazın tamamını ele geçirebilir. Açığın, kümelenmiş cihazlarda çalışan veritabanı servisini hedef alması, etkisinin birden fazla cihaza yayılabileceği anlamına geliyor. CISA kataloğu kamu kurumları için 23 Kasım 2026 son tarihini verdiği için bu açığa acilen bakılması gerekiyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2026-129448",
+   "cveId": "CVE-2026-129448",
+   "vendor": "Apache",
+   "product": "Roller",
+   "nameOriginal": "Apache Roller Deserialization of Untrusted Data Vulnerability",
+   "descriptionOriginal": "Apache Roller contains a deserialization of untrusted data vulnerability that allows an unauthenticated remote attacker to execute arbitrary code via the XML-RPC endpoint, which accepts and deserializes vendor extension types before authentication. This CVE covers the same underlying vulnerability as CVE-2026-82384 but applies to a broader range of affected versions.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Apache Roller güvenilmeyen veriyi serileştirme açığı",
+   "descriptionTr": "Apache Roller, güvenilmeyen verilerin seri halden çıkarılmasıyla ilgili bir açık içeriyor. Bu açık, kimlik doğrulaması yapılmamış uzak bir saldırganın XML-RPC uç noktası üzerinden keyfi kod çalıştırmasına olanak tanıyor; çünkü uç nokta, kimlik doğrulamadan önce satıcı uzantısı türlerini kabul edip seri halden çıkarıyor. CISA'ya göre bu kayıt, CVE-2026-82384 ile aynı temel açığı kapsıyor ancak etkilenen sürüm aralığı daha geniş.",
+   "actionTr": "Üreticinin talimatlarına uygun önlemleri uygulayın ve her varlığın internete açıklık durumunu değerlendirin. Önlem bulunmuyorsa, CISA'nın BOD 26-04 kapsamındaki rehberine göre ürünün kullanımını durdurun.",
+   "dateAdded": "2026-11-20",
+   "dueDate": "2026-11-23",
+   "ransomware": false,
+   "cwes": [
+    "CWE-502"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-129448",
+   "translated": true,
+   "explanationTr": "Açık, saldırganın kimlik doğrulaması olmadan sunucuda kendi kodunu çalıştırmasına izin verdiği için sunucuyu tamamen ele geçirme riski taşıyor. Internete açık Apache Roller kurulumları en büyük risk altında; kamu kurumları için son tarih 23 Kasım 2026 olarak belirlendi.}",
+   "writer": "ai"
   }
  ]
 }

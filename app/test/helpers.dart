@@ -9,6 +9,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:techpulse/app.dart';
+import 'package:techpulse/core/config.dart';
 import 'package:techpulse/data/data_source.dart';
 import 'package:techpulse/data/local_store.dart';
 import 'package:techpulse/state/providers.dart';
@@ -42,14 +43,20 @@ Future<void> initTestLocale() async {
   await initializeDateFormatting('tr');
 }
 
-/// Uygulamayı sahte veriyle kurar.
+/// Test verisinin üretildiği ana yakın sabit bir "şimdi": sıralama ve yenilikler her çalıştırmada aynı olsun.
+final testNow = DateTime.utc(2026, 11, 25, 20);
+
+/// Uygulamayı sahte veriyle kurar. Varsayılan olarak ilk açılış ekranı geçilmiş sayılır.
 Future<Widget> buildTestApp({
   FakeSource? source,
   LocalStore? store,
   Widget? home,
   Map<String, Object> prefs = const {},
+  bool onboarded = true,
 }) async {
-  SharedPreferences.setMockInitialValues(prefs);
+  // Testlerde ağdan görsel indirilmez; konuya özel kapaklar çizilir.
+  AppConfig.networkImages = false;
+  SharedPreferences.setMockInitialValues({if (onboarded) 'profile.onboarded': true, ...prefs});
   final preferences = await SharedPreferences.getInstance();
   return ProviderScope(
     // Testlerde otomatik yeniden deneme kapalı: hata hemen görünsün, bekleyen zamanlayıcı kalmasın.
@@ -58,6 +65,7 @@ Future<Widget> buildTestApp({
       sharedPreferencesProvider.overrideWithValue(preferences),
       localStoreProvider.overrideWithValue(store ?? MemoryStore()),
       dataSourceProvider.overrideWithValue(source ?? FakeSource(allFixtures())),
+      clockProvider.overrideWithValue(() => testNow),
     ],
     child: TechPulseApp(home: home),
   );
