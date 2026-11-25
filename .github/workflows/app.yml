@@ -66,6 +66,7 @@ jobs:
         run: flutter test --exclude-tags screenshots --reporter expanded
 
       - name: Ekran görüntüleri
+        if: success() || failure()
         run: flutter test --tags screenshots --update-goldens --reporter expanded
 
       - uses: actions/upload-artifact@v5
@@ -87,6 +88,17 @@ jobs:
         with:
           name: TechPulse-apk
           path: TechPulse.apk
+
+      - name: Ekran görüntülerini ve APK'yı ci-app dalına gönder
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p ../ci-out/screenshots ../ci-out/apk
+          cp -R test/screenshots/goldens/. ../ci-out/screenshots/ 2>/dev/null || true
+          cp ../TechPulse.apk ../ci-out/apk/ 2>/dev/null || true
+          find test -path '*failures*' -name '*.png' -exec cp {} ../ci-out/screenshots/ \; 2>/dev/null || true
+          bash ../tools/publish_branch.sh ci-app ../ci-out "Derleme #${{ github.run_number }} çıktıları"
 
       - name: Oluşan platform klasörlerini depoya ekle
         if: github.ref == 'refs/heads/main'
@@ -135,6 +147,12 @@ jobs:
         with:
           name: emulator-ekranlari
           path: emulator-shots
+
+      - name: Emülatör ekranlarını ci-emulator dalına gönder
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bash tools/publish_branch.sh ci-emulator emulator-shots "Emülatör denemesi #${{ github.run_number }}"
 
   release:
     name: APK'yı yayımla

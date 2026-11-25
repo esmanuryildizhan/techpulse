@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     permissions:
-      contents: read
+      contents: write # ci-data dalına veri anlık görüntüsü göndermek için
     defaults:
       run:
         working-directory: pipeline
@@ -85,6 +85,11 @@ jobs:
             cat "$GITHUB_WORKSPACE/site/v1/meta.json"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Veri anlık görüntüsünü ci-data dalına gönder
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash ../tools/publish_branch.sh ci-data "$GITHUB_WORKSPACE/site" "Veri anlık görüntüsü $(date -u '+%Y-%m-%d %H:%M UTC')"
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4

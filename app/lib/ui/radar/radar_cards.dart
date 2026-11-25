@@ -85,18 +85,27 @@ class ModelCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Stat(icon: Icons.favorite_border, value: Fmt.compact(model.likes), semanticsLabel: '${model.likes} beğeni'),
-                    const SizedBox(width: 12),
-                    Stat(
-                      icon: Icons.download_outlined,
-                      value: Fmt.compact(model.downloads),
-                      semanticsLabel: '${model.downloads} indirme',
+                    Expanded(
+                      child: Wrap(
+                        spacing: 12,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Stat(
+                            icon: Icons.favorite_border,
+                            value: Fmt.compact(model.likes),
+                            semanticsLabel: '${model.likes} beğeni',
+                          ),
+                          Stat(
+                            icon: Icons.download_outlined,
+                            value: Fmt.compact(model.downloads),
+                            semanticsLabel: '${model.downloads} indirme',
+                          ),
+                          if (model.parameters != null)
+                            Stat(icon: Icons.memory, value: Fmt.parameters(model.parameters!), semanticsLabel: 'parametre'),
+                        ],
+                      ),
                     ),
-                    if (model.parameters != null) ...[
-                      const SizedBox(width: 12),
-                      Stat(icon: Icons.memory, value: Fmt.parameters(model.parameters!), semanticsLabel: 'parametre'),
-                    ],
-                    const Spacer(),
                     BookmarkButton(kind: BookmarkKind.model, entry: model, compact: true),
                   ],
                 ),

@@ -115,7 +115,7 @@ class NewsCard extends ConsumerWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              CategoryPill(category: item.category),
+              Flexible(child: CategoryPill(category: item.category)),
               if (item.points != null) ...[
                 const SizedBox(width: 12),
                 Stat(icon: Icons.arrow_upward_rounded, value: Fmt.compact(item.points!), semanticsLabel: '${item.points} puan'),
