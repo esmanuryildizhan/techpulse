@@ -153,7 +153,8 @@ jobs:
         if: always()
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: bash tools/publish_branch.sh ci-emulator emulator-shots "Emülatör denemesi #${{ github.run_number }}"
+        run: |
+          bash tools/publish_branch.sh ci-emulator emulator-shots "Emülatör denemesi, derleme ${{ github.run_number }}"
 
   release:
     name: APK'yı yayımla
