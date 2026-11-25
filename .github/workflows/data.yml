@@ -1,8 +1,10 @@
 name: Veri hattı
 
-# Saatte bir kaynakları toplar, yeni kayıtları açık kaynaklı OPUS-MT modeliyle (Helsinki Üniversitesi)
-# bu sunucunun işlemcisinde Türkçeye çevirir ve sonucu GitHub Pages'te statik JSON olarak yayımlar.
-# Uygulama bu dosyaları okur. Hiçbir dış yapay zekâ servisi, hesap veya API anahtarı gerekmez.
+# Saatte bir kaynakları toplar ve sonucu GitHub Pages'te statik JSON olarak yayımlar; uygulama bu dosyaları okur.
+# Türkçe metinler:
+#  - ANTHROPIC_API_KEY sırrı tanımlıysa yapay zekâ editörü (Claude Haiku 5.5) her kaydın kaynağını okuyup
+#    özgün Türkçe başlık, spot ve ayrıntılı anlatım yazar.
+#  - Tanımlı değilse açık kaynaklı OPUS-MT modeli (Helsinki Üniversitesi) başlık ve kısa açıklamayı çevirir.
 
 on:
   schedule:
@@ -10,8 +12,15 @@ on:
   workflow_dispatch:
     inputs:
       max_texts:
-        description: Bu çalışmada çevrilecek en fazla metin
+        description: Bu çalışmada çevrilecek en fazla metin (OPUS-MT)
         default: "600"
+      ai_max:
+        description: Yapay zekâ editörünün bu çalışmada yazacağı en fazla kayıt (boş = 150)
+        default: ""
+      dry_run:
+        description: Deneme çalışması (sonuç ci-data dalına yazılır, uygulamaya yayımlanmaz)
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths: ["pipeline/**", ".github/workflows/data.yml"]
@@ -30,6 +39,8 @@ jobs:
     timeout-minutes: 40
     permissions:
       contents: write # ci-data dalına veri anlık görüntüsü göndermek için
+    env:
+      HAS_AI_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
     defaults:
       run:
         working-directory: pipeline
@@ -47,26 +58,32 @@ jobs:
       - run: npm test
 
       - uses: actions/setup-python@v6
+        if: env.HAS_AI_KEY != 'true'
         with:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: pipeline/mt/requirements.txt
 
       - name: Çeviri modelinin bağımlılıkları
+        if: env.HAS_AI_KEY != 'true'
         run: |
           python -m pip install --upgrade pip
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -r mt/requirements.txt
 
       - name: Çeviri modeli önbelleği
+        if: env.HAS_AI_KEY != 'true'
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
           key: hf-opus-mt-tc-big-en-tr-v1
 
-      - name: Veriyi topla ve çevir
+      - name: Veriyi topla ve Türkçe metinleri yaz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Kod değişikliğiyle (push) başlayan çalışmalar deneme niteliğindedir: az sayıda kayıt yazılır, yayımlanmaz.
+          AI_MAX_ITEMS: ${{ github.event_name == 'push' && '6' || inputs.ai_max }}
           MAX_TRANSLATION_TEXTS: ${{ inputs.max_texts || '600' }}
           MT_PYTHON: python
           HF_HUB_DISABLE_TELEMETRY: "1"
@@ -92,13 +109,17 @@ jobs:
         run: bash ../tools/publish_branch.sh ci-data "$GITHUB_WORKSPACE/site" "Veri anlık görüntüsü $(date -u '+%Y-%m-%d %H:%M UTC')"
 
       - uses: actions/configure-pages@v5
+        if: ${{ github.event_name != 'push' && !inputs.dry_run }}
       - uses: actions/upload-pages-artifact@v4
+        if: ${{ github.event_name != 'push' && !inputs.dry_run }}
         with:
           path: site
 
   deploy:
     name: GitHub Pages'e yayımla
     needs: build
+    # Yalnızca saatlik ve elle başlatılan çalışmalar yayımlanır; kod değişikliği çalışmaları deneme amaçlıdır.
+    if: ${{ github.event_name != 'push' && !inputs.dry_run }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

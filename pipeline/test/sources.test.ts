@@ -169,7 +169,9 @@ describe('yedek konu belirleme', () => {
     assert.equal(classify('New ransomware hits hospitals', '', 'industry'), 'security');
     assert.equal(classify('Nvidia unveils new GPU', '', 'industry'), 'hardware');
     // "program" içinde "ram" geçer ama donanım sayılmamalı
-    assert.equal(classify('A program for students', '', 'software'), 'software');
+    assert.equal(classify('A program for students', '', 'dev'), 'dev');
+    assert.equal(classify('NASA launches a new Mars rover', '', 'industry'), 'science');
+    assert.equal(classify('Kubernetes 1.40 adds new scheduler', '', 'industry'), 'cloud');
     assert.equal(classify('Hello', '', 'industry'), 'industry');
   });
 });

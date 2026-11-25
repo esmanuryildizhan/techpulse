@@ -41,6 +41,9 @@ export function parseRepos(data: { items?: GhSearchItem[] }, limit = 30): Repo[]
       topics,
       isAi: AI_WORDS.test(`${fullName} ${description} ${topics.join(' ')}`),
       translated: false,
+      // GitHub'ın her depo için ürettiği paylaşım görseli (proje adı, açıklama, yıldız sayısı).
+      imageUrl: `https://opengraph.githubassets.com/1/${fullName.split('/').map(encodeURIComponent).join('/')}`,
+      writer: null,
     });
     if (out.length >= limit) break;
   }

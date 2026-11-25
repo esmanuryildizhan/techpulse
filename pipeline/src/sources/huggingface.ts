@@ -108,6 +108,8 @@ export function parseTrendingModels(list: HfModelListItem[], limit = 40): AiMode
       summaryVersion: MODEL_SUMMARY_VERSION,
       translated: false,
       cardExcerpt: '',
+      highlights: [],
+      writer: null,
     });
     if (out.length >= limit) break;
   }
@@ -187,6 +189,7 @@ interface HfDailyPaper {
   summary?: string;
   publishedAt?: string;
   numComments?: number;
+  thumbnail?: string;
 }
 
 export function parseDailyPapers(list: HfDailyPaper[]): Paper[] {
@@ -217,6 +220,15 @@ export function parseDailyPapers(list: HfDailyPaper[]): Paper[] {
       githubUrl: github,
       tags: asArray(paper.ai_keywords).map(String).slice(0, 4),
       translated: false,
+      imageUrl:
+        typeof entry.thumbnail === 'string' && entry.thumbnail.startsWith('https://')
+          ? entry.thumbnail
+          : `https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/${encodeURIComponent(id)}.png`,
+      article: null,
+      topics: [],
+      readingMinutes: null,
+      writer: null,
+      writerVersion: 0,
     });
   }
   return out;

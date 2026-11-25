@@ -50,6 +50,10 @@ function fixtureFetchers(): Fetchers {
     dailyPapers: async () => parseDailyPapers(JSON.parse(fixture('hf-papers.json'))),
     repos: async () => parseRepos(JSON.parse(fixture('github-search.json'))),
     kev: async () => parseKev(JSON.parse(fixture('kev.json'))),
+    page: async (url) => {
+      if (url.includes('phi-5')) return { imageUrl: 'https://cdn.example.com/phi.jpg', text: '', description: '' };
+      throw new Error('HTTP 403');
+    },
   };
 }
 
@@ -206,6 +210,10 @@ describe('runPipeline', () => {
     assert.ok(news.items.every((n) => !n.translated && n.titleTr === null));
     const gpu = news.items.find((n) => n.titleOriginal.includes('GPU'))!;
     assert.equal(gpu.category, 'hardware');
-    assert.match(meta.translator.note ?? '', /Çeviri kapalı/);
+    assert.match(meta.editor.note ?? '', /kapalı/);
+    // Editör yokken yeni haberlerin kapak görseli sayfadan okunur.
+    const phi = news.items.find((n) => n.titleOriginal.startsWith('Introducing Phi-5'))!;
+    assert.equal(phi.imageUrl, 'https://cdn.example.com/phi.jpg');
+    assert.ok(news.items.every((n) => n.writer === null && n.article === null && n.hidden === false));
   });
 });

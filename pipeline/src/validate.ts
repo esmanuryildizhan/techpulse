@@ -1,3 +1,4 @@
+import { migrateCategory } from './categories.ts';
 import type { AiModel, NewsItem, Paper, Repo, Vulnerability } from './types.ts';
 import { CATEGORIES } from './types.ts';
 
@@ -20,6 +21,24 @@ const isHttps: Check = (v) => typeof v === 'string' && v.startsWith('https://');
 const isStringArray: Check = (v) => Array.isArray(v) && v.every(isString);
 const isDate: Check = (v) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
 const isNullableDate: Check = (v) => v === null || isDate(v);
+
+const isWriter: Check = (v) => v === null || v === 'ai' || v === 'mt';
+const isNullableHttps: Check = (v) => v === null || isHttps(v);
+const isNullableNumber: Check = (v) => v === null || isInt(v);
+
+function isArticle(value: unknown): boolean {
+  if (value === null) return true;
+  if (!value || typeof value !== 'object') return false;
+  const a = value as Record<string, unknown>;
+  return (
+    isNonEmpty(a['intro']) &&
+    Array.isArray(a['primer']) &&
+    (a['primer'] as unknown[]).every((p) => conforms(p, { term: isNonEmpty, explanation: isNonEmpty })) &&
+    Array.isArray(a['sections']) &&
+    (a['sections'] as unknown[]).length > 0 &&
+    (a['sections'] as unknown[]).every((s) => conforms(s, { heading: isNonEmpty, body: isNonEmpty }))
+  );
+}
 
 function conforms(value: unknown, shape: Record<string, Check>): boolean {
   if (!value || typeof value !== 'object') return false;
@@ -45,6 +64,14 @@ const NEWS_SHAPE: Record<string, Check> = {
   points: isNullableInt,
   comments: isNullableInt,
   discussionUrl: (v) => v === null || isHttps(v),
+  imageUrl: isNullableHttps,
+  article: isArticle,
+  topics: isStringArray,
+  importance: isNullableNumber,
+  readingMinutes: isNullableNumber,
+  writer: isWriter,
+  writerVersion: isInt,
+  hidden: isBool,
 };
 
 const MODEL_SHAPE: Record<string, Check> = {
@@ -67,6 +94,8 @@ const MODEL_SHAPE: Record<string, Check> = {
   summaryVersion: (v) => v === undefined || isInt(v),
   translated: isBool,
   cardExcerpt: isString,
+  highlights: isStringArray,
+  writer: isWriter,
 };
 
 const PAPER_SHAPE: Record<string, Check> = {
@@ -84,6 +113,12 @@ const PAPER_SHAPE: Record<string, Check> = {
   githubUrl: (v) => v === null || isHttps(v),
   tags: isStringArray,
   translated: isBool,
+  imageUrl: isNullableHttps,
+  article: isArticle,
+  topics: isStringArray,
+  readingMinutes: isNullableNumber,
+  writer: isWriter,
+  writerVersion: isInt,
 };
 
 const REPO_SHAPE: Record<string, Check> = {
@@ -100,6 +135,8 @@ const REPO_SHAPE: Record<string, Check> = {
   topics: isStringArray,
   isAi: isBool,
   translated: isBool,
+  imageUrl: isNullableHttps,
+  writer: isWriter,
 };
 
 const KEV_SHAPE: Record<string, Check> = {
@@ -119,6 +156,8 @@ const KEV_SHAPE: Record<string, Check> = {
   cwes: isStringArray,
   nvdUrl: isHttps,
   translated: isBool,
+  explanationTr: isNullableString,
+  writer: isWriter,
 };
 
 function keepValid<T>(label: string, items: unknown, shape: Record<string, Check>, warn: (msg: string) => void): T[] {
@@ -135,4 +174,70 @@ export const validate = {
   repos: (items: unknown, warn: (m: string) => void = () => {}) => keepValid<Repo>('projeler', items, REPO_SHAPE, warn),
   security: (items: unknown, warn: (m: string) => void = () => {}) =>
     keepValid<Vulnerability>('güvenlik', items, KEV_SHAPE, warn),
+};
+
+// ---------------------------------------------------------------------------------------------
+// Önceki sürümlerin yayımladığı kayıtlar yeni alanlardan yoksundur; doğrulamadan önce varsayılanlarla tamamlanır.
+
+type Raw = Record<string, unknown>;
+
+function obj(value: unknown): Raw | null {
+  return value && typeof value === 'object' && !Array.isArray(value) ? { ...(value as Raw) } : null;
+}
+
+function writerOf(item: Raw): 'ai' | 'mt' | null {
+  if (item['writer'] === 'ai' || item['writer'] === 'mt') return item['writer'];
+  return item['translated'] === true ? 'mt' : null;
+}
+
+function withDefaults(item: Raw, defaults: Raw): Raw {
+  for (const [key, value] of Object.entries(defaults)) {
+    if (item[key] === undefined) item[key] = value;
+  }
+  return item;
+}
+
+export const upgrade = {
+  news(value: unknown): unknown {
+    const item = obj(value);
+    if (!item) return value;
+    item['category'] = migrateCategory(item['category']) ?? 'industry';
+    return withDefaults(item, {
+      imageUrl: null,
+      article: null,
+      topics: [],
+      importance: null,
+      readingMinutes: null,
+      writer: writerOf(item),
+      writerVersion: 0,
+      hidden: false,
+    });
+  },
+  models(value: unknown): unknown {
+    const item = obj(value);
+    if (!item) return value;
+    return withDefaults(item, { highlights: [], writer: writerOf(item) });
+  },
+  papers(value: unknown): unknown {
+    const item = obj(value);
+    if (!item) return value;
+    return withDefaults(item, {
+      imageUrl: null,
+      article: null,
+      topics: [],
+      readingMinutes: null,
+      writer: writerOf(item),
+      writerVersion: 0,
+    });
+  },
+  repos(value: unknown): unknown {
+    const item = obj(value);
+    if (!item) return value;
+    return withDefaults(item, { imageUrl: null, writer: writerOf(item) });
+  },
+  security(value: unknown): unknown {
+    const item = obj(value);
+    if (!item) return value;
+    return withDefaults(item, { explanationTr: null, writer: writerOf(item) });
+  },
 };

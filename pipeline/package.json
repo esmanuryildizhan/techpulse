@@ -9,8 +9,10 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@mozilla/readability": "^0.6.0",
     "entities": "^9.0.0",
-    "fast-xml-parser": "^5.12.1"
+    "fast-xml-parser": "^5.12.1",
+    "linkedom": "^0.18.15"
   },
   "devDependencies": {
     "@types/node": "^26.6.10",

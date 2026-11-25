@@ -6,8 +6,32 @@ export const SCHEMA_VERSION = 1;
 /** Model özeti çıkarma yöntemi değişince artırılır; eski özetler yeniden üretilir. */
 export const MODEL_SUMMARY_VERSION = 2;
 
-export type Category = 'ai' | 'software' | 'hardware' | 'security' | 'industry';
-export const CATEGORIES: readonly Category[] = ['ai', 'software', 'hardware', 'security', 'industry'];
+/** Yapay zekâ yazarının talimatı değişince artırılır; eski metinler sırayla yeniden yazılır. */
+export const WRITER_VERSION = 1;
+
+export type Category = 'ai' | 'security' | 'dev' | 'data' | 'hardware' | 'cloud' | 'mobile' | 'science' | 'industry';
+export const CATEGORIES: readonly Category[] = ['ai', 'security', 'dev', 'data', 'hardware', 'cloud', 'mobile', 'science', 'industry'];
+
+/** Türkçe metni kim üretti: 'ai' = yapay zekâ editörü, 'mt' = makine çevirisi, null = henüz yok. */
+export type Writer = 'ai' | 'mt' | null;
+
+/** "Önce bunu bil" kutusundaki terim açıklaması. */
+export interface Primer {
+  term: string;
+  explanation: string;
+}
+
+export interface ArticleSection {
+  heading: string;
+  body: string;
+}
+
+/** Yapay zekâ editörünün kaynak haberden yazdığı özgün Türkçe anlatım. */
+export interface Article {
+  intro: string;
+  primer: Primer[];
+  sections: ArticleSection[];
+}
 
 export type SourceKind = 'official' | 'news' | 'community';
 
@@ -34,6 +58,10 @@ export interface RawNews {
   points?: number;
   comments?: number;
   discussionUrl?: string;
+  /** Akışta haberle birlikte verilen görsel (varsa). */
+  imageUrl?: string | null;
+  /** Akışın verdiği tam metin (varsa); yalnızca yapay zekâ yazarına girdi olur, yayımlanmaz. */
+  content?: string;
 }
 
 export interface NewsItem {
@@ -54,6 +82,19 @@ export interface NewsItem {
   points: number | null;
   comments: number | null;
   discussionUrl: string | null;
+  /** Haberin kapak görseli (yayıncının og:image'i veya akıştaki görsel). */
+  imageUrl: string | null;
+  /** Yapay zekâ editörünün yazdığı ayrıntılı anlatım; makine çevirisinde null. */
+  article: Article | null;
+  /** 2-4 kısa Türkçe konu etiketi (Keşfet'teki trend konular bunlardan çıkar). */
+  topics: string[];
+  /** 1 (niş) - 5 (sektörü etkileyen) önem puanı; öne çıkan haberler bununla seçilir. */
+  importance: number | null;
+  readingMinutes: number | null;
+  writer: Writer;
+  writerVersion: number;
+  /** Yapay zekâ editörü teknolojiyle ilgisiz bulduysa true; uygulamada gösterilmez, yeniden yazılmaz. */
+  hidden: boolean;
 }
 
 export type Modality = 'text' | 'vision' | 'audio' | 'multimodal' | 'other';
@@ -79,6 +120,9 @@ export interface AiModel {
   translated: boolean;
   /** Model kartından çıkarılan kısa metin; yalnızca çeviri için tutulur */
   cardExcerpt: string;
+  /** Modelin öne çıkan özellikleri (yapay zekâ editörü yazar, en fazla 3 madde). */
+  highlights: string[];
+  writer: Writer;
 }
 
 export interface Paper {
@@ -96,6 +140,12 @@ export interface Paper {
   githubUrl: string | null;
   tags: string[];
   translated: boolean;
+  imageUrl: string | null;
+  article: Article | null;
+  topics: string[];
+  readingMinutes: number | null;
+  writer: Writer;
+  writerVersion: number;
 }
 
 export interface Repo {
@@ -112,6 +162,8 @@ export interface Repo {
   topics: string[];
   isAi: boolean;
   translated: boolean;
+  imageUrl: string | null;
+  writer: Writer;
 }
 
 export interface Vulnerability {
@@ -131,6 +183,9 @@ export interface Vulnerability {
   cwes: string[];
   nvdUrl: string;
   translated: boolean;
+  /** Açığın sade dille anlatımı: ne işe yarar, kimleri etkiler (yapay zekâ editörü yazar). */
+  explanationTr: string | null;
+  writer: Writer;
 }
 
 export interface Envelope<T> {
@@ -158,6 +213,16 @@ export interface Meta {
     requests: number;
     translatedItems: number;
     pendingItems: number;
+    note: string | null;
+  };
+  /** Yapay zekâ editörünün bu çalışmadaki özeti. */
+  editor: {
+    model: string | null;
+    written: number;
+    failed: number;
+    pending: number;
+    inputTokens: number;
+    outputTokens: number;
     note: string | null;
   };
   counts: Record<'news' | 'models' | 'papers' | 'repos' | 'security', number>;

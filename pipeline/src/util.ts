@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { decodeHTML } from 'entities';
 
 export const USER_AGENT =
-  'Mozilla/5.0 (compatible; TechPulseBot/1.0; +https://github.com/techpulse; student project)';
+  'Mozilla/5.0 (compatible; TechPulseBot/1.0; +https://github.com/esmanuryildizhan/techpulse; student project)';
 
 /** Kısa ve kararlı kimlik: aynı girdi her zaman aynı kimliği üretir. */
 export function stableId(input: string, length = 24): string {

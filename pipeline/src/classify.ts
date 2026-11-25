@@ -1,3 +1,4 @@
+import { CATEGORY_INFO } from './categories.ts';
 import type { Category, FeedSource } from './types.ts';
 
 /**
@@ -5,34 +6,10 @@ import type { Category, FeedSource } from './types.ts';
  * en yüksek puan 3 veya üzerindeyse o konu seçilir, değilse kaynağın varsayılan konusu kullanılır.
  * Kelimeler tam kelime olarak aranır: "RAM" kelimesi "program" içinde bulunmaz.
  */
-const RULES: Record<Category, string[]> = {
-  ai: [
-    'ai', 'artificial intelligence', 'machine learning', 'deep learning', 'neural', 'llm', 'llms', 'gpt',
-    'chatgpt', 'gemini', 'claude', 'llama', 'mistral', 'deepseek', 'qwen', 'openai', 'anthropic', 'deepmind',
-    'hugging face', 'transformer', 'diffusion', 'model', 'models', 'agent', 'agents', 'agentic', 'copilot',
-    'inference', 'training', 'fine-tuning', 'reasoning', 'multimodal', 'computer vision', 'robotics', 'chatbot',
-  ],
-  software: [
-    'software', 'developer', 'developers', 'programming', 'code', 'coding', 'open source', 'github', 'git',
-    'python', 'javascript', 'typescript', 'rust', 'go', 'java', 'kotlin', 'swift', 'flutter', 'dart', 'react',
-    'linux', 'windows', 'macos', 'android', 'ios', 'api', 'sdk', 'framework', 'library', 'compiler', 'database',
-    'cloud', 'kubernetes', 'docker', 'release', 'update', 'browser', 'chrome', 'firefox', 'app', 'apps',
-  ],
-  hardware: [
-    'chip', 'chips', 'cpu', 'gpu', 'gpus', 'processor', 'semiconductor', 'tsmc', 'intel', 'amd', 'nvidia', 'arm',
-    'qualcomm', 'snapdragon', 'ram', 'ssd', 'motherboard', 'laptop', 'smartphone', 'iphone', 'pixel', 'galaxy',
-    'display', 'battery', 'hardware', 'raspberry pi', 'rtx', 'radeon', 'ryzen', 'core ultra', 'wafer', 'device',
-  ],
-  security: [
-    'security', 'vulnerability', 'vulnerabilities', 'exploit', 'exploited', 'zero-day', 'cve', 'malware',
-    'ransomware', 'phishing', 'breach', 'hack', 'hacked', 'hackers', 'attack', 'attacks', 'backdoor', 'botnet',
-    'patch', 'spyware', 'trojan', 'ddos', 'leak', 'leaked', 'cybersecurity', 'threat', 'apt',
-  ],
-  industry: [
-    'acquisition', 'acquires', 'funding', 'raises', 'valuation', 'ipo', 'layoffs', 'ceo', 'lawsuit', 'regulation',
-    'antitrust', 'eu', 'ftc', 'policy', 'market', 'revenue', 'earnings', 'startup', 'startups', 'deal', 'tariff',
-  ],
-};
+const RULES: Record<Category, string[]> = Object.fromEntries(CATEGORY_INFO.map((c) => [c.id, c.keywords])) as Record<
+  Category,
+  string[]
+>;
 
 function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -83,6 +60,10 @@ const PROMOTION =
  * genel haber sitelerinin (The Verge, TechCrunch, Ars Technica) teknolojiyle ilgisi olmayan
  * yazıları (dizi, film, oyun incelemesi vb.) ise teknoloji kelimesi içermiyorsa elenir.
  */
+export function isPromotion(title: string): boolean {
+  return PROMOTION.test(title);
+}
+
 export function isRelevant(title: string, excerpt: string, source: FeedSource | undefined): boolean {
   if (PROMOTION.test(title)) return false;
   if (source && source.kind === 'news' && source.defaultCategory === 'industry') {

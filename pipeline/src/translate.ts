@@ -164,11 +164,15 @@ export function polishState(state: State): void {
     p.summaryTr = fix(p.summaryTr);
   }
   for (const v of state.security) {
-    v.nameTr = kevNameTr(v.nameOriginal) ?? fix(v.nameTr);
+    v.nameTr = v.writer === 'ai' ? fix(v.nameTr) : (kevNameTr(v.nameOriginal) ?? fix(v.nameTr));
+    v.explanationTr = fix(v.explanationTr);
     v.descriptionTr = fix(v.descriptionTr);
     v.actionTr = fix(v.actionTr);
   }
-  for (const m of state.models) m.summaryTr = fix(m.summaryTr);
+  for (const m of state.models) {
+    m.summaryTr = fix(m.summaryTr);
+    m.highlights = m.highlights.map((h) => polishTurkish(h));
+  }
   for (const r of state.repos) r.descriptionTr = fix(r.descriptionTr);
 }
 
@@ -196,7 +200,10 @@ function buildJobs(state: State): Job[] {
           ? [{ source: lead, apply: (t: string) => (item.summaryTr = tidy(t, 380) || null), required: false }]
           : []),
       ],
-      done: () => (item.translated = true),
+      done: () => {
+        item.translated = true;
+        item.writer = 'mt';
+      },
     });
   }
 
@@ -210,7 +217,10 @@ function buildJobs(state: State): Job[] {
           ? [{ source: lead, apply: (t: string) => (paper.summaryTr = tidy(t, 480) || null), required: false }]
           : []),
       ],
-      done: () => (paper.translated = true),
+      done: () => {
+        paper.translated = true;
+        paper.writer = 'mt';
+      },
     });
   }
 
@@ -234,7 +244,15 @@ function buildJobs(state: State): Job[] {
         required: false,
       });
     }
-    if (fields.length > 0) jobs.push({ fields, done: () => (vuln.translated = true) });
+    if (fields.length > 0) {
+      jobs.push({
+        fields,
+        done: () => {
+          vuln.translated = true;
+          vuln.writer = 'mt';
+        },
+      });
+    }
   }
 
   for (const model of state.models) {
@@ -250,6 +268,7 @@ function buildJobs(state: State): Job[] {
       done: () => {
         model.translated = true;
         model.summaryVersion = MODEL_SUMMARY_VERSION;
+        model.writer = 'mt';
       },
     });
   }
@@ -260,7 +279,10 @@ function buildJobs(state: State): Job[] {
       fields: [
         { source: leadSentences(repo.descriptionOriginal, 260), apply: (t) => (repo.descriptionTr = tidy(t, 300) || null), required: true },
       ],
-      done: () => (repo.translated = true),
+      done: () => {
+        repo.translated = true;
+        repo.writer = 'mt';
+      },
     });
   }
 
@@ -337,6 +359,7 @@ export async function translatePending(
 /** Haberlerin konusunu anahtar kelimelere göre belirler (başlık 3 puan, açıklama 1 puan). */
 export function applyCategories(state: State): void {
   for (const item of state.news) {
+    if (item.writer === 'ai') continue; // konu yapay zekâ editörünce belirlendi
     const source = findSource(item.sourceId);
     item.category = classify(item.titleOriginal, item.excerptOriginal, source?.defaultCategory ?? 'industry');
   }

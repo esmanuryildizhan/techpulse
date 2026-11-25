@@ -44,6 +44,8 @@ export function parseKev(data: { vulnerabilities?: KevEntry[] }, limit = 120): V
       cwes: asArray(entry.cwes).map(String).filter((c) => /^CWE-\d+$/.test(c)),
       nvdUrl: `https://nvd.nist.gov/vuln/detail/${cveId}`,
       translated: false,
+      explanationTr: null,
+      writer: null,
     });
   }
   out.sort((a, b) => (a.dateAdded === b.dateAdded ? b.cveId.localeCompare(a.cveId) : b.dateAdded.localeCompare(a.dateAdded)));

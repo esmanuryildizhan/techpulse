@@ -15,17 +15,21 @@ export const PAPER_CAP = 150;
 export function mergeNews(previous: NewsItem[], fresh: RawNews[], now: Date): NewsItem[] {
   const nowIso = now.toISOString();
   const byId = new Map<string, NewsItem>();
-  for (const item of previous) byId.set(item.id, { ...item, tags: [...item.tags] });
+  for (const item of previous) byId.set(item.id, { ...item, tags: [...item.tags], topics: [...item.topics] });
 
   for (const raw of fresh) {
     const existing = byId.get(raw.id);
     if (existing) {
       if (raw.points !== undefined) existing.points = raw.points;
       if (raw.comments !== undefined) existing.comments = raw.comments;
+      if (!existing.imageUrl && raw.imageUrl) existing.imageUrl = raw.imageUrl;
       if (existing.titleOriginal !== raw.title) {
+        // Kaynak başlığı değiştirdiyse haber yeniden yazılır.
         existing.titleOriginal = raw.title;
         existing.excerptOriginal = truncate(raw.excerpt, 600);
         existing.translated = false;
+        existing.writer = null;
+        existing.writerVersion = 0;
       }
       continue;
     }
@@ -49,6 +53,14 @@ export function mergeNews(previous: NewsItem[], fresh: RawNews[], now: Date): Ne
       points: raw.points ?? null,
       comments: raw.comments ?? null,
       discussionUrl: raw.discussionUrl ?? null,
+      imageUrl: raw.imageUrl ?? null,
+      article: null,
+      topics: [],
+      importance: null,
+      readingMinutes: null,
+      writer: null,
+      writerVersion: 0,
+      hidden: false,
     });
   }
 
@@ -65,11 +77,13 @@ export function mergeModels(previous: AiModel[], fresh: AiModel[]): AiModel[] {
   return fresh.map((model, index) => {
     const before = old.get(model.id);
     const merged: AiModel = { ...model, rank: index + 1 };
-    if (before && (before.summaryVersion ?? 0) === MODEL_SUMMARY_VERSION) {
+    if (before && (before.writer === 'ai' || (before.summaryVersion ?? 0) === MODEL_SUMMARY_VERSION)) {
       merged.summaryTr = before.summaryTr;
       merged.summaryVersion = before.summaryVersion;
       merged.translated = before.translated;
       merged.cardExcerpt = before.cardExcerpt;
+      merged.highlights = [...before.highlights];
+      merged.writer = before.writer;
       merged.parameters = before.parameters ?? model.parameters;
       merged.license = model.license ?? before.license;
     }
@@ -86,6 +100,7 @@ export function mergePapers(previous: Paper[], fresh: Paper[], now: Date): Paper
       existing.upvotes = paper.upvotes;
       existing.comments = paper.comments;
       existing.githubUrl = paper.githubUrl ?? existing.githubUrl;
+      existing.imageUrl = existing.imageUrl ?? paper.imageUrl;
     } else {
       byId.set(paper.id, paper);
     }
@@ -102,7 +117,7 @@ export function mergeRepos(previous: Repo[], fresh: Repo[]): Repo[] {
   return fresh.map((repo) => {
     const before = old.get(repo.id);
     if (before && before.descriptionOriginal === repo.descriptionOriginal) {
-      return { ...repo, descriptionTr: before.descriptionTr, translated: before.translated };
+      return { ...repo, descriptionTr: before.descriptionTr, translated: before.translated, writer: before.writer };
     }
     return repo;
   });
@@ -113,7 +128,15 @@ export function mergeKev(previous: Vulnerability[], fresh: Vulnerability[]): Vul
   return fresh.map((vuln) => {
     const before = old.get(vuln.id);
     if (before && before.translated && before.descriptionOriginal === vuln.descriptionOriginal) {
-      return { ...vuln, nameTr: before.nameTr, descriptionTr: before.descriptionTr, actionTr: before.actionTr, translated: true };
+      return {
+        ...vuln,
+        nameTr: before.nameTr,
+        descriptionTr: before.descriptionTr,
+        actionTr: before.actionTr,
+        explanationTr: before.explanationTr,
+        translated: true,
+        writer: before.writer,
+      };
     }
     return vuln;
   });

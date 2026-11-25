@@ -8,12 +8,15 @@ import { enrichModel, fetchDailyPapers, fetchTrendingModels } from './sources/hu
 import { fetchKev } from './sources/kev.ts';
 import { fetchFeed } from './sources/rss.ts';
 import type { TranslateFn } from './mt.ts';
-import { isRelevant } from './classify.ts';
-import { applyCategories, polishState, translatePending } from './translate.ts';
+import { isPromotion, isRelevant } from './classify.ts';
+import { fetchArticle, type ArticlePage } from './article.ts';
+import type { LlmClient } from './llm.ts';
+import { applyCategories, polishState, translatePending, type TranslateSummary } from './translate.ts';
+import { runEditor, type EditorSummary } from './writer.ts';
 import type { AiModel, Envelope, FeedSource, Meta, Paper, RawNews, Repo, SourceStatus, State, Vulnerability } from './types.ts';
 import { SCHEMA_VERSION } from './types.ts';
 import { errorMessage, fetchJson, log, mapLimit } from './util.ts';
-import { validate } from './validate.ts';
+import { upgrade, validate } from './validate.ts';
 
 export interface Fetchers {
   feed: (source: FeedSource) => Promise<RawNews[]>;
@@ -23,6 +26,8 @@ export interface Fetchers {
   dailyPapers: () => Promise<Paper[]>;
   repos: () => Promise<Repo[]>;
   kev: () => Promise<Vulnerability[]>;
+  /** Haber sayfası (kapak görseli ve metin). */
+  page: (url: string) => Promise<ArticlePage>;
 }
 
 export interface PipelineOptions {
@@ -34,6 +39,12 @@ export interface PipelineOptions {
   /** Makine çevirisi; null ise çeviri yapılmaz (kayıtlar özgün diliyle yayımlanır). */
   translate?: TranslateFn | null;
   maxTranslationTexts?: number;
+  /** Yapay zekâ editörü (Claude). Varsa Türkçe metinleri o yazar; yoksa makine çevirisi kullanılır. */
+  llm?: LlmClient | null;
+  /** Bir çalışmada yapay zekâ editörünün yazacağı en fazla kayıt. */
+  aiMaxItems?: number;
+  aiConcurrency?: number;
+  aiDeadlineMs?: number;
   fetchers?: Partial<Fetchers>;
 }
 
@@ -60,7 +71,8 @@ async function loadPrevious(options: PipelineOptions): Promise<State> {
         }
         if (envelope?.schemaVersion !== SCHEMA_VERSION) return;
         const warn = (msg: string) => log.warn(`Önceki yayın: ${msg}`);
-        (state as unknown as Record<FileKey, unknown[]>)[key] = validate[key](envelope.items, warn);
+        const items = Array.isArray(envelope.items) ? envelope.items.map((item) => upgrade[key](item)) : [];
+        (state as unknown as Record<FileKey, unknown[]>)[key] = validate[key](items, warn);
       } catch (error) {
         log.info(`Önceki ${key}.json okunamadı (ilk çalışmada normaldir): ${errorMessage(error)}`);
       }
@@ -78,6 +90,7 @@ function defaultFetchers(token: string | undefined): Fetchers {
     dailyPapers: () => fetchDailyPapers(),
     repos: () => fetchTrendingRepos(token),
     kev: () => fetchKev(),
+    page: (url) => fetchArticle(url),
   };
 }
 
@@ -143,13 +156,16 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
     security: kev ? mergeKev(previous.security, kev) : previous.security,
   };
 
-  // İndirim yazıları ve teknolojiyle ilgisiz genel haberler ayıklanır (önceki yayındakiler dahil).
+  // İndirim yazıları her durumda ayıklanır. Yapay zekâ editörü yoksa teknolojiyle ilgisiz genel haberler
+  // anahtar kelimelerle ayıklanır; editör varsa ilgisizliği o belirler (hidden).
   const before = state.news.length;
-  state.news = state.news.filter((n) => isRelevant(n.titleOriginal, n.excerptOriginal, findSource(n.sourceId)));
+  state.news = state.news.filter((n) =>
+    options.llm ? !isPromotion(n.titleOriginal) : isRelevant(n.titleOriginal, n.excerptOriginal, findSource(n.sourceId)),
+  );
   if (state.news.length !== before) log.info(`İlgisiz bulunan ${before - state.news.length} haber ayıklandı.`);
 
   // 3) Yeni modellerin kartını oku (parametre sayısı, lisans, kısa açıklama).
-  const toEnrich = state.models.filter((m) => !m.translated && m.cardExcerpt === '').slice(0, 15);
+  const toEnrich = state.models.filter((m) => m.writer !== 'ai' && m.cardExcerpt === '').slice(0, 15);
   if (toEnrich.length > 0) {
     const enriched = await mapLimit(toEnrich, 4, async (model) => {
       try {
@@ -162,14 +178,29 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
     state.models = state.models.map((m) => byId.get(m.id) ?? m);
   }
 
-  // 4) Konuyu belirle ve Türkçeye çevir (açık kaynak OPUS-MT modeli, Actions sunucusunda).
+  // 4) Türkçe metinler. Yapay zekâ editörü varsa kaynakları okuyup özgün metin yazar; yoksa (veya editör
+  //    durursa) açık kaynak OPUS-MT ile başlık ve kısa açıklama çevrilir.
   applyCategories(state);
-  const translation = await translatePending(state, options.translate ?? null, {
-    maxTexts: options.maxTranslationTexts,
-  });
+  let editor: EditorSummary | null = null;
+  if (options.llm) {
+    const feedContent = new Map(freshNews.filter((n) => n.content).map((n) => [n.id, n.content!]));
+    editor = await runEditor(state, options.llm, {
+      maxItems: options.aiMaxItems,
+      concurrency: options.aiConcurrency,
+      deadlineMs: options.aiDeadlineMs,
+      feedContent,
+      fetchPage: fetchers.page,
+    });
+  } else {
+    await fetchNewImages(state, fetchers, now);
+  }
+  let translation: TranslateSummary = { model: null, texts: 0, translatedItems: 0, pendingItems: 0, note: null };
+  if (options.translate) {
+    translation = await translatePending(state, options.translate, { maxTexts: options.maxTranslationTexts });
+  }
   // Terim düzeltmeleri (ör. "kırılganlık" → "güvenlik açığı") ve CISA açık adlarının sözlükle çevirisi.
   polishState(state);
-  // Özeti çıkarılmış modellerin kart metnini yayımlamaya gerek yok.
+  // Özeti yazılmış modellerin kart metnini yayımlamaya gerek yok.
   for (const model of state.models) if (model.translated) model.cardExcerpt = '';
 
   // 5) Doğrula ve yaz.
@@ -193,6 +224,15 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
       pendingItems: translation.pendingItems,
       note: translation.note,
     },
+    editor: {
+      model: editor?.model ?? null,
+      written: editor?.written ?? 0,
+      failed: editor?.failed ?? 0,
+      pending: editor?.pending ?? 0,
+      inputTokens: editor?.inputTokens ?? 0,
+      outputTokens: editor?.outputTokens ?? 0,
+      note: editor ? editor.note : 'Yapay zekâ editörü kapalı (ANTHROPIC_API_KEY tanımlı değil)',
+    },
     counts: {
       news: output.news.length,
       models: output.models.length,
@@ -205,6 +245,26 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
 
   await writeOutput(options.outDir, output, meta);
   return { state: output, meta };
+}
+
+/** Editör yokken: bu çalışmada ilk kez görülen ve görseli olmayan haberlerin sayfasından kapak görselini okur. */
+async function fetchNewImages(state: State, fetchers: Fetchers, now: Date): Promise<void> {
+  const nowIso = now.toISOString();
+  const targets = state.news.filter((n) => !n.imageUrl && n.firstSeenAt === nowIso).slice(0, 80);
+  if (targets.length === 0) return;
+  let found = 0;
+  await mapLimit(targets, 6, async (item) => {
+    try {
+      const page = await fetchers.page(item.url);
+      if (page.imageUrl) {
+        item.imageUrl = page.imageUrl;
+        found++;
+      }
+    } catch {
+      // Sayfa okunamazsa uygulama konuya özel bir kapak çizer.
+    }
+  });
+  log.info(`Kapak görseli: ${targets.length} haberden ${found} tanesinde bulundu.`);
 }
 
 async function writeOutput(outDir: string, state: State, meta: Meta): Promise<void> {

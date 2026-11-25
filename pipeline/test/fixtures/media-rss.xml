@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<channel>
+  <title>Media feed</title>
+  <item>
+    <title>Chipmaker unveils new GPU</title>
+    <link>https://news.example.com/gpu</link>
+    <pubDate>Tue, 24 Nov 2026 10:00:00 +0000</pubDate>
+    <description>A new GPU arrives.</description>
+    <media:content url="http://cdn.example.com/gpu.jpg" medium="image" width="1200" height="630"/>
+  </item>
+  <item>
+    <title>Thumbnail only</title>
+    <link>https://news.example.com/thumb</link>
+    <pubDate>Tue, 24 Nov 2026 09:00:00 +0000</pubDate>
+    <description>Thumb.</description>
+    <media:thumbnail url="https://cdn.example.com/thumb.png"/>
+  </item>
+  <item>
+    <title>Inline image in content</title>
+    <link>https://news.example.com/inline</link>
+    <pubDate>Tue, 24 Nov 2026 08:00:00 +0000</pubDate>
+    <description>Short summary.</description>
+    <content:encoded><![CDATA[<p><img src="https://feeds.feedburner.com/~r/x/~4/pixel" width="1" height="1"><img src="/uploads/inline.webp" alt=""></p><p>This is the full article body. It is much longer than the summary and contains several sentences that explain what happened in detail, why it matters and what readers should do next. It keeps going for a while so that it is clearly longer than the short description provided in the feed item.</p>]]></content:encoded>
+  </item>
+  <item>
+    <title>Enclosure image</title>
+    <link>https://news.example.com/enclosure</link>
+    <pubDate>Tue, 24 Nov 2026 07:00:00 +0000</pubDate>
+    <description>Enclosure.</description>
+    <enclosure url="https://cdn.example.com/enc.jpg" type="image/jpeg" length="1000"/>
+  </item>
+</channel>
+</rss>
