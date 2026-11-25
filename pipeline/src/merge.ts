@@ -1,5 +1,6 @@
 import { findSource } from './sources/feeds.ts';
 import type { AiModel, NewsItem, Paper, RawNews, Repo, Vulnerability } from './types.ts';
+import { MODEL_SUMMARY_VERSION } from './types.ts';
 import { daysAgo, truncate } from './util.ts';
 
 export const NEWS_RETENTION_DAYS = 30;
@@ -64,8 +65,9 @@ export function mergeModels(previous: AiModel[], fresh: AiModel[]): AiModel[] {
   return fresh.map((model, index) => {
     const before = old.get(model.id);
     const merged: AiModel = { ...model, rank: index + 1 };
-    if (before) {
+    if (before && (before.summaryVersion ?? 0) === MODEL_SUMMARY_VERSION) {
       merged.summaryTr = before.summaryTr;
+      merged.summaryVersion = before.summaryVersion;
       merged.translated = before.translated;
       merged.cardExcerpt = before.cardExcerpt;
       merged.parameters = before.parameters ?? model.parameters;

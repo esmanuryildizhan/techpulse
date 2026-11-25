@@ -64,6 +64,7 @@ const MODEL_SHAPE: Record<string, Check> = {
   license: isNullableString,
   parameters: isNullableInt,
   summaryTr: isNullableString,
+  summaryVersion: (v) => v === undefined || isInt(v),
   translated: isBool,
   cardExcerpt: isString,
 };

@@ -121,8 +121,17 @@ describe('Hugging Face', () => {
   });
 
   it('model kartını sadeleştirir', () => {
-    const card = cleanModelCard('---\nlicense: mit\n---\n# Model\n![badge](x.svg)\nThis is a [great](https://x) model.\n```py\ncode()\n```\n| a | b |\n');
-    assert.equal(card, 'Model This is a great model.');
+    const card = cleanModelCard(
+      '---\nlicense: mit\n---\n# Vision-Seg\n\n<p align="center"><img src="x.png"></p>\n\n' +
+        '[Demo](https://a) | [Paper](https://b) | [Discord](https://c)\n\n' +
+        'Join our Discord community to get help and chat with other users today!\n\n' +
+        'Vision-Seg is a [promptable](https://x) segmentation model that segments any object in images and videos. ' +
+        'It was trained on a large dataset of masks.\n\n## Usage\n\n```py\ncode()\n```\n\n| a | b |\n|---|---|\n',
+    );
+    assert.equal(
+      card,
+      'Vision-Seg is a promptable segmentation model that segments any object in images and videos. It was trained on a large dataset of masks.',
+    );
   });
 
   it('günlük makaleleri okur, kimliği olmayanı atar', () => {

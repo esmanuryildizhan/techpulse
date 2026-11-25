@@ -1,14 +1,15 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { mergeKev, mergeModels, mergeNews, mergePapers, mergeRepos } from './merge.ts';
-import { FEEDS, HACKER_NEWS } from './sources/feeds.ts';
+import { FEEDS, findSource, HACKER_NEWS } from './sources/feeds.ts';
 import { fetchTrendingRepos } from './sources/github.ts';
 import { fetchHackerNews } from './sources/hackernews.ts';
 import { enrichModel, fetchDailyPapers, fetchTrendingModels } from './sources/huggingface.ts';
 import { fetchKev } from './sources/kev.ts';
 import { fetchFeed } from './sources/rss.ts';
 import type { TranslateFn } from './mt.ts';
-import { applyCategories, translatePending } from './translate.ts';
+import { isRelevant } from './classify.ts';
+import { applyCategories, polishState, translatePending } from './translate.ts';
 import type { AiModel, Envelope, FeedSource, Meta, Paper, RawNews, Repo, SourceStatus, State, Vulnerability } from './types.ts';
 import { SCHEMA_VERSION } from './types.ts';
 import { errorMessage, fetchJson, log, mapLimit } from './util.ts';
@@ -142,6 +143,11 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
     security: kev ? mergeKev(previous.security, kev) : previous.security,
   };
 
+  // İndirim yazıları ve teknolojiyle ilgisiz genel haberler ayıklanır (önceki yayındakiler dahil).
+  const before = state.news.length;
+  state.news = state.news.filter((n) => isRelevant(n.titleOriginal, n.excerptOriginal, findSource(n.sourceId)));
+  if (state.news.length !== before) log.info(`İlgisiz bulunan ${before - state.news.length} haber ayıklandı.`);
+
   // 3) Yeni modellerin kartını oku (parametre sayısı, lisans, kısa açıklama).
   const toEnrich = state.models.filter((m) => !m.translated && m.cardExcerpt === '').slice(0, 15);
   if (toEnrich.length > 0) {
@@ -161,6 +167,8 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
   const translation = await translatePending(state, options.translate ?? null, {
     maxTexts: options.maxTranslationTexts,
   });
+  // Terim düzeltmeleri (ör. "kırılganlık" → "güvenlik açığı") ve CISA açık adlarının sözlükle çevirisi.
+  polishState(state);
   // Özeti çıkarılmış modellerin kart metnini yayımlamaya gerek yok.
   for (const model of state.models) if (model.translated) model.cardExcerpt = '';
 

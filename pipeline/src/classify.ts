@@ -1,4 +1,4 @@
-import type { Category } from './types.ts';
+import type { Category, FeedSource } from './types.ts';
 
 /**
  * Yedek konu belirleyici. Asıl konu, çeviri sırasında dil modeli tarafından seçilir;
@@ -61,4 +61,32 @@ export function classify(title: string, excerpt: string, fallback: Category): Ca
     }
   }
   return bestScore >= 3 ? best : fallback;
+}
+
+/** Başlık ve açıklamadaki teknoloji kelimelerinin toplam puanı (başlık 3, açıklama 1). */
+export function techScore(title: string, excerpt: string): number {
+  let score = 0;
+  for (const category of Object.keys(COMPILED) as Category[]) {
+    for (const pattern of COMPILED[category]) {
+      if (pattern.test(title)) score += 3;
+      if (pattern.test(excerpt)) score += 1;
+    }
+  }
+  return score;
+}
+
+const PROMOTION =
+  /(\bdeals?\b|\bsave \$|\$\d[\d,.]*\s*off\b|\b\d+% off\b|black friday|cyber monday|prime day|gift guide|holiday gifts?|\bcoupons?\b|promo code|\bon sale\b|\bbest .+ to buy\b)/i;
+
+/**
+ * Geliştirici kitlesi için ilgisiz içerikleri ayıklar: indirim/alışveriş yazıları her kaynaktan,
+ * genel haber sitelerinin (The Verge, TechCrunch, Ars Technica) teknolojiyle ilgisi olmayan
+ * yazıları (dizi, film, oyun incelemesi vb.) ise teknoloji kelimesi içermiyorsa elenir.
+ */
+export function isRelevant(title: string, excerpt: string, source: FeedSource | undefined): boolean {
+  if (PROMOTION.test(title)) return false;
+  if (source && source.kind === 'news' && source.defaultCategory === 'industry') {
+    return techScore(title, excerpt) > 0;
+  }
+  return true;
 }

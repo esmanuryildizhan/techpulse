@@ -11,7 +11,9 @@ import { parseDailyPapers, parseTrendingModels } from '../src/sources/huggingfac
 import { parseKev } from '../src/sources/kev.ts';
 import { parseFeed } from '../src/sources/rss.ts';
 import type { TranslateFn } from '../src/mt.ts';
-import { leadSentences, translatePending } from '../src/translate.ts';
+import { kevNameTr, leadSentences, polishTurkish, translatePending } from '../src/translate.ts';
+import { isRelevant } from '../src/classify.ts';
+import { FEEDS } from '../src/sources/feeds.ts';
 import type { Envelope, NewsItem } from '../src/types.ts';
 
 const fixture = (name: string) => readFileSync(new URL(`./fixtures/${name}`, import.meta.url), 'utf8');
@@ -69,6 +71,35 @@ describe('leadSentences', () => {
   });
 });
 
+describe('çeviri düzeltmeleri', () => {
+  it('CISA açık adlarını sözlükle çevirir', () => {
+    assert.equal(kevNameTr('Drupal Core Remote Code Execution Vulnerability'), 'Drupal Core Uzaktan Kod Çalıştırma Açığı');
+    assert.equal(
+      kevNameTr('Juniper Session Smart Router OS Command Injection Vulnerability'),
+      'Juniper Session Smart Router İşletim Sistemi Komut Enjeksiyonu Açığı',
+    );
+    assert.equal(kevNameTr('Something Strange Vulnerability'), null);
+    assert.equal(kevNameTr('Not a vuln name'), null);
+  });
+
+  it('sık terim hatalarını düzeltir ve tekrar uygulanabilir', () => {
+    const fixed = polishTurkish('Drupal Kırılganlığı ve yapay zeka; Güçlendirme Öğrenmesi ile başarılı sömürü % 6 oranında');
+    assert.equal(fixed, 'Drupal Güvenlik Açığı ve yapay zekâ; Pekiştirmeli Öğrenme ile başarılı istismar %6 oranında');
+    assert.equal(polishTurkish(fixed), fixed);
+    assert.equal(polishTurkish('müşterilerin% 6sı'), 'müşterilerin %6sı');
+  });
+
+  it('indirim ve teknolojiyle ilgisiz haberleri ayıklar', () => {
+    const verge = FEEDS.find((f) => f.id === 'the-verge');
+    const blog = FEEDS.find((f) => f.id === 'openai');
+    assert.equal(isRelevant('Best Black Friday 2026 3D Printer deals live', '', blog), false);
+    assert.equal(isRelevant('Save $250 on the M5 MacBook Air', '', blog), false);
+    assert.equal(isRelevant("Blade Runner 2099's showrunner on adapting the series", 'A TV show', verge), false);
+    assert.equal(isRelevant('OpenAI releases a new model', '', verge), true);
+    assert.equal(isRelevant('A quiet post', '', blog), true);
+  });
+});
+
 describe('translatePending', () => {
   it('aynı metni bir kez çevirir ve bütçeye uyar', async () => {
     const state = {
@@ -83,7 +114,8 @@ describe('translatePending', () => {
     assert.equal(summary.translatedItems, 2);
     // İki kaydın "required action" metinleri farklı; adlar ve açıklamalar farklı: 6 benzersiz metin
     assert.equal(calls[0].length, new Set(calls[0]).size);
-    assert.ok(state.security.every((v) => v.translated && v.nameTr?.startsWith('TR: ')));
+    assert.ok(state.security.every((v) => v.translated && v.descriptionTr?.startsWith('TR: ')));
+    assert.equal(state.security[0].nameTr, 'Fortinet FortiOS Sınır Dışı Yazma Açığı');
 
     const tight = { news: [], models: [], papers: [], repos: [], security: parseKev(JSON.parse(fixture('kev.json'))) };
     const limited = await translatePending(tight, fakeMt().translate, { maxTexts: 3 });
@@ -97,7 +129,7 @@ describe('translatePending', () => {
     assert.equal(summary.translatedItems, 0);
     assert.equal(summary.pendingItems, 2);
     assert.match(summary.note ?? '', /model indirilemedi/);
-    assert.ok(state.security.every((v) => !v.translated && v.nameTr === null));
+    assert.ok(state.security.every((v) => !v.translated && v.descriptionTr === null));
   });
 });
 
@@ -132,7 +164,8 @@ describe('runPipeline', () => {
 
     const security = await readEnvelope<{ nameTr: string }>(out, 'security');
     assert.equal(security.items.length, 2);
-    assert.equal(security.items[0].nameTr, 'TR: Fortinet FortiOS Out-of-Bounds Write Vulnerability');
+    assert.equal(security.items[0].nameTr, 'Fortinet FortiOS Sınır Dışı Yazma Açığı');
+    assert.equal(security.items[1].nameTr, 'Microsoft Windows Yetki Yükseltme Açığı');
 
     assert.equal(meta.counts.news, 6);
     assert.equal(meta.translator.pendingItems, 0);

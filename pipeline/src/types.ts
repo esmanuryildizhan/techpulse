@@ -3,6 +3,9 @@
 
 export const SCHEMA_VERSION = 1;
 
+/** Model özeti çıkarma yöntemi değişince artırılır; eski özetler yeniden üretilir. */
+export const MODEL_SUMMARY_VERSION = 2;
+
 export type Category = 'ai' | 'software' | 'hardware' | 'security' | 'industry';
 export const CATEGORIES: readonly Category[] = ['ai', 'software', 'hardware', 'security', 'industry'];
 
@@ -72,6 +75,7 @@ export interface AiModel {
   license: string | null;
   parameters: number | null;
   summaryTr: string | null;
+  summaryVersion: number;
   translated: boolean;
   /** Model kartından çıkarılan kısa metin; yalnızca çeviri için tutulur */
   cardExcerpt: string;

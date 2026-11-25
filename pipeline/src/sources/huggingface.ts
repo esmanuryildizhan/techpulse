@@ -1,4 +1,5 @@
 import type { AiModel, Modality, Paper } from '../types.ts';
+import { MODEL_SUMMARY_VERSION } from '../types.ts';
 import { asArray, cleanText, fetchJson, fetchText, toInt, toIsoDate, truncate } from '../util.ts';
 
 const HF = 'https://huggingface.co';
@@ -104,6 +105,7 @@ export function parseTrendingModels(list: HfModelListItem[], limit = 40): AiMode
       license: licenseFromTags(tags),
       parameters: null,
       summaryTr: null,
+      summaryVersion: MODEL_SUMMARY_VERSION,
       translated: false,
       cardExcerpt: '',
     });
@@ -118,18 +120,34 @@ export async function fetchTrendingModels(): Promise<AiModel[]> {
   return parseTrendingModels(list);
 }
 
-/** Model kartındaki (README.md) metni çeviri için sadeleştirir. */
+/**
+ * Model kartından (README.md) modeli anlatan ilk düzyazı paragraflarını çıkarır. Başlıklar, tablolar,
+ * rozetler, bağlantı listeleri, kod blokları ve "Discord'a katılın" gibi kısa satırlar atlanır.
+ */
 export function cleanModelCard(markdown: string, max = 1800): string {
-  let text = markdown.replace(/^---[\s\S]*?\n---\s*/, ''); // YAML ön bilgisi
-  text = text
-    .replace(/```[\s\S]*?```/g, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-    .replace(/^\s*\|.*\|\s*$/gm, ' ')
-    .replace(/^#+\s*/gm, '')
-    .replace(/[*_`>]/g, '');
-  return truncate(cleanText(text), max);
+  let text = markdown.replace(/^\uFEFF?---[\s\S]*?\n---\s*/, ''); // YAML ön bilgisi
+  text = text.replace(/```[\s\S]*?```/g, '\n\n').replace(/<!--[\s\S]*?-->/g, ' ');
+  const kept: string[] = [];
+  for (const block of text.split(/\n\s*\n/)) {
+    const raw = block.trim();
+    if (!raw) continue;
+    if (/^(#|\||!\[|>|[-*+] |\d+\. |<(?:div|img|table|a|h\d|center|picture|video|iframe)\b)/i.test(raw)) continue;
+    const links = (raw.match(/\]\(/g) ?? []).length;
+    const clean = raw
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+      .replace(/https?:\/\/\S+/g, ' ')
+      .replace(/[*_`~]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const words = clean.split(' ').filter((w) => /\p{L}{2,}/u.test(w)).length;
+    if (clean.length < 60 || words < 8 || links > 3 || !/[.!?:]/.test(clean)) continue;
+    if (/\b(discord|follow us|join us|bibtex|citation|cite this|pip install|huggingface-cli)\b/i.test(clean)) continue;
+    kept.push(clean);
+    if (kept.join(' ').length >= max) break;
+  }
+  return truncate(cleanText(kept.join(' ')), max);
 }
 
 interface HfModelDetail {

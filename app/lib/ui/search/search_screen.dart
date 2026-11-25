@@ -83,9 +83,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           autofocus: true,
           onChanged: _onChanged,
           textInputAction: TextInputAction.search,
+          textAlignVertical: TextAlignVertical.center,
           decoration: InputDecoration(
             hintText: 'Haber, model, makale, CVE ara…',
             border: InputBorder.none,
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(vertical: 14),
             suffixIcon: _controller.text.isEmpty
                 ? null
                 : IconButton(
