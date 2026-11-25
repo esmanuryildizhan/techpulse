@@ -8,7 +8,11 @@ import 'package:techpulse/ui/search/search_screen.dart';
 import 'helpers.dart';
 
 void main() {
-  setUpAll(initTestLocale);
+  setUpAll(() async {
+    await initTestLocale();
+    // Gerçek yazı tipleri yüklenmezse test yazı tipi (Ahem) metinleri çok geniş çizer ve yerleşim değişir.
+    await loadAppFonts();
+  });
 
   testWidgets('Gündem haberleri listeler ve öne çıkan kartı gösterir', (tester) async {
     usePhoneSize(tester);
@@ -26,7 +30,10 @@ void main() {
     await tester.pumpWidget(await buildTestApp());
     await settle(tester);
 
-    await tester.tap(find.textContaining('Yazılım 2'));
+    final chip = find.textContaining('Yazılım 2', skipOffstage: false);
+    await tester.ensureVisible(chip);
+    await settle(tester, frames: 3);
+    await tester.tap(chip);
     await settle(tester, frames: 4);
 
     expect(find.text('Show HN: Rust ile yazılmış küçük, gömülü bir veritabanı'), findsOneWidget);
