@@ -39,13 +39,23 @@ class NewsImage extends StatelessWidget {
     final image = url;
     final Widget child = image == null || !AppConfig.networkImages
         ? fallback
-        : CachedNetworkImage(
-            imageUrl: image,
-            fit: BoxFit.cover,
-            fadeInDuration: const Duration(milliseconds: 220),
-            memCacheWidth: 1200,
-            placeholder: (context, _) => ColoredBox(color: context.tp.skeleton),
-            errorWidget: (context, _, _) => fallback,
+        : LayoutBuilder(
+            builder: (context, constraints) {
+              // Görsel, ekrandaki boyutuna yetecek çözünürlükte çözülür; küçük kartta 1200 piksellik görseli
+              // belleğe açmak hem belleği hem pili boşa harcar. (Yatay görseller için yükseklik payı bırakılır.)
+              final dpr = MediaQuery.devicePixelRatioOf(context);
+              final w = constraints.maxWidth.isFinite ? constraints.maxWidth : 400.0;
+              final h = constraints.maxHeight.isFinite ? constraints.maxHeight : w;
+              final decodeWidth = (math.max(w, h * 1.9) * dpr).round().clamp(96, 1400);
+              return CachedNetworkImage(
+                imageUrl: image,
+                fit: BoxFit.cover,
+                fadeInDuration: const Duration(milliseconds: 220),
+                memCacheWidth: decodeWidth,
+                placeholder: (context, _) => ColoredBox(color: context.tp.skeleton),
+                errorWidget: (context, _, _) => fallback,
+              );
+            },
           );
     return ClipRRect(borderRadius: borderRadius, child: SizedBox.expand(child: child));
   }
