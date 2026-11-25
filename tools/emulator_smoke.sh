@@ -35,7 +35,9 @@ tap_text() {
       | grep -o 'bounds="\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]"' | head -1 || true)
   fi
   if [ -n "$bounds" ]; then
-    read -r x1 y1 x2 y2 < <(echo "$bounds" | grep -o '[0-9]\+' | tr '\n' ' ')
+    local nums
+    nums=$(echo "$bounds" | grep -o '[0-9]\+' | tr '\n' ' ')
+    read -r x1 y1 x2 y2 <<< "$nums" # (here-string satır sonu ekler; read hata kodu döndürmez)
     tap $(((x1 + x2) / 2)) $(((y1 + y2) / 2))
     echo "dokunuldu: $text"
   else
