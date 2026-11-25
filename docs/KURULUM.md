@@ -9,7 +9,9 @@ Bu rehber, hiç mobil programlama bilmeyen biri için adım adım yazıldı.
 3. İndirme bitince bildirimden veya **Dosyalar → İndirilenler** klasöründen **TechPulse.apk** dosyasına dokunun.
 4. Telefon "Bilinmeyen uygulamalar yüklenemez" ya da "Bu kaynaktan yüklemeye izin ver" derse **Ayarlar**'a dokunun, açılan sayfadaki anahtarı açın ve geri dönün.
 5. **Yükle**'ye dokunun. Google Play Protect bir uyarı gösterirse **Yine de yükle** deyin. Uyarının nedeni uygulamanın Google Play'den değil, bizim derlememizden gelmesidir.
-6. Uygulamayı açın. İlk açılışta internet gerekir; sonraki açılışlarda son veriler internetsiz de görünür.
+6. Uygulamayı açın. İlk açılışta adınızı (isteğe bağlı) ve takip etmek istediğiniz konuları seçin; seçtiğiniz konular Ana Sayfa'da öne gelir. İlk açılışta internet gerekir; sonraki açılışlarda son veriler internetsiz de görünür.
+
+**Nerede ne var?** Alt çubukta dört sekme vardır: **Ana Sayfa** (haberler ve konu filtreleri), **Keşfet** (konular, trendler, Yapay Zekâ Radarı ve Aktif Siber Tehditler), **Kaydedilenler** (kaydet simgesine dokunduğunuz her şey; telefonda saklanır) ve **Profil** (adınız, ilgi alanlarınız, okuma geçmişiniz, favorileriniz ve ayarlar). Ana Sayfa'daki zil simgesi, ilgi alanlarınızdaki yeni gelişmeleri toplar.
 
 **Güncelleme:** Yeni bir sürüm çıktığında aynı adımları tekrarlayın. Yeni APK eskisinin üstüne kurulur ve kaydedilenler silinmez.
 
@@ -17,10 +19,12 @@ Bu rehber, hiç mobil programlama bilmeyen biri için adım adım yazıldı.
 
 ## 2. Veriler nasıl güncelleniyor?
 
-* GitHub Actions'taki **Veri hattı** iş akışı saatte bir (her saatin 17. dakikasında) kendiliğinden çalışır.
-* Kaynakları okur, yeni haberleri Türkçeye çevirir ve sonucu şu adreste yayınlar: `https://esmanuryildizhan.github.io/techpulse/`
+* GitHub Actions'taki **Veri hattı** iş akışı saatte bir (her saatin 23. dakikasında) kendiliğinden çalışır.
+* 40 kaynağı okur; yeni haberlerin kaynak sayfasını okuyup **yapay zekâ editörüyle** (Claude Haiku 5.5) Türkçe başlık, kısa özet ve ayrıntılı anlatım yazar; sonucu şu adreste yayınlar: `https://esmanuryildizhan.github.io/techpulse/`
+* Editör, depo ayarlarındaki **ANTHROPIC_API_KEY** adlı gizli anahtarı kullanır (GitHub'da depo → **Settings → Secrets and variables → Actions**). Anahtarı kimseyle paylaşmayın, koda veya sohbete yapıştırmayın. Anahtar silinirse veri hattı durmaz; yedek olarak OPUS-MT makine çevirisine döner.
+* Maliyet: Anthropic hesabından ölçülen kullanımla ayda yaklaşık 5 ABD doları. Anthropic Console'da aylık harcama sınırı koymanızı öneririz.
 * **Elle çalıştırmak için:** GitHub'da depoyu açın → **Actions** → soldan **Veri hattı** → sağdaki **Run workflow** → yeşil **Run workflow** düğmesi.
-* Uygulamada **Ayarlar → Kaynaklar ve durumları** ekranı, her kaynağın son çalışmada okunup okunamadığını gösterir.
+* Uygulamada **Profil → Kaynaklar ve Veri** ekranı, her kaynağın son çalışmada okunup okunamadığını gösterir.
 
 ## 3. Kodu bilgisayarda açmak ve çalıştırmak (isteğe bağlı, sunum için)
 
@@ -50,7 +54,7 @@ Kod GitHub'daki depoya gönderildiğinde **Uygulama** iş akışı kendiliğinde
 2. birim ve arayüz testlerini çalıştırır,
 3. ekran görüntülerini üretir,
 4. APK'yı derler,
-5. APK'yı Android emülatöründe açıp sekmeleri gezer ve çökme olup olmadığını kontrol eder,
+5. APK'yı Android emülatöründe açıp ilk açılış ekranını geçer, haber ayrıntısını ve sekmeleri gezer, çökme olup olmadığını kontrol eder,
 6. her şey başarılıysa APK'yı **Releases → latest** sayfasına yükler.
 
 ## 5. Sık karşılaşılan sorunlar
@@ -59,7 +63,8 @@ Kod GitHub'daki depoya gönderildiğinde **Uygulama** iş akışı kendiliğinde
 |---|---|
 | Uygulama "İlk kullanım için internet gerekiyor" diyor | İnternete bağlanıp **Tekrar dene**'ye dokunun. |
 | Listenin üstünde "Kaynak verisi … güncellendi; yeni veri bekleniyor" yazıyor | Veri hattı birkaç saattir çalışmamış. GitHub → Actions → Veri hattı'ndan son çalışmaya bakın veya elle çalıştırın. |
-| Bir haberin başlığı İngilizce | Çevirisi bir sonraki saatlik çalışmada yapılır. |
+| Bir haberin başlığı İngilizce, ayrıntıda "Ayrıntılı anlatım hazırlanıyor" yazıyor | Editör o haberi bir sonraki saatlik çalışmada yazar. Uzun süre böyle kalıyorsa Actions'ta Veri hattı'nın son çalışmasını açın; özetteki `"editor"` bölümünün `note` satırı anahtar veya bakiye sorununu gösterir. |
+| Editör hiç yazmıyor, özet "ANTHROPIC_API_KEY tanımlı değil" diyor | Settings → Secrets and variables → Actions'ta anahtarın adı tam olarak `ANTHROPIC_API_KEY` olmalı. |
 | Saatlik çalışmalar hiç başlamıyor veya gecikiyor | GitHub, zamanlanmış işleri yoğun saatlerde geciktirebilir; yeni açılmış depolarda bu gecikme daha uzun olabilir. Beklemeden güncellemek için Veri hattı'nı elle çalıştırın (bölüm 2). |
 | Actions sayfasında "This scheduled workflow is disabled" yazıyor | Açık depolarda 60 gün hiç değişiklik yapılmazsa GitHub saatlik çalışmayı kapatır. Actions → Veri hattı → **Enable workflow** düğmesine basın. |
 | `flutter` komutu tanınmıyor | PATH adımını kontrol edin ve yeni bir terminal açın. |
