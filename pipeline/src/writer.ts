@@ -21,7 +21,7 @@ const STYLE_RULES = `## Doğruluk kuralları (en önemli)
 - Yalnızca kaynak metinde bulunan olguları yaz. Kaynakta olmayan sayı, tarih, isim, alıntı, fiyat, sürüm numarası veya olay uydurma.
 - Kaynakta belirtilmeyen bir şeyi tahmin etme; bilmediğin ayrıntıya hiç değinme.
 - Teknik terimleri ve genel arka planı açıklamak için genel bilgini kullanabilirsin (ör. "fidye yazılımı nedir"), ama bu habere ait yeni bir olgu eklemek için kullanamazsın.
-- İddiaları kime ait olduğunu belirterek aktar ("Microsoft'a göre", "araştırmacıların açıklamasına göre").
+- İddiaları kime ait olduğunu belirterek aktar ("Microsoft'a göre", "araştırmacıların açıklamasına göre"). "Kaynağa göre" ya da "kaynak metne göre" gibi ifadeleri kullanma; bilgiyi sahibine (şirket, kurum, yayın, kişi) dayandır.
 - Kaynak metin kısaysa kısa yaz; uzatmak için tekrar etme, içi boş genel cümleler kurma.
 
 ## Dil ve üslup
@@ -29,7 +29,7 @@ const STYLE_RULES = `## Doğruluk kuralları (en önemli)
 - Kaynağı cümle cümle çevirme. Olayı anla ve deneyimli bir Türk haber editörü gibi kendi cümlelerinle anlat. Doğrudan alıntı gerekiyorsa en fazla bir kısa alıntı kullan.
 - Okur konuya yabancı olabilir: teknik kavramları ilk geçtikleri yerde kısaca açıkla, ama uzman okuru da sıkma.
 - Özel adları çevirme: şirket, ürün, model, programlama dili, kütüphane, işletim sistemi ve CVE adları aynen kalır (ör. Rust, Go, llama.cpp, Windows 11, GPT-5, CVE-2026-1234).
-- Yerleşmiş Türkçe karşılığı olan terimleri Türkçe kullan: vulnerability → güvenlik açığı, exploit → istismar etmek, data breach → veri ihlali, ransomware → fidye yazılımı, open source → açık kaynak, release → sürüm, inference → çıkarım, fine-tuning → ince ayar. Yerleşmemiş terimlerde İngilizcesini koru ve gerekirse kısaca açıkla.
+- Yerleşmiş Türkçe karşılığı olan terimleri Türkçe kullan: vulnerability → güvenlik açığı, exploit → istismar etmek, data breach → veri ihlali, ransomware → fidye yazılımı, open source → açık kaynak, release → sürüm, inference → çıkarım, fine-tuning → ince ayar, wire fraud → elektronik dolandırıcılık, indictment → iddianame. Yerleşmemiş terimlerde İngilizcesini koru ve gerekirse kısaca açıkla; kelimesi kelimesine çeviri uydurma.
 - "Yapay zekâ" yaz. Yüzdeleri "%40", ondalıkları "1,5", büyük sayıları "2,3 milyar dolar" biçiminde, tarihleri "25 Kasım" biçiminde yaz.
 - Markdown, madde işareti, emoji, yıldız veya diyez kullanma; düz metin yaz. Paragrafları boş satırla ayır.
 - Abartıdan, tık tuzağından, ünlemden ve soru biçimindeki başlıklardan kaçın; ilgiyi olgularla uyandır.`;
@@ -47,10 +47,10 @@ ${STYLE_RULES}
 - title: En fazla 90 karakterlik Türkçe başlık. Haberin özünü ve okur için neden ilginç olduğunu söylesin; doğru ve dikkat çekici olsun ama yanıltıcı olmasın. Gerekmedikçe iki nokta üst üste kullanma.
   Zayıf: "Microsoft Kasım güncellemesi bazı kullanıcılarda oturum açma sorunlarına yol açtı"
   Daha iyi: "Microsoft'un Kasım güncellemesi bazı kullanıcıların oturum açmasını engelliyor"
-- summary: Başlığın altındaki spot; 1-2 cümle, en fazla 220 karakter. Başlığı tekrar etmesin; ne olduğunu ve neden önemli olduğunu söylesin.
+- summary: Başlığın altındaki spot; tercihen tek cümle, en fazla 200 karakter. Başlığı tekrar etmesin; ne olduğunu ve neden önemli olduğunu söylesin.
 - intro: Giriş paragrafı; 2-4 cümle. Konuya yabancı birinin de ne olduğunu anlayacağı biçimde olayı özetler.
 - primer: "Önce bunu bil" kutusu. Haberi anlamak için gereken en fazla 3 teknik terim; her açıklama 1-2 sade cümle. Gerek yoksa boş liste.
-- sections: Haberin ayrıntılı anlatımı; 2-5 bölüm. Her bölümde kısa bir başlık (heading) ve 1-3 paragraf (body) olur. Haberin türüne uygun başlıklar seç; örnek: "Ne oldu?", "Bu neden önemli?", "Teknik olarak ne anlama geliyor?", "Kimler etkileniyor?", "Ne yapmalı?", "Bundan sonra ne olacak?". Her haberde aynı şablonu kullanma; kaynağın desteklemediği bölümü ekleme. Giriş ile bölümler aynı cümleleri tekrar etmesin. Toplam uzunluk kaynağın zenginliğine göre 150-450 kelime olsun.
+- sections: Haberin ayrıntılı anlatımı; 2-4 bölüm. Her bölümde kısa bir başlık (heading) ve 1-2 paragraf (body) olur. Haberin türüne uygun başlıklar seç; örnek: "Ne oldu?", "Bu neden önemli?", "Teknik olarak ne anlama geliyor?", "Kimler etkileniyor?", "Ne yapmalı?", "Bundan sonra ne olacak?". Her haberde aynı şablonu kullanma; kaynağın desteklemediği bölümü ekleme. Giriş ile bölümler aynı cümleleri tekrar etmesin. Toplam uzunluk kaynağın zenginliğine göre 150-350 kelime olsun; okur 2-3 dakikada bitirebilmeli.
 - category: Haberin ana konusu; şu kimliklerden biri:
 ${CATEGORY_LIST}
 - topics: 2-4 kısa konu etiketi (1-3 kelime, ilk harfi büyük; ör. "Büyük dil modelleri", "Fidye yazılımı", "Windows", "Kuantum bilgisayar").

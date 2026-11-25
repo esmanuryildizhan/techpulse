@@ -1,3 +1,4 @@
+import { decodeHTML } from 'entities';
 import { XMLParser } from 'fast-xml-parser';
 import type { FeedSource, RawNews } from '../types.ts';
 import { asArray, canonicalUrl, cleanText, daysAgo, fetchText, stableId, str, toIsoDate, truncate } from '../util.ts';
@@ -58,7 +59,8 @@ interface Entry {
 
 /** Görsel adresini doğrular: yalnızca https (http olanlar https'e yükseltilir), izleme pikselleri atlanır. */
 export function normalizeImageUrl(raw: unknown, base?: string): string | null {
-  const value = str(raw).trim();
+  // Bazı siteler og:image adresini iki kez kodlar (&amp;#038;); çözülmezse adres bozulur.
+  const value = decodeHTML(decodeHTML(str(raw).trim()));
   if (!value || value.startsWith('data:')) return null;
   let url: URL;
   try {

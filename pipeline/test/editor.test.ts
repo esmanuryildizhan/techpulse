@@ -12,7 +12,7 @@ import { parseRepos } from '../src/sources/github.ts';
 import { parseHackerNews } from '../src/sources/hackernews.ts';
 import { parseDailyPapers, parseTrendingModels } from '../src/sources/huggingface.ts';
 import { parseKev } from '../src/sources/kev.ts';
-import { parseFeed } from '../src/sources/rss.ts';
+import { normalizeImageUrl, parseFeed } from '../src/sources/rss.ts';
 import type { AiModel, Envelope, NewsItem, Paper, Repo, Vulnerability } from '../src/types.ts';
 import { applyNews, KEV_SCHEMA, MODEL_SCHEMA, NEWS_SCHEMA, PAPER_SCHEMA, paragraphs, plain, REPO_SCHEMA } from '../src/writer.ts';
 
@@ -117,6 +117,10 @@ describe('akış görselleri', () => {
     assert.equal(byTitle.get('Thumbnail only')?.imageUrl, 'https://cdn.example.com/thumb.png');
     assert.equal(byTitle.get('Inline image in content')?.imageUrl, 'https://news.example.com/uploads/inline.webp');
     assert.equal(byTitle.get('Enclosure image')?.imageUrl, 'https://cdn.example.com/enc.jpg');
+    assert.equal(
+      normalizeImageUrl('https://cdn.example.com/a.jpg?quality=90&amp;#038;strip=all'),
+      'https://cdn.example.com/a.jpg?quality=90&strip=all',
+    );
     assert.match(byTitle.get('Inline image in content')?.content ?? '', /full article body/);
     assert.equal(byTitle.get('Thumbnail only')?.content, '');
   });
