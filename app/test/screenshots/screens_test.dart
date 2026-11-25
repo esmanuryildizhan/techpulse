@@ -1,9 +1,12 @@
 @Tags(['screenshots'])
 library;
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:techpulse/data/local_store.dart';
+import 'package:techpulse/data/models.dart';
 import 'package:techpulse/state/providers.dart';
 import 'package:techpulse/ui/discover/discover_screen.dart';
 import 'package:techpulse/ui/news/news_detail_screen.dart';
@@ -35,11 +38,12 @@ void main() {
     bool dark = true,
     bool onboarded = true,
     Map<String, Object> prefs = const {},
+    LocalStore? store,
     Future<void> Function()? act,
   }) async {
     usePhoneSize(tester);
     await tester.pumpWidget(
-      await buildTestApp(home: home, onboarded: onboarded, prefs: {'settings.themeMode': dark ? 'dark' : 'light', ...prefs}),
+      await buildTestApp(home: home, store: store, onboarded: onboarded, prefs: {'settings.themeMode': dark ? 'dark' : 'light', ...prefs}),
     );
     await settle(tester);
     if (act != null) {
@@ -81,13 +85,13 @@ void main() {
     );
   });
 
-  testWidgets('kesfet', (tester) => shoot(tester, '06_kesfet', const DiscoverScreen()));
+  testWidgets('kesfet', (tester) => shoot(tester, '06_kesfet', const Scaffold(body: DiscoverScreen())));
 
   testWidgets('kesfet_devami', (tester) async {
     await shoot(
       tester,
       '07_kesfet_devami',
-      const DiscoverScreen(),
+      const Scaffold(body: DiscoverScreen()),
       act: () => tester.drag(find.byType(CustomScrollView), const Offset(0, -760)),
     );
   });
@@ -109,18 +113,28 @@ void main() {
   });
 
   testWidgets('kaydedilenler', (tester) async {
+    final news = parseNews(fixture('news.json')).items.where((n) => !n.hidden).toList();
+    final papers = parsePapers(fixture('papers.json')).items;
+    final store = MemoryStore();
+    Future<void> save(BookmarkKind kind, Entry entry, int hoursAgo) => store.saveRecord(
+          UserList.bookmarks,
+          BookmarkRecord(
+            key: BookmarkRecord.keyFor(kind, entry.id),
+            kind: kind,
+            payload: jsonEncode(entry.raw),
+            savedAt: testNow.subtract(Duration(hours: hoursAgo)),
+          ),
+        );
+    await save(BookmarkKind.news, news[0], 1);
+    await save(BookmarkKind.news, news[1], 3);
+    await save(BookmarkKind.paper, papers[0], 26);
+    await save(BookmarkKind.news, news[6], 50);
     await shoot(
       tester,
       '14_kaydedilenler',
       const AppShell(),
-      act: () async {
-        for (var i = 0; i < 3; i++) {
-          await tester.tap(find.byTooltip('Kaydet').first);
-          await settle(tester, frames: 3);
-        }
-        await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Kaydedilenler')));
-        await settle(tester, frames: 40);
-      },
+      store: store,
+      act: () => tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Kaydedilenler'))),
     );
   });
 
@@ -134,7 +148,7 @@ void main() {
   });
 
   testWidgets('profil', (tester) {
-    return shoot(tester, '16_profil', const ProfileScreen(), prefs: {...interests, 'profile.name': 'Esma Nur Yıldızhan'});
+    return shoot(tester, '16_profil', const Scaffold(body: ProfileScreen()), prefs: {...interests, 'profile.name': 'Esma Nur Yıldızhan'});
   });
 
   testWidgets('arama', (tester) async {

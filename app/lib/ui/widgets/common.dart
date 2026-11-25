@@ -79,13 +79,12 @@ class TpCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tp = context.tp;
-    final content = DecoratedBox(
-      decoration: BoxDecoration(
-        color: color ?? tp.card,
-        borderRadius: BorderRadius.circular(Tp.radius),
-        border: Border.all(color: tp.border),
-      ),
-      child: ClipRRect(borderRadius: BorderRadius.circular(Tp.radius), child: Padding(padding: padding, child: child)),
+    // Material zemin: içindeki ListTile ve dokunma dalgaları kartın üzerinde doğru çizilir.
+    final content = Material(
+      color: color ?? tp.card,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Tp.radius), side: BorderSide(color: tp.border)),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(padding: padding, child: child),
     );
     if (onTap == null) return content;
     return Pressable(onTap: onTap, semanticLabel: semanticLabel, child: content);

@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:techpulse/app.dart';
 import 'package:techpulse/core/config.dart';
+import 'package:techpulse/core/formatting.dart';
 import 'package:techpulse/data/data_source.dart';
 import 'package:techpulse/data/local_store.dart';
 import 'package:techpulse/state/providers.dart';
@@ -56,6 +57,7 @@ Future<Widget> buildTestApp({
 }) async {
   // Testlerde ağdan görsel indirilmez; konuya özel kapaklar çizilir.
   AppConfig.networkImages = false;
+  Fmt.clock = () => testNow;
   SharedPreferences.setMockInitialValues({if (onboarded) 'profile.onboarded': true, ...prefs});
   final preferences = await SharedPreferences.getInstance();
   return ProviderScope(

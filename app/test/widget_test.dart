@@ -57,7 +57,8 @@ void main() {
     await settle(tester, frames: 4);
 
     expect(find.text(byCategory('security').displayTitle), findsOneWidget);
-    expect(find.text(byCategory('industry').displayTitle, skipOffstage: false), findsNothing);
+    // (Diğer sekmeler arka planda canlı tutulduğu için yalnızca görünen sekmeye bakılır.)
+    expect(find.text(byCategory('industry').displayTitle), findsNothing);
   });
 
   testWidgets('Haber ayrıntısı anlatımı, "Önce bunu bil" kutusunu ve kaynak düğmesini gösterir', (tester) async {
@@ -74,8 +75,11 @@ void main() {
     expect(find.text(item.article!.intro), findsOneWidget);
     expect(find.text('Önce bunu bil', skipOffstage: false), findsOneWidget);
     expect(find.text(item.article!.sections.first.heading, skipOffstage: false), findsOneWidget);
-    expect(find.text('Orijinal haberi kaynağından incele', skipOffstage: false), findsOneWidget);
-    expect(find.textContaining('temel alınarak', skipOffstage: false), findsOneWidget);
+    final scroll = find.descendant(of: find.byType(NewsDetailScreen), matching: find.byType(Scrollable)).first;
+    await tester.scrollUntilVisible(find.text('Orijinal haberi kaynağından incele'), 400, scrollable: scroll);
+    await settle(tester, frames: 3);
+    expect(find.text('Orijinal haberi kaynağından incele'), findsOneWidget);
+    expect(find.textContaining('temel alınarak'), findsOneWidget);
     // Açılan haber okuma geçmişine eklenir.
     expect((await store.records(UserList.history)).single.key, BookmarkRecord.keyFor(BookmarkKind.news, item.id));
   });
