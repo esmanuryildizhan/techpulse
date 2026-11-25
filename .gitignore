@@ -1,0 +1,16 @@
+# Node / veri hattı
+node_modules/
+pipeline/dist/
+site/
+*.log
+
+# Derleme çıktıları
+/TechPulse.apk
+emulator-shots/
+
+# İşletim sistemi ve editör
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json

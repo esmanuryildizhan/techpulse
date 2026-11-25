@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel>
+  <title>Example Research Blog</title>
+  <link>https://research.example.com/</link>
+  <item>
+    <title>Introducing Phi-5: a small model that reasons &amp; codes</title>
+    <link>https://research.example.com/blog/phi-5/?utm_source=rss&amp;utm_medium=rss</link>
+    <pubDate>Mon, 23 Nov 2026 16:00:00 +0000</pubDate>
+    <guid isPermaLink="false">https://research.example.com/?p=1</guid>
+    <description><![CDATA[<p>We release <strong>Phi-5</strong>, a 7B parameter model trained on synthetic data.&nbsp;It matches larger models on math benchmarks.</p><p>The post <a href="https://research.example.com/blog/phi-5/">Introducing Phi-5</a> appeared first on Example Research Blog.</p>]]></description>
+    <content:encoded><![CDATA[<p>Long body that should not be used when description exists.</p>]]></content:encoded>
+  </item>
+  <item>
+    <title>Same post again with tracking</title>
+    <link>https://research.example.com/blog/phi-5/?utm_campaign=x</link>
+    <pubDate>Mon, 23 Nov 2026 15:00:00 +0000</pubDate>
+    <description>Duplicate</description>
+  </item>
+  <item>
+    <title>A post without description</title>
+    <link>https://research.example.com/blog/no-desc/</link>
+    <dc:date>2026-11-22T10:00:00Z</dc:date>
+  </item>
+  <item>
+    <title>Very old post</title>
+    <link>https://research.example.com/blog/old/</link>
+    <pubDate>Tue, 01 Sep 2026 10:00:00 +0000</pubDate>
+    <description>Too old to include.</description>
+  </item>
+  <item>
+    <title></title>
+    <link>https://research.example.com/blog/empty-title/</link>
+    <pubDate>Mon, 23 Nov 2026 12:00:00 +0000</pubDate>
+  </item>
+</channel>
+</rss>

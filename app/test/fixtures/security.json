@@ -1,0 +1,46 @@
+{
+ "schemaVersion": 1,
+ "generatedAt": "2026-11-25T09:00:00Z",
+ "items": [
+  {
+   "id": "CVE-2026-22222",
+   "cveId": "CVE-2026-22222",
+   "vendor": "Fortinet",
+   "product": "FortiOS",
+   "nameOriginal": "Fortinet FortiOS Out-of-Bounds Write Vulnerability",
+   "descriptionOriginal": "...",
+   "actionOriginal": "...",
+   "nameTr": "Fortinet FortiOS sınır dışı yazma açığı",
+   "descriptionTr": "FortiOS'ta kimliği doğrulanmamış bir saldırganın özel hazırlanmış isteklerle kod çalıştırmasına izin veren sınır dışı yazma açığı bulunuyor.",
+   "actionTr": "Üreticinin talimatlarına göre güncellemeyi uygulayın veya ürünü kullanmayı bırakın.",
+   "dateAdded": "2026-11-24",
+   "dueDate": "2026-12-15",
+   "ransomware": true,
+   "cwes": [
+    "CWE-787"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-22222",
+   "translated": true
+  },
+  {
+   "id": "CVE-2026-11111",
+   "cveId": "CVE-2026-11111",
+   "vendor": "Microsoft",
+   "product": "Windows",
+   "nameOriginal": "Microsoft Windows Privilege Escalation Vulnerability",
+   "descriptionOriginal": "Microsoft Windows contains a privilege escalation vulnerability.",
+   "actionOriginal": "Apply mitigations per vendor instructions.",
+   "nameTr": null,
+   "descriptionTr": null,
+   "actionTr": null,
+   "dateAdded": "2026-11-20",
+   "dueDate": "2026-12-11",
+   "ransomware": false,
+   "cwes": [
+    "CWE-269"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-11111",
+   "translated": false
+  }
+ ]
+}

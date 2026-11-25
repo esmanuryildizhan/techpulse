@@ -1,0 +1,120 @@
+name: Veri hattı
+
+# Saatte bir kaynakları toplar, yeni kayıtları açık kaynaklı OPUS-MT modeliyle (Helsinki Üniversitesi)
+# bu sunucunun işlemcisinde Türkçeye çevirir ve sonucu GitHub Pages'te statik JSON olarak yayımlar.
+# Uygulama bu dosyaları okur. Hiçbir dış yapay zekâ servisi, hesap veya API anahtarı gerekmez.
+
+on:
+  schedule:
+    - cron: "17 * * * *" # her saatin 17. dakikası (UTC); tam saat başındaki yoğunluktan kaçınmak için
+  workflow_dispatch:
+    inputs:
+      max_texts:
+        description: Bu çalışmada çevrilecek en fazla metin
+        default: "600"
+  push:
+    branches: [main]
+    paths: ["pipeline/**", ".github/workflows/data.yml"]
+
+concurrency:
+  group: data-pipeline
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Topla, çevir, doğrula
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write # ci-data dalına veri anlık görüntüsü göndermek için
+    defaults:
+      run:
+        working-directory: pipeline
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: pipeline/package-lock.json
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/mt/requirements.txt
+
+      - name: Çeviri modelinin bağımlılıkları
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r mt/requirements.txt
+
+      - name: Çeviri modeli önbelleği
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-opus-mt-tc-big-en-tr-v1
+
+      - name: Veriyi topla ve çevir
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAX_TRANSLATION_TEXTS: ${{ inputs.max_texts || '600' }}
+          MT_PYTHON: python
+          HF_HUB_DISABLE_TELEMETRY: "1"
+          TRANSFORMERS_VERBOSITY: error
+          OUT_DIR: ${{ github.workspace }}/site
+        run: |
+          export PAGES_URL="https://${GITHUB_REPOSITORY_OWNER,,}.github.io/${GITHUB_REPOSITORY#*/}"
+          echo "Önceki yayın: $PAGES_URL"
+          npm start
+
+      - name: Özet
+        run: |
+          {
+            echo "### Veri hattı sonucu"
+            echo '```json'
+            cat "$GITHUB_WORKSPACE/site/v1/meta.json"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Veri anlık görüntüsünü ci-data dalına gönder
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash ../tools/publish_branch.sh ci-data "$GITHUB_WORKSPACE/site" "Veri anlık görüntüsü $(date -u '+%Y-%m-%d %H:%M UTC')"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    name: GitHub Pages'e yayımla
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url || steps.retry.outputs.page_url }}
+    steps:
+      # GitHub Pages ara sıra geçici "502 Server Error" döndürür; bir dakika bekleyip bir kez daha denenir.
+      - id: deployment
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - name: Bekle (geçici Pages hatası)
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 60
+      - id: retry
+        if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v4

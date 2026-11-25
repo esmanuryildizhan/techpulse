@@ -1,0 +1,24 @@
+{
+  "name": "techpulse-pipeline",
+  "version": "1.0.0",
+  "description": "TechPulse veri hattı: kaynakları toplar, Türkçeye çevirir, statik JSON API üretir.",
+  "scripts": {
+    "start": "node src/index.ts",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "entities": "^9.0.0",
+    "fast-xml-parser": "^5.12.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.10",
+    "typescript": "^7.0.2"
+  },
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  }
+}
