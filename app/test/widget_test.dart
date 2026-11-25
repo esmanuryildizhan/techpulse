@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:techpulse/data/local_store.dart';
 import 'package:techpulse/ui/news/news_card.dart';
 import 'package:techpulse/ui/news/news_detail_screen.dart';
-import 'package:techpulse/ui/news/news_screen.dart';
 import 'package:techpulse/ui/search/search_screen.dart';
 
 import 'helpers.dart';
@@ -27,15 +26,13 @@ void main() {
     await tester.pumpWidget(await buildTestApp());
     await settle(tester);
 
-    // Çip yatay listede ekranın dışında kalabilir; önce listeyi sola kaydır.
-    await tester.drag(find.byType(CategoryBar), const Offset(-400, 0));
-    await settle(tester, frames: 4);
-    await tester.tap(find.textContaining('Güvenlik 1'));
+    await tester.tap(find.textContaining('Yazılım 2'));
     await settle(tester, frames: 4);
 
-    expect(find.text('Saldırganlar popüler VPN cihazlarındaki kritik açığı istismar ediyor'), findsOneWidget);
+    expect(find.text('Show HN: Rust ile yazılmış küçük, gömülü bir veritabanı'), findsOneWidget);
     expect(find.text('Geliştiriciler için daha hızlı bir akıl yürütme modeli tanıtıldı'), findsNothing);
-    expect(find.textContaining('1 haber'), findsOneWidget);
+    expect(find.textContaining('2 haber'), findsOneWidget);
+    expect(find.text('Öne çıkan'), findsNothing);
   });
 
   testWidgets('Habere dokununca ayrıntı ve kaynak düğmesi açılır', (tester) async {
