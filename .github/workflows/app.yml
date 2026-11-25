@@ -137,9 +137,12 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      # Not: API 34 emülatöründe yazılım tabanlı grafik sürücüsü (SwiftShader), Impeller ile çok sayıda
+      # haber görselini çizerken emülatörün kendisini çökertti (uygulamada çökme kaydı yoktu). API 28'de
+      # Flutter Skia ile çizer ve emülatör kararlı çalışır.
       - uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: 28
           arch: x86_64
           target: google_apis
           profile: pixel_6
