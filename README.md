@@ -17,7 +17,7 @@ Ayrıntılı kurulum, bilgisayarda çalıştırma ve sorun giderme: [docs/KURULU
 
 | Bölüm | İçerik | Kaynak |
 |---|---|---|
-| **Gündem** | Haber başlıkları ve 2-3 cümlelik Türkçe özetler; konu filtresi (Yapay Zekâ, Yazılım, Donanım, Güvenlik, Sektör) | OpenAI, Google AI, Google DeepMind, Microsoft Research, NVIDIA, Hugging Face, GitHub, AWS, Android ve Flutter blogları; The Verge, TechCrunch, Ars Technica, Tom's Hardware, BleepingComputer, The Hacker News; Hacker News |
+| **Gündem** | Türkçeye çevrilmiş başlıklar ve kaynağın kısa açıklaması; konu filtresi (Yapay Zekâ, Yazılım, Donanım, Güvenlik, Sektör) | OpenAI, Google AI, Google DeepMind, Microsoft Research, NVIDIA, Hugging Face, GitHub, AWS, Android ve Flutter blogları; The Verge, TechCrunch, Ars Technica, Tom's Hardware, BleepingComputer, The Hacker News; Hacker News |
 | **YZ Radarı** | Hugging Face'te trend olan modeller (görev, beğeni, indirme, parametre), günün öne çıkan makaleleri (Türkçe özet), GitHub'da son 7 günün yükselen projeleri | Hugging Face Hub API, Hugging Face Daily Papers, GitHub Search API |
 | **Güvenlik** | Saldırganların şu an kullandığı açıklar | CISA Known Exploited Vulnerabilities (KEV) |
 | **Kaydedilenler** | İnternetsiz de açılan yer imleri | Telefondaki SQLite |

@@ -60,4 +60,6 @@ Kod GitHub'daki depoya gönderildiğinde **Uygulama** iş akışı kendiliğinde
 | Uygulama "İlk kullanım için internet gerekiyor" diyor | İnternete bağlanıp **Tekrar dene**'ye dokunun. |
 | Listenin üstünde "Kaynak verisi … güncellendi; yeni veri bekleniyor" yazıyor | Veri hattı birkaç saattir çalışmamış. GitHub → Actions → Veri hattı'ndan son çalışmaya bakın veya elle çalıştırın. |
 | Bir haberin başlığı İngilizce | Çevirisi bir sonraki saatlik çalışmada yapılır. |
+| Saatlik çalışmalar hiç başlamıyor veya gecikiyor | GitHub, zamanlanmış işleri yoğun saatlerde geciktirebilir; yeni açılmış depolarda bu gecikme daha uzun olabilir. Beklemeden güncellemek için Veri hattı'nı elle çalıştırın (bölüm 2). |
+| Actions sayfasında "This scheduled workflow is disabled" yazıyor | Açık depolarda 60 gün hiç değişiklik yapılmazsa GitHub saatlik çalışmayı kapatır. Actions → Veri hattı → **Enable workflow** düğmesine basın. |
 | `flutter` komutu tanınmıyor | PATH adımını kontrol edin ve yeni bir terminal açın. |

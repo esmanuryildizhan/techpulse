@@ -102,7 +102,7 @@ class SettingsScreen extends ConsumerWidget {
               SizedBox(height: 16),
               Text(
                 'TechPulse, yazılım, yapay zekâ, donanım ve siber güvenlik gündemini kaynaklarından toplayıp '
-                'Türkçe özetler. İçeriklerin tüm hakları kaynaklarına aittir; uygulama yalnızca başlık, kısa özet '
+                'Türkçeye çevirir. İçeriklerin tüm hakları kaynaklarına aittir; uygulama yalnızca başlık, kısa açıklama '
                 've kaynağa bağlantı gösterir.',
               ),
             ],

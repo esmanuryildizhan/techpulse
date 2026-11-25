@@ -11,7 +11,7 @@ import '../widgets/common.dart';
 import '../widgets/state_views.dart';
 import 'news_card.dart';
 
-/// Gündem: resmî bloglar, haber siteleri ve Hacker News'ten Türkçe özetlenmiş haberler.
+/// Gündem: resmî bloglar, haber siteleri ve Hacker News'ten Türkçeye çevrilmiş haberler.
 class NewsScreen extends ConsumerStatefulWidget {
   const NewsScreen({super.key});
 

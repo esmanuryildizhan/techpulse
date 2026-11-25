@@ -1,8 +1,8 @@
 import type { Category, FeedSource } from './types.ts';
 
 /**
- * Yedek konu belirleyici. Asıl konu, çeviri sırasında dil modeli tarafından seçilir;
- * çeviri yapılamadığında bu kurallar kullanılır. Başlıktaki eşleşme 3, açıklamadaki 1 puandır.
+ * Kural tabanlı konu belirleyici. Her konunun anahtar kelimeleri başlıkta 3, açıklamada 1 puan alır;
+ * en yüksek puan 3 veya üzerindeyse o konu seçilir, değilse kaynağın varsayılan konusu kullanılır.
  * Kelimeler tam kelime olarak aranır: "RAM" kelimesi "program" içinde bulunmaz.
  */
 const RULES: Record<Category, string[]> = {
