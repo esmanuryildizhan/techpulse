@@ -91,6 +91,12 @@ describe('çeviri düzeltmeleri', () => {
     assert.equal(fixed, 'Drupal Güvenlik Açığı ve yapay zekâ; Pekiştirmeli Öğrenme ile başarılı istismar %6 oranında');
     assert.equal(polishTurkish(fixed), fixed);
     assert.equal(polishTurkish('müşterilerin% 6sı'), 'müşterilerin %6sı');
+    assert.equal(
+      polishTurkish("Kaynak metne göre, şirketin yüksek performanslı GPU'ları satıldı. Kaynağa göre ihracat durdu."),
+      "Şirketin yüksek performanslı GPU'ları satıldı. İhracat durdu.",
+    );
+    assert.equal(polishTurkish('Şirket, kaynağa göre, satışı durdurdu.'), 'Şirket satışı durdurdu.');
+    assert.equal(polishTurkish('Microsoft’a göre sorun çözüldü.'), 'Microsoft’a göre sorun çözüldü.');
   });
 
   it('indirim ve teknolojiyle ilgisiz haberleri ayıklar', () => {

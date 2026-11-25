@@ -1,7 +1,7 @@
 import { classify } from './classify.ts';
 import type { TranslateFn } from './mt.ts';
 import { findSource } from './sources/feeds.ts';
-import type { State } from './types.ts';
+import type { Article, State } from './types.ts';
 import { MODEL_SUMMARY_VERSION } from './types.ts';
 import { errorMessage, log, truncate } from './util.ts';
 
@@ -54,7 +54,18 @@ export function polishTurkish(text: string): string {
   for (const [pattern, replacement] of GLOSSARY) {
     out = typeof replacement === 'string' ? out.replace(pattern, replacement) : out.replace(pattern, replacement);
   }
-  return out;
+  return dropSourcePhrases(out);
+}
+
+// Editör talimata rağmen zaman zaman "Kaynak metne göre, ..." diye başlıyor. Bilgi zaten sahibine dayandırılıyor;
+// bu kalıp okura bir şey anlatmadığı için atılır ve cümlenin ilk harfi büyütülür.
+const SOURCE_PHRASE_START = /(^|[.!?…]\s+)(?:kaynak (?:metne|metinde|habere|haberde)|kaynağa) göre,?\s+(\p{L})/giu;
+const SOURCE_PHRASE_MID = /,\s*(?:kaynak (?:metne|habere)|kaynağa) göre,/giu;
+
+export function dropSourcePhrases(text: string): string {
+  return text
+    .replace(SOURCE_PHRASE_START, (_m, before: string, letter: string) => before + letter.toLocaleUpperCase('tr'))
+    .replace(SOURCE_PHRASE_MID, '');
 }
 
 /** Çeviri çıktısını sadeleştirir. */
@@ -155,13 +166,21 @@ export function kevNameTr(name: string): string | null {
 /** Bütün çevrilmiş metinlere terim düzeltmelerini uygular; CISA adlarını sözlükle yeniler. */
 export function polishState(state: State): void {
   const fix = (text: string | null) => (text ? polishTurkish(text) : text);
+  const fixArticle = (article: Article | null | undefined): void => {
+    if (!article) return;
+    article.intro = polishTurkish(article.intro);
+    article.primer = article.primer.map((p) => ({ term: p.term, explanation: polishTurkish(p.explanation) }));
+    article.sections = article.sections.map((s) => ({ heading: s.heading, body: polishTurkish(s.body) }));
+  };
   for (const n of state.news) {
     n.titleTr = fix(n.titleTr);
     n.summaryTr = fix(n.summaryTr);
+    fixArticle(n.article);
   }
   for (const p of state.papers) {
     p.titleTr = fix(p.titleTr);
     p.summaryTr = fix(p.summaryTr);
+    fixArticle(p.article);
   }
   for (const v of state.security) {
     v.nameTr = v.writer === 'ai' ? fix(v.nameTr) : (kevNameTr(v.nameOriginal) ?? fix(v.nameTr));
