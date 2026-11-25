@@ -1,16 +1,17 @@
 name: Veri hattı
 
-# Saatte bir kaynakları toplar, yeni kayıtları GitHub Models ile Türkçeye çevirir ve
-# sonucu GitHub Pages'te statik JSON olarak yayımlar. Uygulama bu dosyaları okur.
+# Saatte bir kaynakları toplar, yeni kayıtları açık kaynaklı OPUS-MT modeliyle (Helsinki Üniversitesi)
+# bu sunucunun işlemcisinde Türkçeye çevirir ve sonucu GitHub Pages'te statik JSON olarak yayımlar.
+# Uygulama bu dosyaları okur. Hiçbir dış yapay zekâ servisi, hesap veya API anahtarı gerekmez.
 
 on:
   schedule:
     - cron: "17 * * * *" # her saatin 17. dakikası (UTC); tam saat başındaki yoğunluktan kaçınmak için
   workflow_dispatch:
     inputs:
-      max_requests:
-        description: Bu çalışmadaki en fazla çeviri isteği
-        default: "30"
+      max_texts:
+        description: Bu çalışmada çevrilecek en fazla metin
+        default: "600"
   push:
     branches: [main]
     paths: ["pipeline/**", ".github/workflows/data.yml"]
@@ -26,10 +27,9 @@ jobs:
   build:
     name: Topla, çevir, doğrula
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     permissions:
       contents: read
-      models: read # GitHub Models'i hazır GITHUB_TOKEN ile kullanmak için
     defaults:
       run:
         working-directory: pipeline
@@ -46,10 +46,31 @@ jobs:
       - run: npm run typecheck
       - run: npm test
 
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/mt/requirements.txt
+
+      - name: Çeviri modelinin bağımlılıkları
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r mt/requirements.txt
+
+      - name: Çeviri modeli önbelleği
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-opus-mt-tc-big-en-tr-v1
+
       - name: Veriyi topla ve çevir
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MAX_TRANSLATION_REQUESTS: ${{ inputs.max_requests || '30' }}
+          MAX_TRANSLATION_TEXTS: ${{ inputs.max_texts || '600' }}
+          MT_PYTHON: python
+          HF_HUB_DISABLE_TELEMETRY: "1"
+          TRANSFORMERS_VERBOSITY: error
           OUT_DIR: ${{ github.workspace }}/site
         run: |
           export PAGES_URL="https://${GITHUB_REPOSITORY_OWNER,,}.github.io/${GITHUB_REPOSITORY#*/}"

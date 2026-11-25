@@ -7,15 +7,8 @@ import { fetchHackerNews } from './sources/hackernews.ts';
 import { enrichModel, fetchDailyPapers, fetchTrendingModels } from './sources/huggingface.ts';
 import { fetchKev } from './sources/kev.ts';
 import { fetchFeed } from './sources/rss.ts';
-import {
-  applyFallbackCategories,
-  translateKev,
-  translateModels,
-  translateNews,
-  translatePapers,
-  translateRepos,
-} from './translate.ts';
-import { Translator } from './translator.ts';
+import type { TranslateFn } from './mt.ts';
+import { applyCategories, translatePending } from './translate.ts';
 import type { AiModel, Envelope, FeedSource, Meta, Paper, RawNews, Repo, SourceStatus, State, Vulnerability } from './types.ts';
 import { SCHEMA_VERSION } from './types.ts';
 import { errorMessage, fetchJson, log, mapLimit } from './util.ts';
@@ -37,10 +30,9 @@ export interface PipelineOptions {
   previousDir?: string;
   token?: string;
   now?: Date;
-  maxTranslationRequests?: number;
-  translationDeadlineMs?: number;
-  translatorFetch?: typeof fetch;
-  translatorModel?: string;
+  /** Makine çevirisi; null ise çeviri yapılmaz (kayıtlar özgün diliyle yayımlanır). */
+  translate?: TranslateFn | null;
+  maxTranslationTexts?: number;
   fetchers?: Partial<Fetchers>;
 }
 
@@ -164,30 +156,13 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
     state.models = state.models.map((m) => byId.get(m.id) ?? m);
   }
 
-  // 4) Türkçeye çevir. Öncelik: haberler, makaleler, güvenlik, modeller, projeler.
-  const translator = new Translator({
-    token: options.token,
-    maxRequests: options.maxTranslationRequests ?? 30,
-    deadline: Date.now() + (options.translationDeadlineMs ?? 9 * 60_000),
-    fetchImpl: options.translatorFetch,
-    forcedModel: options.translatorModel,
+  // 4) Konuyu belirle ve Türkçeye çevir (açık kaynak OPUS-MT modeli, Actions sunucusunda).
+  applyCategories(state);
+  const translation = await translatePending(state, options.translate ?? null, {
+    maxTexts: options.maxTranslationTexts,
   });
-  await translator.init();
-  let translatedItems = 0;
-  translatedItems += await translateNews(translator, state.news);
-  translatedItems += await translatePapers(translator, state.papers);
-  translatedItems += await translateKev(translator, state.security);
-  translatedItems += await translateModels(translator, state.models);
-  translatedItems += await translateRepos(translator, state.repos);
-  if (translator.stopReason) log.warn(`Çeviri durdu: ${translator.stopReason}`);
-  applyFallbackCategories(state.news);
   // Özeti çıkarılmış modellerin kart metnini yayımlamaya gerek yok.
   for (const model of state.models) if (model.translated) model.cardExcerpt = '';
-
-  const pendingItems =
-    state.news.filter((n) => !n.translated).length +
-    state.papers.filter((p) => !p.translated).length +
-    state.security.filter((v) => !v.translated).length;
 
   // 5) Doğrula ve yaz.
   const warn = (msg: string) => log.warn(`Yayın öncesi doğrulama: ${msg}`);
@@ -204,11 +179,11 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
     schemaVersion: SCHEMA_VERSION,
     generatedAt,
     translator: {
-      model: translator.model,
-      requests: translator.requests,
-      translatedItems,
-      pendingItems,
-      note: translator.stopReason,
+      model: translation.model,
+      requests: translation.texts,
+      translatedItems: translation.translatedItems,
+      pendingItems: translation.pendingItems,
+      note: translation.note,
     },
     counts: {
       news: output.news.length,

@@ -44,7 +44,7 @@ void main() {
 
     expect(find.byType(NewsDetailScreen), findsOneWidget);
     expect(find.textContaining('Kaynağında oku'), findsOneWidget);
-    expect(find.textContaining('yapay zekâ ile otomatik'), findsOneWidget);
+    expect(find.textContaining('makine çevirisidir'), findsOneWidget);
   });
 
   testWidgets('Kaydedilen haber Kaydedilenler sekmesinde görünür', (tester) async {

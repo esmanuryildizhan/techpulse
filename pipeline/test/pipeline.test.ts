@@ -10,40 +10,22 @@ import { parseHackerNews } from '../src/sources/hackernews.ts';
 import { parseDailyPapers, parseTrendingModels } from '../src/sources/huggingface.ts';
 import { parseKev } from '../src/sources/kev.ts';
 import { parseFeed } from '../src/sources/rss.ts';
-import { parseModelJson, Translator } from '../src/translator.ts';
+import type { TranslateFn } from '../src/mt.ts';
+import { leadSentences, translatePending } from '../src/translate.ts';
 import type { Envelope, NewsItem } from '../src/types.ts';
 
 const fixture = (name: string) => readFileSync(new URL(`./fixtures/${name}`, import.meta.url), 'utf8');
 const NOW = new Date('2026-11-25T12:00:00Z');
 
-/** GitHub Models'i taklit eden sahte sunucu. */
-function fakeModels(options: { catalog?: unknown; failFirstModel?: boolean; status?: number } = {}) {
-  const calls: { model: string; items: number }[] = [];
-  const impl = (async (input: string | URL | Request, init?: RequestInit) => {
-    const url = String(input);
-    if (url.endsWith('/catalog/models')) {
-      return new Response(JSON.stringify(options.catalog ?? []), { status: 200 });
-    }
-    const body = JSON.parse(String(init?.body));
-    if (options.status) return new Response('limit', { status: options.status });
-    if (options.failFirstModel && calls.length === 0 && body.model === 'openai/gpt-4.1-mini') {
-      calls.push({ model: body.model, items: 0 });
-      return new Response('{"error":{"code":"unknown_model"}}', { status: 404 });
-    }
-    const user = JSON.parse(body.messages[1].content) as { items: Record<string, unknown>[] };
-    calls.push({ model: body.model, items: user.items.length });
-    const items = user.items.map((item) => {
-      const id = item.id;
-      if ('snippet' in item) return { id, title_tr: `TR: ${item.title}`, summary_tr: 'Türkçe özet.', category: 'ai', tags: ['Test', '#Etiket'] };
-      if ('abstract' in item) return { id, title_tr: `TR: ${item.title}`, summary_tr: 'Makale özeti.', tags: ['Görüntü bölütleme'] };
-      if ('card' in item) return { id, summary_tr: 'Model özeti.' };
-      if ('topics' in item) return { id, description_tr: 'Proje açıklaması.' };
-      return { id, name_tr: 'Açık adı', description_tr: 'Açık açıklaması.', action_tr: 'Yamayı uygulayın.' };
-    });
-    const content = '```json\n' + JSON.stringify({ items }) + '\n```';
-    return new Response(JSON.stringify({ choices: [{ message: { content } }] }), { status: 200 });
-  }) as typeof fetch;
-  return { impl, calls };
+/** Sahte makine çevirisi: her metnin başına "TR: " ekler ve çağrıları sayar. */
+function fakeMt(options: { fail?: boolean } = {}) {
+  const calls: string[][] = [];
+  const translate: TranslateFn = async (texts) => {
+    calls.push(texts);
+    if (options.fail) throw new Error('model indirilemedi');
+    return { model: 'test/mt', translations: texts.map((t) => `TR: ${t}`), seconds: 0.1 };
+  };
+  return { translate, calls };
 }
 
 function fixtureFetchers(): Fetchers {
@@ -73,70 +55,70 @@ async function readEnvelope<T>(dir: string, name: string): Promise<Envelope<T>> 
   return JSON.parse(await readFile(join(dir, 'v1', `${name}.json`), 'utf8'));
 }
 
-describe('parseModelJson', () => {
-  it('kod bloğu ve çevre metni tolere eder', () => {
-    assert.deepEqual(parseModelJson('```json\n{"a":1}\n```'), { a: 1 });
-    assert.deepEqual(parseModelJson('Here you go: {"a":2} thanks'), { a: 2 });
-    assert.equal(parseModelJson('no json'), null);
+describe('leadSentences', () => {
+  it('kısa metni olduğu gibi bırakır', () => {
+    assert.equal(leadSentences('Kısa bir metin.', 100), 'Kısa bir metin.');
+  });
+  it('sınırı aşmadan ilk cümleleri alır', () => {
+    const text = 'First sentence here. Second sentence is a bit longer. Third one would overflow the limit.';
+    assert.equal(leadSentences(text, 60), 'First sentence here. Second sentence is a bit longer.');
+  });
+  it('ilk cümle bile sığmazsa kelime sınırında keser', () => {
+    const out = leadSentences('word '.repeat(40).trim(), 50);
+    assert.ok(out.length <= 51 && out.endsWith('…'));
   });
 });
 
-describe('Translator', () => {
-  it('katalogdan düşük katmanlı modeli öne alır', async () => {
-    const { impl, calls } = fakeModels({
-      catalog: [
-        { id: 'openai/gpt-4.1-mini', rate_limit_tier: 'high' },
-        { id: 'openai/gpt-4o-mini', rate_limit_tier: 'low' },
-      ],
-    });
-    const t = new Translator({ token: 'x', fetchImpl: impl, retryDelayMs: 0 });
-    await t.init();
-    await t.completeJson('sys', JSON.stringify({ items: [{ id: '1', title: 'a', snippet: '' }] }));
-    assert.equal(calls[0].model, 'openai/gpt-4o-mini');
-    assert.equal(t.model, 'openai/gpt-4o-mini');
+describe('translatePending', () => {
+  it('aynı metni bir kez çevirir ve bütçeye uyar', async () => {
+    const state = {
+      news: [],
+      models: [],
+      papers: [],
+      repos: [],
+      security: parseKev(JSON.parse(fixture('kev.json'))),
+    };
+    const { translate, calls } = fakeMt();
+    const summary = await translatePending(state, translate, { maxTexts: 100 });
+    assert.equal(summary.translatedItems, 2);
+    // İki kaydın "required action" metinleri farklı; adlar ve açıklamalar farklı: 6 benzersiz metin
+    assert.equal(calls[0].length, new Set(calls[0]).size);
+    assert.ok(state.security.every((v) => v.translated && v.nameTr?.startsWith('TR: ')));
+
+    const tight = { news: [], models: [], papers: [], repos: [], security: parseKev(JSON.parse(fixture('kev.json'))) };
+    const limited = await translatePending(tight, fakeMt().translate, { maxTexts: 3 });
+    assert.equal(limited.translatedItems, 1);
+    assert.equal(limited.pendingItems, 1);
   });
 
-  it('bulunamayan modelde sıradakine geçer', async () => {
-    const { impl, calls } = fakeModels({ failFirstModel: true });
-    const t = new Translator({ token: 'x', fetchImpl: impl, retryDelayMs: 0 });
-    const out = await t.completeJson('sys', JSON.stringify({ items: [{ id: '1', title: 'a', snippet: '' }] }));
-    assert.ok(out);
-    assert.equal(calls[1].model, 'openai/gpt-4o-mini');
-  });
-
-  it('oran sınırında bu çalışma için durur', async () => {
-    const { impl } = fakeModels({ status: 429 });
-    const t = new Translator({ token: 'x', fetchImpl: impl, retryDelayMs: 0 });
-    assert.equal(await t.completeJson('sys', '{"items":[]}'), null);
-    assert.equal(t.available, false);
-    assert.match(t.stopReason ?? '', /oran sınırı/);
-  });
-
-  it('jeton yoksa hiç istek atmaz', async () => {
-    const t = new Translator({});
-    assert.equal(t.available, false);
-    assert.equal(await t.completeJson('s', 'u'), null);
-    assert.equal(t.requests, 0);
+  it('çeviri başarısız olursa kayıtlar bekleyen kalır', async () => {
+    const state = { news: [], models: [], papers: [], repos: [], security: parseKev(JSON.parse(fixture('kev.json'))) };
+    const summary = await translatePending(state, fakeMt({ fail: true }).translate);
+    assert.equal(summary.translatedItems, 0);
+    assert.equal(summary.pendingItems, 2);
+    assert.match(summary.note ?? '', /model indirilemedi/);
+    assert.ok(state.security.every((v) => !v.translated && v.nameTr === null));
   });
 });
 
 describe('runPipeline', () => {
   it('kaynakları toplar, çevirir, doğrular ve yazar', async () => {
     const out = await mkdtemp(join(tmpdir(), 'tp-'));
-    const { impl, calls } = fakeModels();
+    const { translate, calls } = fakeMt();
     const { meta } = await runPipeline({
       outDir: out,
-      token: 'x',
       now: NOW,
       fetchers: fixtureFetchers(),
-      translatorFetch: impl,
+      translate,
     });
 
     const news = await readEnvelope<NewsItem>(out, 'news');
     assert.equal(news.schemaVersion, 1);
     assert.equal(news.items.length, 6); // 2 RSS + 2 Atom + 2 HN
     assert.ok(news.items.every((n) => n.translated && n.titleTr?.startsWith('TR: ')));
-    assert.deepEqual(news.items[0].tags, ['Test', 'Etiket']);
+    const phi = news.items.find((n) => n.titleOriginal.startsWith('Introducing Phi-5'))!;
+    assert.match(phi.summaryTr ?? '', /^TR: We release Phi-5/);
+    assert.equal(phi.category, 'ai');
     // en yeni haber başta
     assert.equal(news.items[0].sourceId, 'android-developers');
     const hn = news.items.find((n) => n.sourceId === 'hacker-news')!;
@@ -144,20 +126,21 @@ describe('runPipeline', () => {
     assert.equal(hn.discussionUrl, 'https://news.ycombinator.com/item?id=46001');
 
     const models = await readEnvelope<{ summaryTr: string | null; parameters: number | null; cardExcerpt: string }>(out, 'models');
-    assert.equal(models.items[0].summaryTr, 'Model özeti.');
+    assert.match(models.items[0].summaryTr ?? '', /^TR: Vision-Seg is a promptable/);
     assert.equal(models.items[0].parameters, 2_000_000_000);
     assert.equal(models.items[0].cardExcerpt, '');
 
     const security = await readEnvelope<{ nameTr: string }>(out, 'security');
     assert.equal(security.items.length, 2);
-    assert.equal(security.items[0].nameTr, 'Açık adı');
+    assert.equal(security.items[0].nameTr, 'TR: Fortinet FortiOS Out-of-Bounds Write Vulnerability');
 
     assert.equal(meta.counts.news, 6);
     assert.equal(meta.translator.pendingItems, 0);
     const openai = meta.sources.find((s) => s.id === 'openai')!;
     assert.equal(openai.ok, false);
     assert.match(openai.error ?? '', /403/);
-    assert.ok(calls.length >= 5);
+    assert.equal(calls.length, 1, 'bütün metinler tek seferde çevrilmeli');
+    assert.equal(meta.translator.model, 'test/mt');
 
     const html = await readFile(join(out, 'index.html'), 'utf8');
     assert.match(html, /TechPulse Veri API/);
@@ -165,19 +148,18 @@ describe('runPipeline', () => {
 
   it('ikinci çalışmada çevrilmiş kayıtları yeniden çevirmez', async () => {
     const first = await mkdtemp(join(tmpdir(), 'tp-'));
-    await runPipeline({ outDir: first, token: 'x', now: NOW, fetchers: fixtureFetchers(), translatorFetch: fakeModels().impl });
+    await runPipeline({ outDir: first, now: NOW, fetchers: fixtureFetchers(), translate: fakeMt().translate });
 
     const second = await mkdtemp(join(tmpdir(), 'tp-'));
-    const { impl, calls } = fakeModels();
+    const { translate, calls } = fakeMt();
     const { meta } = await runPipeline({
       outDir: second,
       previousDir: first,
-      token: 'x',
       now: new Date(NOW.getTime() + 3_600_000),
       fetchers: fixtureFetchers(),
-      translatorFetch: impl,
+      translate,
     });
-    assert.equal(calls.length, 0, 'çevrilmiş kayıtlar için istek atılmamalı');
+    assert.equal(calls.length, 0, 'çevrilmiş kayıtlar tekrar çevrilmemeli');
     assert.equal(meta.counts.news, 6);
     const news = await readEnvelope<NewsItem>(second, 'news');
     assert.ok(news.items.every((n) => n.translated));
@@ -191,6 +173,6 @@ describe('runPipeline', () => {
     assert.ok(news.items.every((n) => !n.translated && n.titleTr === null));
     const gpu = news.items.find((n) => n.titleOriginal.includes('GPU'))!;
     assert.equal(gpu.category, 'hardware');
-    assert.match(meta.translator.note ?? '', /GITHUB_TOKEN/);
+    assert.match(meta.translator.note ?? '', /Çeviri kapalı/);
   });
 });

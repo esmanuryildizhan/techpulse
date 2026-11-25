@@ -283,8 +283,8 @@ class _VulnerabilitySheet extends StatelessWidget {
           InfoNote(
             icon: Icons.translate,
             text: vuln.nameTr != null
-                ? 'Açıklamalar CISA kataloğundan yapay zekâ ile Türkçeye çevrildi. Bilgi amaçlıdır; çözüm için '
-                    'üreticinin güvenlik duyurusunu esas alın.'
+                ? 'Açıklamalar CISA kataloğundan makine çevirisiyle (açık kaynaklı OPUS-MT modeli) Türkçeye çevrildi. '
+                    'Bilgi amaçlıdır; çözüm için üreticinin güvenlik duyurusunu esas alın.'
                 : 'Bu kaydın çevirisi henüz hazır değil; CISA kataloğundaki özgün metin gösteriliyor.',
           ),
         ],

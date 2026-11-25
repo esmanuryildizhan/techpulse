@@ -29,7 +29,7 @@ Kaynaklar (RSS/Atom, Hacker News, Hugging Face, GitHub, CISA)
         │  saatte bir
         ▼
 GitHub Actions: pipeline/ (Node.js 24 + TypeScript)
-  topla → temizle → tekilleştir → GitHub Models ile Türkçeye çevir → doğrula
+  topla → temizle → tekilleştir → konu belirle → OPUS-MT ile Türkçeye çevir → doğrula
         │
         ▼
 GitHub Pages: statik JSON API (v1/news.json, models.json, papers.json, repos.json, security.json, meta.json)
@@ -39,8 +39,8 @@ Flutter uygulaması: app/ (Riverpod 3, dio, sqflite)
   önce önbellek, sonra ağ · çevrimdışı çalışma · yer imleri
 ```
 
-* Uygulamada hiçbir API anahtarı yoktur. Çeviri, GitHub Actions'ın hazır `GITHUB_TOKEN` jetonuyla GitHub Models üzerinden yapılır (`models: read` izni).
-* Bir kaynak çökerse diğerleri çalışmaya devam eder; çeviri kotası dolarsa bekleyen kayıtlar bir sonraki saatte çevrilir.
+* Uygulamada hiçbir API anahtarı yoktur. Çeviri, Helsinki Üniversitesi'nin açık kaynaklı İngilizce→Türkçe modeliyle ([OPUS-MT, opus-mt-tc-big-en-tr](https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-tr), CC BY 4.0) doğrudan GitHub Actions sunucusunda yapılır; dış bir yapay zekâ servisine bağımlı değildir.
+* Bir kaynak çökerse diğerleri çalışmaya devam eder; çeviri yapılamazsa kayıtlar özgün başlıklarıyla yayımlanır ve bir sonraki saatte yeniden denenir.
 * Yayımlanan her kayıt şemaya göre doğrulanır; bozuk veri uygulamaya ulaşmaz.
 
 ## Klasörler

@@ -180,7 +180,10 @@ class _ModelSheet extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           if (model.summaryTr != null)
-            const InfoNote(icon: Icons.translate, text: 'Özet, model kartından yapay zekâ ile otomatik hazırlandı.'),
+            const InfoNote(
+              icon: Icons.translate,
+              text: 'Açıklama, model kartının ilk cümlelerinin makine çevirisidir (açık kaynaklı OPUS-MT modeli).',
+            ),
         ],
       ),
     );

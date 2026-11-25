@@ -1,242 +1,199 @@
 import { classify } from './classify.ts';
+import type { TranslateFn } from './mt.ts';
 import { findSource } from './sources/feeds.ts';
-import type { AiModel, Category, NewsItem, Paper, Repo, Vulnerability } from './types.ts';
-import { CATEGORIES } from './types.ts';
-import type { Translator } from './translator.ts';
-import { log, truncate } from './util.ts';
+import type { State } from './types.ts';
+import { errorMessage, log, truncate } from './util.ts';
 
-const STYLE = `You are a senior Turkish technology editor. You turn English technology content into accurate, natural Turkish for a mobile app read by Turkish software developers, engineers and computer-engineering students.
-Rules:
-- Write fluent, natural Turkish; do not translate word for word. Use correct Turkish grammar, spelling and punctuation (e.g. "yapay zekâ").
-- Keep names of companies, products, models, datasets, libraries, programming languages, CVE ids and version numbers exactly as in the source.
-- Prefer established Turkish technical terms: yapay zekâ, makine öğrenmesi, derin öğrenme, büyük dil modeli, güvenlik açığı, yama, açık kaynak, geliştirici, işlemci, ekran kartı, veri kümesi, çıkarım. If a term has no common Turkish equivalent, keep the English term.
-- Never add facts, numbers, opinions or context that are not in the input. Do not speculate.
-- No markdown, no emojis, no surrounding quotation marks.
-- Return only valid JSON in exactly the requested shape, one object per input item, with the same "id" values.`;
+/**
+ * Çeviri planı: her kaydın Türkçeye çevrilecek alanları (başlık, kısa açıklamanın ilk cümleleri vb.)
+ * toplanır, aynı metin bir kez çevrilir, sonuçlar kayıtlara yazılır. Bir kayıt, bütün alanları
+ * çevrildiğinde "translated" olarak işaretlenir; böylece sonraki çalışmalarda tekrar çevrilmez.
+ *
+ * Model yeni bilgi üretmez, yalnızca kaynağın kendi metnini çevirir (makine çevirisi).
+ */
 
-const NEWS_SYSTEM = `${STYLE}
-For each news item return:
-- "title_tr": the headline in Turkish, max 110 characters, informative, no clickbait, no trailing period.
-- "summary_tr": 1–3 sentences, max 320 characters, summarising only what the snippet says. If the snippet is empty or too short to summarise, return "".
-- "category": exactly one of "ai" (artificial intelligence, machine learning, models, AI products), "software" (programming, developer tools, operating systems, apps, open source, cloud), "hardware" (chips, GPUs, devices, phones, PCs, semiconductors), "security" (vulnerabilities, attacks, malware, breaches, privacy incidents), "industry" (business, funding, acquisitions, regulation, policy, companies, society).
-- "tags": 0–3 short tags (proper nouns or technologies such as "OpenAI", "Rust", "CVE-2026-1234"), no "#".
-JSON shape: {"items":[{"id":"","title_tr":"","summary_tr":"","category":"","tags":[]}]}`;
+/** Metnin ilk cümlelerini, toplam uzunluk `max` karakteri geçmeyecek şekilde alır. */
+export function leadSentences(text: string, max: number): string {
+  const clean = text.replace(/\s+/g, ' ').trim();
+  if (clean.length <= max) return clean;
+  const sentences = clean.split(/(?<=[.!?])\s+(?=["“(\[A-Z0-9])/);
+  let out = '';
+  for (const sentence of sentences) {
+    const next = out ? `${out} ${sentence}` : sentence;
+    if (next.length > max) break;
+    out = next;
+  }
+  return out || truncate(clean, max);
+}
 
-const PAPER_SYSTEM = `${STYLE}
-For each research paper return:
-- "title_tr": the title in Turkish, max 150 characters. Keep method/model names (e.g. "SAM 3", "LoRA") as they are.
-- "summary_tr": 2–3 sentences, max 420 characters, for a machine-learning student: which problem it addresses, what the method does, and the main result as stated in the abstract. Only use information from the abstract.
-- "tags": 1–3 short topic tags in Turkish or established English (e.g. "Görüntü bölütleme", "Difüzyon modelleri", "LLM", "Pekiştirmeli öğrenme").
-JSON shape: {"items":[{"id":"","title_tr":"","summary_tr":"","tags":[]}]}`;
-
-const MODEL_SYSTEM = `${STYLE}
-For each Hugging Face model return:
-- "summary_tr": 1–2 sentences, max 260 characters, explaining what the model is and what it is for, using only the model card text, task and parameter count given. If the card text is empty or uninformative, return "".
-JSON shape: {"items":[{"id":"","summary_tr":""}]}`;
-
-const REPO_SYSTEM = `${STYLE}
-For each GitHub repository return:
-- "description_tr": one sentence, max 180 characters, that explains in Turkish what the project does, based only on its description and topics. If the description is empty, return "".
-JSON shape: {"items":[{"id":"","description_tr":""}]}`;
-
-const KEV_SYSTEM = `${STYLE}
-For each actively exploited vulnerability from the CISA KEV catalog return:
-- "name_tr": the vulnerability name in Turkish, max 120 characters (e.g. "Microsoft Windows Yetki Yükseltme Açığı").
-- "description_tr": the description in Turkish, max 420 characters, technically precise.
-- "action_tr": the required action in Turkish, max 300 characters.
-JSON shape: {"items":[{"id":"","name_tr":"","description_tr":"","action_tr":""}]}`;
-
-/** Model çıktısındaki metni temizler; sınırı aşanı kısaltır. */
-export function tidy(value: unknown, max: number): string {
-  if (typeof value !== 'string') return '';
-  let text = value
-    .replace(/\*\*|__|`/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/^["'“”‘’«»]+|["'“”‘’«»]+$/g, '')
-    .replace(/^(özet|başlık|açıklama)\s*:\s*/i, '')
-    .trim();
+/** Çeviri çıktısını sadeleştirir. */
+export function tidy(value: string, max: number): string {
+  let text = value.replace(/\s+/g, ' ').trim();
+  text = text.replace(/^["'“”‘’«»]+|["'“”‘’«»]+$/g, '').trim();
   if (text.length > max) text = truncate(text, max);
   return text;
 }
 
-function tidyTags(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  const out: string[] = [];
-  for (const tag of value) {
-    const clean = tidy(tag, 28).replace(/^#/, '');
-    if (clean && !out.some((t) => t.toLowerCase() === clean.toLowerCase())) out.push(clean);
-    if (out.length >= 3) break;
-  }
-  return out;
+interface Field {
+  source: string;
+  apply: (translation: string) => void;
+  required: boolean;
 }
 
-function resultsById(parsed: unknown): Map<string, Record<string, unknown>> {
-  const map = new Map<string, Record<string, unknown>>();
-  let list: unknown = parsed;
-  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-    const obj = parsed as Record<string, unknown>;
-    list = obj.items ?? obj.results ?? obj.data ?? Object.values(obj).find(Array.isArray);
-  }
-  if (!Array.isArray(list)) return map;
-  for (const entry of list) {
-    if (entry && typeof entry === 'object' && typeof (entry as Record<string, unknown>).id === 'string') {
-      map.set((entry as Record<string, unknown>).id as string, entry as Record<string, unknown>);
-    }
-  }
-  return map;
+interface Job {
+  fields: Field[];
+  done: () => void;
 }
 
-function chunk<T>(items: T[], size: number): T[][] {
-  const out: T[][] = [];
-  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size));
-  return out;
-}
+function buildJobs(state: State): Job[] {
+  const jobs: Job[] = [];
 
-async function runBatches<T extends { id: string }>(
-  label: string,
-  translator: Translator,
-  pending: T[],
-  batchSize: number,
-  system: string,
-  toInput: (item: T) => Record<string, unknown>,
-  apply: (item: T, result: Record<string, unknown>) => boolean,
-  maxTokens = 3000,
-): Promise<number> {
-  let done = 0;
-  for (const batch of chunk(pending, batchSize)) {
-    if (!translator.available) break;
-    const user = JSON.stringify({ items: batch.map((item) => ({ id: item.id, ...toInput(item) })) });
-    const parsed = await translator.completeJson(system, user, maxTokens);
-    if (parsed === null) continue;
-    const results = resultsById(parsed);
-    for (const item of batch) {
-      const result = results.get(item.id);
-      if (result && apply(item, result)) done++;
-    }
-  }
-  if (pending.length > 0) log.info(`Çeviri [${label}]: ${done}/${pending.length} kayıt çevrildi.`);
-  return done;
-}
-
-export async function translateNews(translator: Translator, items: NewsItem[]): Promise<number> {
-  const pending = items.filter((item) => !item.translated);
-  return runBatches(
-    'haberler',
-    translator,
-    pending,
-    8,
-    NEWS_SYSTEM,
-    (item) => ({ source: item.sourceName, title: item.titleOriginal, snippet: truncate(item.excerptOriginal, 600) }),
-    (item, result) => {
-      const title = tidy(result.title_tr, 140);
-      if (!title) return false;
-      item.titleTr = title;
-      item.summaryTr = tidy(result.summary_tr, 360) || null;
-      const category = String(result.category ?? '') as Category;
-      if (CATEGORIES.includes(category)) item.category = category;
-      item.tags = tidyTags(result.tags);
-      item.translated = true;
-      return true;
-    },
-  );
-}
-
-export async function translatePapers(translator: Translator, items: Paper[]): Promise<number> {
-  const pending = items.filter((item) => !item.translated);
-  return runBatches(
-    'makaleler',
-    translator,
-    pending,
-    5,
-    PAPER_SYSTEM,
-    (item) => ({ title: item.titleOriginal, abstract: truncate(item.abstractOriginal, 1400) }),
-    (item, result) => {
-      const title = tidy(result.title_tr, 170);
-      const summary = tidy(result.summary_tr, 460);
-      if (!title || !summary) return false;
-      item.titleTr = title;
-      item.summaryTr = summary;
-      const tags = tidyTags(result.tags);
-      if (tags.length > 0) item.tags = tags;
-      item.translated = true;
-      return true;
-    },
-  );
-}
-
-export async function translateModels(translator: Translator, items: AiModel[]): Promise<number> {
-  const pending = items.filter((item) => !item.translated && item.cardExcerpt.length >= 80);
-  return runBatches(
-    'modeller',
-    translator,
-    pending,
-    5,
-    MODEL_SYSTEM,
-    (item) => ({
-      model: item.id,
-      task: item.pipelineTag ?? 'unknown',
-      parameters: item.parameters,
-      card: truncate(item.cardExcerpt, 1500),
-    }),
-    (item, result) => {
-      item.summaryTr = tidy(result.summary_tr, 300) || null;
-      item.translated = true;
-      return true;
-    },
-  );
-}
-
-export async function translateRepos(translator: Translator, items: Repo[]): Promise<number> {
-  const pending = items.filter((item) => !item.translated && item.descriptionOriginal.length > 0);
-  return runBatches(
-    'projeler',
-    translator,
-    pending,
-    10,
-    REPO_SYSTEM,
-    (item) => ({ name: item.id, description: item.descriptionOriginal, topics: item.topics }),
-    (item, result) => {
-      item.descriptionTr = tidy(result.description_tr, 220) || null;
-      item.translated = true;
-      return true;
-    },
-    2000,
-  );
-}
-
-export async function translateKev(translator: Translator, items: Vulnerability[]): Promise<number> {
-  const pending = items.filter((item) => !item.translated);
-  return runBatches(
-    'güvenlik',
-    translator,
-    pending,
-    6,
-    KEV_SYSTEM,
-    (item) => ({
-      name: item.nameOriginal,
-      vendor: item.vendor,
-      product: item.product,
-      description: item.descriptionOriginal,
-      action: item.actionOriginal,
-    }),
-    (item, result) => {
-      const name = tidy(result.name_tr, 160);
-      const description = tidy(result.description_tr, 480);
-      if (!name || !description) return false;
-      item.nameTr = name;
-      item.descriptionTr = description;
-      item.actionTr = tidy(result.action_tr, 340) || null;
-      item.translated = true;
-      return true;
-    },
-  );
-}
-
-/** Çevrilemeyen haberler için anahtar kelimeyle konu tahmini. */
-export function applyFallbackCategories(items: NewsItem[]): void {
-  for (const item of items) {
+  for (const item of state.news) {
     if (item.translated) continue;
+    const lead = leadSentences(item.excerptOriginal, 320);
+    jobs.push({
+      fields: [
+        { source: item.titleOriginal, apply: (t) => (item.titleTr = tidy(t, 160)), required: true },
+        ...(lead.length >= 40
+          ? [{ source: lead, apply: (t: string) => (item.summaryTr = tidy(t, 380) || null), required: false }]
+          : []),
+      ],
+      done: () => (item.translated = true),
+    });
+  }
+
+  for (const paper of state.papers) {
+    if (paper.translated) continue;
+    const lead = leadSentences(paper.abstractOriginal, 420);
+    jobs.push({
+      fields: [
+        { source: paper.titleOriginal, apply: (t) => (paper.titleTr = tidy(t, 180)), required: true },
+        ...(lead.length >= 40
+          ? [{ source: lead, apply: (t: string) => (paper.summaryTr = tidy(t, 480) || null), required: false }]
+          : []),
+      ],
+      done: () => (paper.translated = true),
+    });
+  }
+
+  for (const vuln of state.security) {
+    if (vuln.translated) continue;
+    const fields: Field[] = [];
+    if (vuln.nameOriginal) fields.push({ source: vuln.nameOriginal, apply: (t) => (vuln.nameTr = tidy(t, 160)), required: true });
+    if (vuln.descriptionOriginal) {
+      fields.push({
+        source: leadSentences(vuln.descriptionOriginal, 420),
+        apply: (t) => (vuln.descriptionTr = tidy(t, 480)),
+        required: true,
+      });
+    }
+    if (vuln.actionOriginal) {
+      fields.push({
+        source: leadSentences(vuln.actionOriginal, 300),
+        apply: (t) => (vuln.actionTr = tidy(t, 340) || null),
+        required: false,
+      });
+    }
+    if (fields.length > 0) jobs.push({ fields, done: () => (vuln.translated = true) });
+  }
+
+  for (const model of state.models) {
+    if (model.translated) continue;
+    const lead = leadSentences(model.cardExcerpt, 260);
+    if (lead.length < 60) {
+      // Kart okunduysa ama anlamlı bir açıklama yoksa çevrilecek bir şey yok.
+      if (model.cardExcerpt) model.translated = true;
+      continue;
+    }
+    jobs.push({
+      fields: [{ source: lead, apply: (t) => (model.summaryTr = tidy(t, 300) || null), required: true }],
+      done: () => (model.translated = true),
+    });
+  }
+
+  for (const repo of state.repos) {
+    if (repo.translated || repo.descriptionOriginal.length === 0) continue;
+    jobs.push({
+      fields: [
+        { source: leadSentences(repo.descriptionOriginal, 260), apply: (t) => (repo.descriptionTr = tidy(t, 300) || null), required: true },
+      ],
+      done: () => (repo.translated = true),
+    });
+  }
+
+  return jobs;
+}
+
+export interface TranslateSummary {
+  model: string | null;
+  texts: number;
+  translatedItems: number;
+  pendingItems: number;
+  note: string | null;
+}
+
+/**
+ * Bekleyen kayıtları çevirir. `maxTexts`, bir çalışmada çevrilecek en fazla metin sayısıdır;
+ * fazlası sonraki çalışmaya kalır (öncelik sırası: haberler, makaleler, güvenlik, modeller, projeler).
+ */
+export async function translatePending(
+  state: State,
+  translate: TranslateFn | null,
+  options: { maxTexts?: number } = {},
+): Promise<TranslateSummary> {
+  const maxTexts = options.maxTexts ?? 600;
+  const jobs = buildJobs(state);
+  if (jobs.length === 0) return { model: null, texts: 0, translatedItems: 0, pendingItems: 0, note: null };
+  if (!translate) {
+    return { model: null, texts: 0, translatedItems: 0, pendingItems: jobs.length, note: 'Çeviri kapalı' };
+  }
+
+  // Bütçeye sığan işleri seç; aynı metin birden fazla kayıtta geçse de bir kez sayılır.
+  const unique = new Map<string, number>();
+  const selected: Job[] = [];
+  for (const job of jobs) {
+    const fresh = job.fields.filter((f) => !unique.has(f.source)).length;
+    if (unique.size + fresh > maxTexts) break;
+    for (const field of job.fields) if (!unique.has(field.source)) unique.set(field.source, unique.size);
+    selected.push(job);
+  }
+
+  const texts = [...unique.keys()];
+  let result;
+  try {
+    result = await translate(texts);
+  } catch (error) {
+    const note = `Çeviri yapılamadı: ${errorMessage(error)}`;
+    log.warn(note);
+    return { model: null, texts: 0, translatedItems: 0, pendingItems: jobs.length, note };
+  }
+
+  let translatedItems = 0;
+  for (const job of selected) {
+    const outputs = job.fields.map((f) => result.translations[unique.get(f.source)!] ?? '');
+    const missingRequired = job.fields.some((f, i) => f.required && !outputs[i].trim());
+    if (missingRequired) continue;
+    job.fields.forEach((field, i) => {
+      if (outputs[i].trim()) field.apply(outputs[i]);
+    });
+    job.done();
+    translatedItems++;
+  }
+
+  const pendingItems = jobs.length - translatedItems;
+  log.info(`Çeviri: ${texts.length} metin, ${translatedItems} kayıt (${result.seconds} sn, ${result.model}); bekleyen ${pendingItems}`);
+  return {
+    model: result.model,
+    texts: texts.length,
+    translatedItems,
+    pendingItems,
+    note: pendingItems > 0 ? `${pendingItems} kayıt sonraki çalışmada çevrilecek` : null,
+  };
+}
+
+/** Haberlerin konusunu anahtar kelimelere göre belirler (başlık 3 puan, açıklama 1 puan). */
+export function applyCategories(state: State): void {
+  for (const item of state.news) {
     const source = findSource(item.sourceId);
     item.category = classify(item.titleOriginal, item.excerptOriginal, source?.defaultCategory ?? 'industry');
   }

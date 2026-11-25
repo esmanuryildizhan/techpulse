@@ -132,11 +132,12 @@ class NewsDetailScreen extends StatelessWidget {
             InfoNote(
               icon: Icons.translate,
               text: translatedSummary
-                  ? 'Türkçe başlık ve özet, ${item.sourceName} tarafından yayımlanan başlık ve kısa açıklamadan '
-                      'yapay zekâ ile otomatik hazırlandı; küçük hatalar içerebilir. Haberin tamamı ve tüm hakları '
-                      '${item.sourceName} kaynağına aittir.'
+                  ? 'Türkçe başlık ve özet, ${item.sourceName} tarafından yayımlanan başlık ve kısa açıklamanın '
+                      'makine çevirisidir (açık kaynaklı OPUS-MT modeli); küçük hatalar içerebilir. Haberin tamamı ve '
+                      'tüm hakları ${item.sourceName} kaynağına aittir.'
                   : item.translated
-                      ? 'Türkçe başlık yapay zekâ ile otomatik çevrildi. Haberin tamamı ve tüm hakları ${item.sourceName} kaynağına aittir.'
+                      ? 'Türkçe başlık makine çevirisidir (açık kaynaklı OPUS-MT modeli). Haberin tamamı ve tüm hakları '
+                          '${item.sourceName} kaynağına aittir.'
                       : 'Bu haberin çevirisi henüz hazır değil; özgün başlık gösteriliyor. Haberin tüm hakları ${item.sourceName} kaynağına aittir.',
             ),
           ],

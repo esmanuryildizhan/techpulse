@@ -57,10 +57,8 @@ class SettingsScreen extends ConsumerWidget {
             leading: const Icon(Icons.translate),
             title: const Text('Çeviri'),
             subtitle: Text(
-              meta?.translatorModel == null
-                  ? 'GitHub Models üzerinden yapay zekâ ile'
-                  : 'GitHub Models · ${meta!.translatorModel}'
-                      '${meta.pendingTranslations > 0 ? ' · ${meta.pendingTranslations} kayıt sırada' : ''}',
+              'Açık kaynaklı OPUS-MT modeli (Helsinki Üniversitesi), veri sunucusunda çalışır'
+              '${(meta?.pendingTranslations ?? 0) > 0 ? ' · ${meta!.pendingTranslations} kayıt sırada' : ''}',
             ),
           ),
           ListTile(

@@ -134,8 +134,8 @@ class PaperDetailScreen extends StatelessWidget {
             const SizedBox(height: 24),
             const InfoNote(
               icon: Icons.translate,
-              text: 'Türkçe başlık ve özet, makalenin özgün özetinden yapay zekâ ile otomatik hazırlandı. '
-                  'Makalenin tüm hakları yazarlarına aittir.',
+              text: 'Türkçe başlık ve özet, makalenin özgün başlığının ve özetinin ilk cümlelerinin makine çevirisidir '
+                  '(açık kaynaklı OPUS-MT modeli). Makalenin tüm hakları yazarlarına aittir.',
             ),
           ],
         ),

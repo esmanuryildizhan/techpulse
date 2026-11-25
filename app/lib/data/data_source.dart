@@ -15,23 +15,20 @@ class AppException implements Exception {
   static AppException from(Object error) {
     if (error is AppException) return error;
     if (error is DioException) {
-      switch (error.type) {
-        case DioExceptionType.connectionError:
-        case DioExceptionType.connectionTimeout:
-        case DioExceptionType.receiveTimeout:
-        case DioExceptionType.sendTimeout:
-          return const AppException('İnternet bağlantısı kurulamadı.', offline: true);
-        case DioExceptionType.badResponse:
-          final code = error.response?.statusCode ?? 0;
-          if (code == 404) return const AppException('Veri henüz yayınlanmamış (404).');
-          return AppException('Sunucu hata verdi ($code).');
-        case DioExceptionType.cancel:
-          return const AppException('İstek iptal edildi.');
-        case DioExceptionType.badCertificate:
-          return const AppException('Güvenli bağlantı doğrulanamadı.');
-        case DioExceptionType.unknown:
-          return const AppException('İnternet bağlantısı kurulamadı.', offline: true);
-      }
+      return switch (error.type) {
+        DioExceptionType.connectionError ||
+        DioExceptionType.connectionTimeout ||
+        DioExceptionType.receiveTimeout ||
+        DioExceptionType.sendTimeout ||
+        DioExceptionType.unknown =>
+          const AppException('İnternet bağlantısı kurulamadı.', offline: true),
+        DioExceptionType.badResponse => error.response?.statusCode == 404
+            ? const AppException('Veri henüz yayınlanmamış (404).')
+            : AppException('Sunucu hata verdi (${error.response?.statusCode ?? 0}).'),
+        DioExceptionType.badCertificate => const AppException('Güvenli bağlantı doğrulanamadı.'),
+        DioExceptionType.cancel => const AppException('İstek iptal edildi.'),
+        _ => const AppException('Veri alınamadı.'),
+      };
     }
     if (error is FormatException) return const AppException('Gelen veri okunamadı.');
     return const AppException('Beklenmeyen bir hata oluştu.');

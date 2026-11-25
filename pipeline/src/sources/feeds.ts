@@ -11,7 +11,6 @@ export const FEEDS: FeedSource[] = [
   { id: 'google-ai', name: 'Google AI', kind: 'official', url: 'https://blog.google/technology/ai/rss/', homepage: 'https://blog.google/technology/ai/', defaultCategory: 'ai', maxItems: 5 },
   { id: 'deepmind', name: 'Google DeepMind', kind: 'official', url: 'https://deepmind.google/blog/rss.xml', homepage: 'https://deepmind.google/discover/blog/', defaultCategory: 'ai', maxItems: 5 },
   { id: 'microsoft-research', name: 'Microsoft Research', kind: 'official', url: 'https://www.microsoft.com/en-us/research/feed/', homepage: 'https://www.microsoft.com/en-us/research/blog/', defaultCategory: 'ai', maxItems: 5 },
-  { id: 'microsoft-ai', name: 'Microsoft AI Blog', kind: 'official', url: 'https://blogs.microsoft.com/ai/feed/', homepage: 'https://blogs.microsoft.com/ai/', defaultCategory: 'ai', maxItems: 4 },
   { id: 'huggingface-blog', name: 'Hugging Face Blog', kind: 'official', url: 'https://huggingface.co/blog/feed.xml', homepage: 'https://huggingface.co/blog', defaultCategory: 'ai', maxItems: 5 },
   { id: 'nvidia-developer', name: 'NVIDIA Developer', kind: 'official', url: 'https://developer.nvidia.com/blog/feed', homepage: 'https://developer.nvidia.com/blog/', defaultCategory: 'ai', maxItems: 5 },
   { id: 'apple-ml', name: 'Apple Machine Learning', kind: 'official', url: 'https://machinelearning.apple.com/rss.xml', homepage: 'https://machinelearning.apple.com/', defaultCategory: 'ai', maxItems: 4 },
