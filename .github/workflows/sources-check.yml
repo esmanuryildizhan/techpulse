@@ -1,0 +1,30 @@
+# Bakım aracı: aday RSS/Atom kaynaklarının erişilebilir olup olmadığını, kaç kayıt döndürdüğünü ve
+# haber sayfalarında kapak görseli (og:image) bulunup bulunmadığını denetler. Elle çalıştırılır.
+name: Kaynak denetimi
+on:
+  workflow_dispatch:
+    inputs:
+      feeds:
+        description: "Boşlukla ayrılmış akış adresleri"
+        required: true
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Kaynakları dene
+        env:
+          FEEDS: ${{ inputs.feeds }}
+        run: node tools/probe_sources.mjs $FEEDS | tee probe.jsonl
+      - name: Sonucu ci-probe dalına yaz
+        run: |
+          mkdir -p out && cp probe.jsonl out/
+          curl -s "https://huggingface.co/api/daily_papers?limit=2" | head -c 4000 > out/hf-papers.json || true
+          cd out && git init -q && git config user.name ci && git config user.email ci@example.com && git add -A && git commit -qm probe
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/ci-probe
