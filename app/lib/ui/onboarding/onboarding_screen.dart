@@ -41,7 +41,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(Tp.page, 24, Tp.page, 24),
                 children: [
-                  const BrandMark(size: 56),
+                  const Align(alignment: Alignment.centerLeft, child: BrandMark(size: 56)),
                   const SizedBox(height: 20),
                   Text('${AppConfig.appName}\'a hoş geldin', style: context.text.headlineMedium),
                   const SizedBox(height: 8),

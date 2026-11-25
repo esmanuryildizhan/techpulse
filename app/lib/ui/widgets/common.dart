@@ -254,7 +254,8 @@ class SectionHeader extends StatelessWidget {
     return Padding(
       padding: padding ?? const EdgeInsets.fromLTRB(Tp.page, 28, Tp.page - 8, 12),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        // Alt başlık yoksa "Tümünü gör" düğmesi başlıkla aynı hizada dursun.
+        crossAxisAlignment: subtitle == null ? CrossAxisAlignment.center : CrossAxisAlignment.end,
         children: [
           Expanded(
             child: Column(

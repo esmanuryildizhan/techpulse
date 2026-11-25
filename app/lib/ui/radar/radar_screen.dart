@@ -25,12 +25,10 @@ class RadarScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Yapay Zekâ Radarı'),
           bottom: const TabBar(
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
             tabs: [
-              Tab(text: 'Trend Modeller'),
-              Tab(text: 'Günün Makaleleri'),
-              Tab(text: 'Yükselen Projeler'),
+              Tab(text: 'Modeller'),
+              Tab(text: 'Makaleler'),
+              Tab(text: 'Projeler'),
             ],
           ),
         ),
