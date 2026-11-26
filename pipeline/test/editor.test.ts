@@ -248,7 +248,7 @@ describe('yapay zekâ editörü', () => {
     assert.match(hnRequest.user, /Haber metnine ulaşılamadı/);
     // Teknik derinlik ayrı istekte, sade anlatımın başlıklarıyla birlikte istenir.
     const deepRequest = requests.find((r) => r.schema === DEEP_SCHEMA && r.user.includes('seven billion'))!;
-    assert.match(deepRequest.user, /Sade anlatımın bölüm başlıkları: "Küçük model nasıl akıl yürütüyor\?"/);
+    assert.match(deepRequest.user, /Sade anlatımın bölüm başlıkları \(bunları KULLANMA\): "Küçük model nasıl akıl yürütüyor\?"/);
     assert.equal(deepRequest.maxTokens, 16_000);
 
     const papers = await readEnvelope<Paper>(out, 'papers');
@@ -279,7 +279,11 @@ describe('yapay zekâ editörü', () => {
     assert.equal(meta.editor.model, 'test/editor');
     assert.equal(meta.editor.pending, 0);
     // Haber ve makalelerde iki istek (sade + teknik), diğerlerinde bir istek yapılır.
-    const jobs = requests.filter((r) => r.schema !== DEEP_SCHEMA).length;
+    // (Çok kısa kalan yanıt bir kez daha istenir; sahte editörün yanıtları kısa olduğu için tekrarlar sayılmaz.)
+    const retry = (r: LlmRequest) => r.user.includes('Önceki denemende');
+    const jobs = requests.filter((r) => r.schema !== DEEP_SCHEMA && !retry(r)).length;
+    const again1 = requests.find((r) => retry(r) && r.schema === DEEP_SCHEMA)!;
+    assert.match(again1.user, /en az 2\.400 kelime|en az 1\.900 kelime|en az 1\.200 kelime/);
     assert.equal(meta.editor.written, jobs);
     assert.equal(meta.editor.inputTokens, requests.length * 1000);
     assert.equal(meta.translator.model, null);
@@ -309,7 +313,7 @@ describe('yapay zekâ editörü', () => {
     const out = await mkdtemp(join(tmpdir(), 'tp-ai-'));
     const budget = fakeEditor();
     const { meta } = await runPipeline({ outDir: out, now: NOW, fetchers: fetchers(), llm: budget.client, aiMaxItems: 3, aiConcurrency: 1 });
-    assert.equal(budget.requests.filter((r) => r.schema === NEWS_SCHEMA).length, 3);
+    assert.equal(budget.requests.filter((r) => r.schema === NEWS_SCHEMA && !r.user.includes('Önceki denemende')).length, 3);
     assert.equal(meta.editor.written, 3);
     assert.ok(meta.editor.pending > 0);
     const news = await readEnvelope<NewsItem>(out, 'news');

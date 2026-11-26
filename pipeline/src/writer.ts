@@ -69,7 +69,7 @@ tldr, why ve simple aynı cümleleri tekrar etmez. Giriş (intro) bölümlerin i
 - why: "Bu gelişme neden önemli?" kutusu. 2-4 cümle: olayın sektöre, kullanıcılara ya da geliştiricilere etkisi ve büyük resimdeki yeri.
 - simple: Sade anlatım. Okur yazının sonunda şu soruların hepsini cevaplayabilmeli: Ne oldu, kim yaptı, ne zaman? Konu olan teknoloji ya da ürün nedir ve günlük dille nasıl çalışır? Bu gelişmeden önce durum neydi? Önemli ayrıntılar ve rakamlar neler? Kim nasıl etkileniyor, tepkiler neler? Sırada ne var, okur ne yapmalı? Kaynaktaki önemli olguların hiçbirini atlama.
   - intro: 3-5 cümlelik giriş paragrafı; olayın özünü ve okur için anlamını söyler.
-  - sections: 5-7 bölüm; her bölüm 2-4 paragraf, her paragraf 3-6 cümle. Haber metni verildiyse toplam 700-1.200 kelime. Yalnızca kısa açıklama verildiyse 300-500 kelime: bilinen olguları aktar, konu olan teknolojiyi genel bilginle açıkla, habere ait yeni olgu ekleme.
+  - sections: 6-7 bölüm; her bölüm 3 paragraf, her paragraf 4-6 cümle. Uzunluk hedefi istekte verilir; hedefin altında kalma. Yalnızca kısa açıklama verildiyse bilinen olguları aktar, konu olan teknolojiyi genel bilginle açıkla, habere ait yeni olgu ekleme.
 - glossary: 3-6 kavram. ${GLOSSARY_RULES}
 - category: Haberin ana konusu; şu kimliklerden biri:
 ${CATEGORY_LIST}
@@ -78,7 +78,7 @@ ${CATEGORY_LIST}
 
 export const NEWS_DEEP_SYSTEM = `${PERSONA}
 
-Bu istekte bir haberin "teknik derinlik" yazısını hazırlıyorsun: konuyu bilen yazılımcı, mühendis ve araştırmacılar için, saygın bir mühendislik dergisinde yayımlanacak uzun bir inceleme yazısı. Okur yazıyı bitirdiğinde konuyu bir meslektaşına ayrıntısıyla anlatabilecek kadar kavramalı. Sade anlatım ayrıca yazıldı; başlıklarını aşağıda veriyorum, aynı bilgileri aynı biçimde tekrar etme, onları teknik olarak derinleştir.
+Bu istekte bir haberin "teknik derinlik" yazısını hazırlıyorsun: konuyu bilen yazılımcı, mühendis ve araştırmacılar için, saygın bir mühendislik dergisinde yayımlanacak uzun bir inceleme yazısı. Okur yazıyı bitirdiğinde konuyu bir meslektaşına ayrıntısıyla anlatabilecek kadar kavramalı. Sade anlatım ayrıca yazıldı; başlıklarını istekte veriyorum. O başlıkları KULLANMA ve aynı bilgileri aynı biçimde tekrar etme: teknik yazı kendi başlıklarıyla, konuyu bir mühendisin gözünden yeniden kurar.
 
 ${STYLE_RULES}
 
@@ -94,7 +94,7 @@ Haberin konusuna uyanları seç ve derinlemesine işle:
 
 ## Alanlar
 - intro: 4-6 cümlelik giriş; konunun teknik özünü ve yazının neleri ele alacağını söyler.
-- sections: Önem puanı 3 ve üzeri olan ve haber metni verilen haberlerde 7-10 bölüm, toplam 1.800-3.200 kelime. Önem puanı 1-2 olan ya da yalnızca kısa açıklaması olan haberlerde 4-6 bölüm, toplam 900-1.500 kelime. Her bölüm 3-5 paragraf, her paragraf 4-7 cümle.
+- sections: Uzunluk hedefi istekte verilir (bölüm sayısı ve en az kelime); hedefin altında kalma. Her bölüm 4-5 paragraf, her paragraf 5-7 cümle. Kaynak kısaysa uzunluğu konunun teknik arka planını, çalışma mantığını, alternatiflerini ve uygulamadaki karşılığını derinlemesine anlatarak sağla; habere ait olgu uydurarak değil.
 - glossary: Teknik yazıda geçen ve aşağıda verilen sade anlatım kavramları arasında OLMAYAN 2-6 kavram. ${GLOSSARY_RULES}
 - Haberin anlatılabilecek hiçbir teknik boyutu yoksa (ör. yalnızca bir yönetici ataması ya da dava haberi) intro boş metin, sections ve glossary boş liste olsun. Teknoloji şirketlerine dair haberlerin çoğunda ürünün ya da teknolojinin anlatılabilecek bir tarafı vardır; boş bırakmadan önce bunu düşün.`;
 
@@ -111,13 +111,13 @@ ${STYLE_RULES}
 - why: "Bu araştırma neden önemli?" kutusu. 2-4 cümle.
 - simple: Sade anlatım. Okur şu soruları cevaplayabilmeli: Araştırmacılar hangi sorunu çözmeye çalışıyor ve bu sorun neden zor? Önceki yöntemler ne yapıyordu? Önerilen fikir günlük dille nasıl çalışıyor? Nasıl denendi, ne bulundu (rakamlarla)? Sınırları neler? Gerçek hayatta ne işe yarayabilir?
   - intro: 3-5 cümle.
-  - sections: 5-7 bölüm; her bölüm 2-4 paragraf. Makale metni verildiyse toplam 700-1.100 kelime; yalnızca özet verildiyse 350-550 kelime.
+  - sections: 6-7 bölüm; her bölüm 3 paragraf, her paragraf 4-6 cümle. Uzunluk hedefi istekte verilir; hedefin altında kalma.
 - glossary: 3-6 kavram. ${GLOSSARY_RULES}
 - topics: 2-4 kısa konu etiketi (ör. "Dil modelleri", "Görüntü üretimi", "Pekiştirmeli öğrenme").`;
 
 export const PAPER_DEEP_SYSTEM = `${PERSONA}
 
-Bu istekte bir yapay zekâ araştırma makalesinin "teknik derinlik" yazısını hazırlıyorsun: alanı bilen mühendis ve araştırmacılar için, bir mühendislik dergisinde yayımlanacak ayrıntılı bir makale incelemesi. Sade anlatım ayrıca yazıldı; başlıklarını aşağıda veriyorum, onları tekrar etme, derinleştir.
+Bu istekte bir yapay zekâ araştırma makalesinin "teknik derinlik" yazısını hazırlıyorsun: alanı bilen mühendis ve araştırmacılar için, bir mühendislik dergisinde yayımlanacak ayrıntılı bir makale incelemesi. Sade anlatım ayrıca yazıldı; başlıklarını istekte veriyorum. O başlıkları KULLANMA ve aynı bilgileri tekrar etme; konuyu bir araştırmacının gözünden derinleştir.
 
 ${STYLE_RULES}
 
@@ -131,7 +131,7 @@ ${STYLE_RULES}
 
 ## Alanlar
 - intro: 4-6 cümle.
-- sections: Makale metni verildiyse 7-10 bölüm, toplam 1.800-3.000 kelime; yalnızca özet verildiyse 4-5 bölüm, toplam 800-1.200 kelime ve yalnızca özette yazanlara dayan. Her bölüm 3-5 paragraf.
+- sections: Uzunluk hedefi istekte verilir; hedefin altında kalma. Her bölüm 4-5 paragraf, her paragraf 5-7 cümle. Yalnızca özet verildiyse makaleye ait olgularda yalnızca özete dayan.
 - glossary: Teknik yazıda geçen ve sade anlatım kavramları arasında OLMAYAN 2-6 kavram. ${GLOSSARY_RULES}`;
 
 
@@ -548,6 +548,62 @@ export function applyKev(vuln: Vulnerability, out: KevOut): boolean {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Uzunluk hedefleri. Model toplam kelime sayısına bölüm sayısından daha az uyuyor; bu yüzden hedef istekte
+// hem bölüm sayısı hem kelime aralığı olarak verilir ve çok kısa kalan yanıt bir kez daha istenir.
+
+export interface LengthTarget {
+  sections: string;
+  min: number;
+  max: number;
+}
+
+const thousands = (n: number) => n.toLocaleString('tr-TR');
+
+export function lengthLine(label: string, t: LengthTarget): string {
+  return `${label} için uzunluk hedefi: ${t.sections} bölüm, toplam ${thousands(t.min)}-${thousands(t.max)} kelime (yaklaşık ${Math.round(t.min / 180)}-${Math.round(t.max / 180)} dakikalık okuma). Bu hedefin altında kalma.`;
+}
+
+export function simpleTarget(basis: Story['basis']): LengthTarget {
+  return basis === 'full' ? { sections: '6-7', min: 800, max: 1300 } : { sections: '4-5', min: 350, max: 550 };
+}
+
+export function deepTarget(basis: Story['basis'], importance: number | null, kind: 'haber' | 'makale'): LengthTarget {
+  if (basis === 'excerpt') return { sections: '5-6', min: 900, max: 1300 };
+  if (kind === 'makale') return { sections: '9-10', min: 2200, max: 3200 };
+  const level = importance ?? 3;
+  if (level >= 4) return { sections: '9-11', min: 2400, max: 3400 };
+  if (level === 3) return { sections: '8-9', min: 1900, max: 2600 };
+  return { sections: '6-7', min: 1200, max: 1700 };
+}
+
+/** Yanıttaki anlatımın kelime sayısı (giriş ve bölümler). */
+export function outWords(version: Partial<StoryVersionOut> | null | undefined): number {
+  if (!version) return 0;
+  const parts = [version.intro ?? '', ...(Array.isArray(version.sections) ? version.sections.map((s) => `${s?.heading ?? ''} ${s?.body ?? ''}`) : [])];
+  return words(parts);
+}
+
+function shortNote(label: string, got: number, t: LengthTarget): string {
+  return `\n\nÖnceki denemende ${label} ${got} kelimeydi; bu, hedefin çok altında. Bu sefer ${t.sections} bölüm ve en az ${thousands(t.min)} kelime yaz. Uzunluğu tekrarla değil, açıklama, örnek ve ayrıntıyla sağla.`;
+}
+
+/** Çok kısa kalan yanıt bir kez daha istenir; ikisinden uzun olanı kullanılır. */
+async function askLong<T>(
+  ask: (user: string) => Promise<T | null>,
+  user: string,
+  measure: (out: T) => number,
+  label: string,
+  target: LengthTarget,
+): Promise<T | null> {
+  const first = await ask(user);
+  if (!first) return null;
+  const got = measure(first);
+  if (got === 0 || got >= target.min * 0.7) return first;
+  const second = await ask(user + shortNote(label, got, target));
+  return second && measure(second) > got ? second : first;
+}
+
+// ---------------------------------------------------------------------------------------------
 // Kullanıcı mesajları (tek bir kaydın girdisi)
 
 function kindLabel(kind: string): string {
@@ -576,6 +632,7 @@ export function newsPrompt(item: NewsItem, page: ArticlePage | null, feedContent
   const excerpt = item.excerptOriginal || page?.description || '';
   if (excerpt) lines.push(`Kaynağın kısa açıklaması: ${excerpt}`);
   if (item.points !== null) lines.push(`Hacker News: ${item.points} puan, ${item.comments ?? 0} yorum (bağlantı topluluk tarafından paylaşıldı).`);
+  lines.push('', lengthLine('Sade anlatım (simple)', simpleTarget(text.length >= 300 ? 'full' : 'excerpt')));
   if (text.length >= 300) {
     lines.push('', `Haber metni (${text.length} karakter):`, '"""', text, '"""');
   } else {
@@ -607,6 +664,7 @@ export function paperPrompt(paper: Paper, fullText: string): string {
     paper.abstractOriginal,
     '"""',
   ].filter((l, i) => l !== '' || i === 5);
+  lines.push('', lengthLine('Sade anlatım (simple)', simpleTarget(fullText.length >= 2000 ? 'full' : 'excerpt')));
   if (fullText.length >= 2000) {
     const text = truncate(fullText, PAPER_SOURCE_LIMIT);
     lines.push('', `Makale metni (${text.length} karakter):`, '"""', text, '"""');
@@ -620,9 +678,11 @@ export function paperPrompt(paper: Paper, fullText: string): string {
 export function deepPrompt(options: { kind: 'haber' | 'makale'; title: string; importance: number | null; story: Story; source: string }): string {
   const { kind, title, importance, story, source } = options;
   const lines = [
+    lengthLine('Teknik derinlik', deepTarget(story.basis, importance, kind)),
+    '',
     `Türkçe başlık: ${title}`,
     ...(importance !== null ? [`Önem puanı: ${importance}`] : []),
-    `Sade anlatımın bölüm başlıkları: ${story.simple.sections.map((s) => `"${s.heading}"`).join(', ')}`,
+    `Sade anlatımın bölüm başlıkları (bunları KULLANMA): ${story.simple.sections.map((s) => `"${s.heading}"`).join(', ')}`,
     `Sade anlatımın kavram listesi: ${story.glossary.map((g) => g.term).join(', ') || '(yok)'}`,
     '',
     story.basis === 'excerpt'
@@ -775,15 +835,22 @@ export async function runEditor(state: State, llm: LlmClient, options: EditorOpt
         const feed = options.feedContent?.get(item.id);
         const source = truncate(sourceText(page, feed), NEWS_SOURCE_LIMIT);
         const basis = source.length >= 300 ? 'full' : 'excerpt';
-        const out = await ask<NewsOut>(NEWS_SYSTEM, newsPrompt(item, page, feed), NEWS_SCHEMA, 10_000);
+        const out = await askLong<NewsOut>(
+          (user) => ask<NewsOut>(NEWS_SYSTEM, user, NEWS_SCHEMA, 10_000),
+          newsPrompt(item, page, feed),
+          (o) => (o.relevant === false ? 0 : outWords(o.simple)),
+          'sade anlatım',
+          simpleTarget(basis),
+        );
         if (!out || !applyNews(item, out, basis)) return false;
         if (item.hidden || !item.story) return true;
         // Teknik derinlik ayrı istekte yazılır: uzun yazı tek yanıtta sade anlatımı kısaltmasın.
-        const deep = await ask<DeepOut>(
-          NEWS_DEEP_SYSTEM,
+        const deep = await askLong<DeepOut>(
+          (user) => ask<DeepOut>(NEWS_DEEP_SYSTEM, user, DEEP_SCHEMA, 16_000),
           deepPrompt({ kind: 'haber', title: item.titleTr ?? item.titleOriginal, importance: item.importance, story: item.story, source: source || item.excerptOriginal }),
-          DEEP_SCHEMA,
-          16_000,
+          (o) => outWords(o),
+          'teknik yazı',
+          deepTarget(basis, item.importance, 'haber'),
         );
         if (!deep) {
           // Sade anlatım yayımlanır; teknik yazı sonraki çalışmada yeniden denenir.
@@ -810,14 +877,21 @@ export async function runEditor(state: State, llm: LlmClient, options: EditorOpt
           }
         }
         const basis = fullText.length >= 2000 ? 'full' : 'excerpt';
-        const out = await ask<PaperOut>(PAPER_SYSTEM, paperPrompt(paper, fullText), PAPER_SCHEMA, 10_000);
+        const out = await askLong<PaperOut>(
+          (user) => ask<PaperOut>(PAPER_SYSTEM, user, PAPER_SCHEMA, 10_000),
+          paperPrompt(paper, fullText),
+          (o) => outWords(o.simple),
+          'sade anlatım',
+          simpleTarget(basis),
+        );
         if (!out || !applyPaper(paper, out, basis) || !paper.story) return false;
         const source = basis === 'full' ? truncate(fullText, PAPER_SOURCE_LIMIT) : paper.abstractOriginal;
-        const deep = await ask<DeepOut>(
-          PAPER_DEEP_SYSTEM,
+        const deep = await askLong<DeepOut>(
+          (user) => ask<DeepOut>(PAPER_DEEP_SYSTEM, user, DEEP_SCHEMA, 16_000),
           deepPrompt({ kind: 'makale', title: paper.titleTr ?? paper.titleOriginal, importance: null, story: paper.story, source }),
-          DEEP_SCHEMA,
-          16_000,
+          (o) => outWords(o),
+          'teknik yazı',
+          deepTarget(basis, null, 'makale'),
         );
         if (!deep) {
           paper.writerVersion = PAPER_WRITER_VERSION - 1;
