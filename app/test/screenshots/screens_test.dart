@@ -178,8 +178,8 @@ void main() {
     );
   });
 
-  testWidgets('radar_modeller', (tester) {
-    return shoot(tester, '13_radar_modeller', const AppShell(), act: () => tester.tap(nav('Radar')));
+  testWidgets('radar_makaleler', (tester) {
+    return shoot(tester, '13_radar_makaleler', const AppShell(), act: () => tester.tap(nav('Radar')));
   });
 
   testWidgets('radar_projeler', (tester) async {

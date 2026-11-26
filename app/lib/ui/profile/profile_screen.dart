@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/config.dart';
 import '../../core/theme.dart';
 import '../../state/providers.dart';
-import '../news/news_detail_screen.dart' show showReadingSizeSheet;
+import '../news/story_reader.dart' show showReadingSizeSheet;
 import '../widgets/common.dart';
 import 'history_screen.dart';
 import 'info_pages.dart';

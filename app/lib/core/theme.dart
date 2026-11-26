@@ -346,13 +346,18 @@ abstract final class AppTheme {
         style: TextButton.styleFrom(foregroundColor: tp.accent, textStyle: sans(14, FontWeight.w600), shape: rounded),
       ),
       iconButtonTheme: IconButtonThemeData(style: IconButton.styleFrom(foregroundColor: tp.text)),
+      // Seçili parça vurgu rengiyle dolar; seçili olmayanlar boş kalır. (Önceki tasarımda seçili olmayan
+      // parça gri boyanıyordu ve seçili sanılıyordu.)
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.resolveWith(
-            (s) => s.contains(WidgetState.selected) ? tp.surface : tp.surfaceAlt,
+            (s) => s.contains(WidgetState.selected) ? tp.accent : tp.surface,
           ),
           foregroundColor: WidgetStateProperty.resolveWith(
-            (s) => s.contains(WidgetState.selected) ? tp.text : tp.textSecondary,
+            (s) => s.contains(WidgetState.selected) ? tp.onAccent : tp.textSecondary,
+          ),
+          iconColor: WidgetStateProperty.resolveWith(
+            (s) => s.contains(WidgetState.selected) ? tp.onAccent : tp.textSecondary,
           ),
           side: WidgetStatePropertyAll(BorderSide(color: tp.border)),
           textStyle: WidgetStatePropertyAll(sans(13.5, FontWeight.w600)),

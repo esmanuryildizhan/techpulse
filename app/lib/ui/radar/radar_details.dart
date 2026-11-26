@@ -6,8 +6,7 @@ import '../../core/theme.dart';
 import '../../data/local_store.dart';
 import '../../data/models.dart';
 import '../../state/providers.dart';
-import '../news/news_detail_screen.dart' show showReadingSizeSheet;
-import '../news/story_view.dart';
+import '../news/story_reader.dart';
 import '../widgets/actions.dart';
 import '../widgets/common.dart';
 
@@ -18,26 +17,18 @@ class _DetailScaffold extends StatelessWidget {
     required this.entry,
     required this.shareTitle,
     required this.children,
-    this.textSize = false,
   });
 
   final BookmarkKind kind;
   final Entry entry;
   final String shareTitle;
   final List<Widget> children;
-  final bool textSize;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          if (textSize)
-            IconButton(
-              tooltip: 'Yazı boyutu',
-              onPressed: () => showReadingSizeSheet(context),
-              icon: const Icon(Icons.format_size_rounded),
-            ),
           BookmarkButton(kind: kind, entry: entry),
           IconButton(
             tooltip: 'Paylaş',
@@ -322,47 +313,38 @@ class RepoDetailScreen extends StatelessWidget {
 // Makale
 // ---------------------------------------------------------------------------
 
-class PaperDetailScreen extends ConsumerStatefulWidget {
+class PaperDetailScreen extends ConsumerWidget {
   const PaperDetailScreen({super.key, required this.paper});
 
   final Paper paper;
 
   @override
-  ConsumerState<PaperDetailScreen> createState() => _PaperDetailScreenState();
-}
-
-class _PaperDetailScreenState extends ConsumerState<PaperDetailScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && ref.read(settingsProvider).recordHistory) {
-        ref.read(historyProvider.notifier).add(BookmarkKind.paper, widget.paper);
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tp = context.tp;
-    final paper = widget.paper;
     final settings = ref.watch(settingsProvider);
     final scale = settings.readingSize.scale;
-    final article = paper.article;
-    final story = article == null ? null : Story.fromArticle(article);
     final extra = <(String, String)>[
       ('arXiv sayfası', paper.arxivUrl),
       if (paper.githubUrl case final github?) ('Makalenin kodu (GitHub)', github),
     ];
-    return _DetailScaffold(
+    return StoryReader(
       kind: BookmarkKind.paper,
       entry: paper,
-      shareTitle: paper.displayTitle,
-      textSize: true,
-      children: [
+      title: paper.displayTitle,
+      story: paper.story,
+      whyTitle: 'Bu araştırma neden önemli?',
+      glossaryTitle: 'Bu makaledeki kavramlar',
+      excerptNote: 'Makalenin tam metnine ulaşılamadı; bu yazı makalenin özetine dayanıyor.',
+      header: [
         Text('Araştırma makalesi', style: context.text.labelMedium?.copyWith(color: tp.accent)),
         const SizedBox(height: 10),
-        Text(paper.displayTitle, style: Tp.headline(context, size: 25, weight: FontWeight.w700, height: 1.22)),
+        Semantics(
+          header: true,
+          child: Text(
+            paper.displayTitle,
+            style: Tp.headline(context, size: 25 * scale.clamp(0.9, 1.15), weight: FontWeight.w700, height: 1.22),
+          ),
+        ),
         if (settings.showOriginalTitles && paper.titleTr != null && paper.titleTr != paper.titleOriginal) ...[
           const SizedBox(height: 8),
           Text(
@@ -373,30 +355,26 @@ class _PaperDetailScreenState extends ConsumerState<PaperDetailScreen> {
         const SizedBox(height: 12),
         if (paper.authorLine.isNotEmpty) Text(paper.authorLine, style: context.text.bodySmall),
         const SizedBox(height: 4),
-        MetaLine(
-          parts: [
-            Fmt.date(paper.publishedAt),
-            '${paper.upvotes} oy',
-            if (paper.readingMinutes != null) '${paper.readingMinutes} dk okuma',
-          ],
-        ),
-        const SizedBox(height: 6),
+        MetaLine(parts: [Fmt.date(paper.publishedAt), 'Hugging Face\'te ${paper.upvotes} oy']),
+        const SizedBox(height: 4),
         Text('Oylar, Hugging Face Daily Papers topluluğuna aittir.', style: context.text.labelSmall),
-        const SizedBox(height: 22),
-        if (story != null) ...[
-          StoryContent(story: story, level: ReadingLevel.simple, scale: scale),
-          if (story.glossary.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            const SectionHeader(title: 'Bu makaledeki kavramlar', padding: EdgeInsets.only(bottom: 12)),
-            GlossaryList(entries: story.glossary),
-          ],
-        ] else ...[
-          Text(paper.summaryTr ?? paper.abstractOriginal, style: Tp.article(context, scale)),
-          const SizedBox(height: 12),
-          Text('Makalenin ayrıntılı Türkçe anlatımı hazırlanıyor.', style: context.text.labelSmall),
-        ],
-        const SizedBox(height: Tp.section),
+      ],
+      fallback: [
+        Text(paper.summaryTr ?? paper.abstractOriginal, style: Tp.article(context, scale)),
+        const SizedBox(height: 12),
+        const ReaderNote(
+          icon: Icons.hourglass_top_rounded,
+          text: 'Makalenin ayrıntılı Türkçe anlatımı hazırlanıyor; genellikle bir saat içinde eklenir.',
+        ),
+      ],
+      footer: [
         LinkBox(title: 'Makale', url: paper.url, openLabel: 'Makale sayfasını aç', extra: extra),
+        const SizedBox(height: 14),
+        Text(
+          'Bu yazı, makalenin kendisinden yapay zekâ desteğiyle Türkçe olarak hazırlandı. Sonuçlar ve rakamlar '
+          'makaleden, kavram açıklamaları genel bilgiden gelir.',
+          style: context.text.labelSmall?.copyWith(height: 1.45),
+        ),
       ],
     );
   }

@@ -97,7 +97,7 @@ void main() {
       final models = parseModels(fixture('models.json')).items;
       expect(models.first.highlights, isA<List<String>>());
       final papers = parsePapers(fixture('papers.json')).items;
-      expect(papers.first.article, isNotNull);
+      expect(papers.first.story, isNotNull);
       final repos = parseRepos(fixture('repos.json')).items;
       final withStory = repos.where((r) => r.story != null).toList();
       expect(withStory, hasLength(2));

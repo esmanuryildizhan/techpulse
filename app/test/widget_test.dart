@@ -134,9 +134,15 @@ void main() {
     expect(find.text('Bu gelişme neden önemli?', skipOffstage: false), findsOneWidget);
     expect(find.text('Sade anlatım'), findsOneWidget);
 
+    // Seçili anlatım vurgu rengiyle dolar; her seçenekte okuma süresi yazar.
+    expect(find.textContaining('dk okuma'), findsWidgets);
     await tester.tap(find.text('Teknik derinlik'));
     await settle(tester, frames: 4);
     expect(find.text(ReadingLevel.technical.description), findsOneWidget);
+    final selected = tester.widget<Material>(
+      find.ancestor(of: find.text('Teknik derinlik'), matching: find.byType(Material)).first,
+    );
+    expect(selected.color, isNot(Colors.transparent));
     expect(
       find.byWidgetPredicate((w) => w is GlossaryParagraph && w.text == story.technical!.intro, skipOffstage: false),
       findsWidgets,
@@ -287,12 +293,20 @@ void main() {
     expect(find.byType(NewsListScreen), findsOneWidget);
   });
 
-  testWidgets('Radar: modeller ve projeler; proje sayfası README tanıtımı ve uyarı gösterir', (tester) async {
+  testWidgets('Radar: makaleler önce, modeller sonda; proje sayfası README tanıtımı ve uyarı gösterir', (tester) async {
     usePhoneSize(tester);
     await tester.pumpWidget(await buildTestApp());
     await settle(tester);
 
     await openTab(tester, 'Radar');
+    // Sıra: Makaleler, Tehditler, Projeler, Modeller; ilk açılan Makaleler.
+    final tabs = ['Makaleler', 'Tehditler', 'Projeler', 'Modeller'].map((t) => tester.getTopLeft(find.text(t)).dx).toList();
+    expect(tabs, orderedEquals([...tabs]..sort()));
+    final papers = parsePapers(fixture('papers.json')).items..sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
+    expect(find.text(papers.first.displayTitle), findsWidgets);
+
+    await tester.tap(find.text('Modeller'));
+    await settle(tester, frames: 8);
     final models = parseModels(fixture('models.json')).items..sort((a, b) => a.rank.compareTo(b.rank));
     expect(find.text(models.first.name), findsWidgets);
 

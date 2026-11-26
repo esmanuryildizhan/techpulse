@@ -499,10 +499,10 @@ final appTabProvider = NotifierProvider<AppTabController, AppTab>(AppTabControll
 
 /// Radar sekmesinin bölümleri.
 enum RadarSection {
-  models('Modeller'),
   papers('Makaleler'),
+  threats('Tehditler'),
   repos('Projeler'),
-  threats('Tehditler');
+  models('Modeller');
 
   const RadarSection(this.label);
 
@@ -512,7 +512,7 @@ enum RadarSection {
 /// Radar'da açık bölüm. Başka bir ekrandan (ör. ana sayfadaki "Siber tehdit" kartı) belirli bir bölüm açılabilir.
 class RadarSectionController extends Notifier<RadarSection> {
   @override
-  RadarSection build() => RadarSection.models;
+  RadarSection build() => RadarSection.papers;
 
   void select(RadarSection section) => state = section;
 }

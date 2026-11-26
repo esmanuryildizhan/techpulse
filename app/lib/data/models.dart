@@ -519,7 +519,7 @@ class Paper implements Entry {
     required this.githubUrl,
     required this.tags,
     required this.imageUrl,
-    required this.article,
+    required this.story,
     required this.topics,
     required this.readingMinutes,
     required this.raw,
@@ -540,7 +540,7 @@ class Paper implements Entry {
     githubUrl: _httpsOrNull(json['githubUrl']),
     tags: _strings(json['tags']),
     imageUrl: _httpsOrNull(json['imageUrl']),
-    article: Article.fromJson(json['article']),
+    story: Story.fromJson(json['story']) ?? _storyFromArticle(json['article']),
     topics: _strings(json['topics']),
     readingMinutes: _intOrNull(json['readingMinutes']),
     raw: json,
@@ -563,7 +563,9 @@ class Paper implements Entry {
   final List<String> tags;
   @override
   final String? imageUrl;
-  final Article? article;
+
+  /// Uzun anlatım (3. sürüm); önceki biçimde yazılmış makalelerde "article" alanından üretilir.
+  final Story? story;
   final List<String> topics;
   final int? readingMinutes;
   @override

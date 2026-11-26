@@ -62,18 +62,8 @@ class _RadarScreenState extends ConsumerState<RadarScreen> with SingleTickerProv
             Expanded(
               child: TabBarView(
                 controller: _tabs,
+                // Sekmelerin sırası RadarSection ile aynıdır: Makaleler, Tehditler, Projeler, Modeller.
                 children: [
-                  _RadarList<AiModel>(
-                    section: RadarSection.models,
-                    provider: modelsProvider,
-                    endpoint: Endpoint.models,
-                    parse: parseModels,
-                    intro:
-                        'Hugging Face\'te bu hafta en çok beğeni ve indirme alan yapay zekâ modelleri. '
-                        'Beğeni ve indirme sayıları Hugging Face kullanıcılarına aittir.',
-                    sort: (items) => items..sort((a, b) => a.rank.compareTo(b.rank)),
-                    card: (m) => ModelCard(model: m),
-                  ),
                   _RadarList<Paper>(
                     section: RadarSection.papers,
                     provider: papersProvider,
@@ -84,6 +74,17 @@ class _RadarScreenState extends ConsumerState<RadarScreen> with SingleTickerProv
                         'Türkçe özetleriyle. Oylar Hugging Face topluluğundan gelir.',
                     sort: (items) => items..sort((a, b) => b.publishedAt.compareTo(a.publishedAt)),
                     card: (p) => PaperCard(paper: p),
+                  ),
+                  _RadarList<Vulnerability>(
+                    section: RadarSection.threats,
+                    provider: securityProvider,
+                    endpoint: Endpoint.security,
+                    parse: parseSecurity,
+                    intro:
+                        'ABD Siber Güvenlik Ajansı (CISA), saldırganların gerçekten kullandığını doğruladığı '
+                        'açıkları bu listeye ekler. Kullandığınız bir ürün listedeyse güncellemeyi geciktirmeyin.',
+                    sort: (items) => items..sort((a, b) => b.dateAdded.compareTo(a.dateAdded)),
+                    card: (v) => VulnerabilityCard(vuln: v),
                   ),
                   _RadarList<Repo>(
                     section: RadarSection.repos,
@@ -96,16 +97,16 @@ class _RadarScreenState extends ConsumerState<RadarScreen> with SingleTickerProv
                     sort: (items) => items..sort((a, b) => b.stars.compareTo(a.stars)),
                     card: (r) => RepoCard(repo: r),
                   ),
-                  _RadarList<Vulnerability>(
-                    section: RadarSection.threats,
-                    provider: securityProvider,
-                    endpoint: Endpoint.security,
-                    parse: parseSecurity,
+                  _RadarList<AiModel>(
+                    section: RadarSection.models,
+                    provider: modelsProvider,
+                    endpoint: Endpoint.models,
+                    parse: parseModels,
                     intro:
-                        'ABD Siber Güvenlik Ajansı (CISA), saldırganların gerçekten kullandığını doğruladığı '
-                        'açıkları bu listeye ekler. Kullandığınız bir ürün listedeyse güncellemeyi geciktirmeyin.',
-                    sort: (items) => items..sort((a, b) => b.dateAdded.compareTo(a.dateAdded)),
-                    card: (v) => VulnerabilityCard(vuln: v),
+                        'Hugging Face\'te bu hafta en çok beğeni ve indirme alan yapay zekâ modelleri. '
+                        'Beğeni ve indirme sayıları Hugging Face kullanıcılarına aittir.',
+                    sort: (items) => items..sort((a, b) => a.rank.compareTo(b.rank)),
+                    card: (m) => ModelCard(model: m),
                   ),
                 ],
               ),

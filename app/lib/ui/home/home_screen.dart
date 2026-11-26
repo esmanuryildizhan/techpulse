@@ -352,23 +352,14 @@ class _ModeSwitch extends StatelessWidget {
               curve: Curves.easeOut,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: selected ? tp.surface : Colors.transparent,
+                color: selected ? tp.accent : Colors.transparent,
                 borderRadius: BorderRadius.circular(9),
-                boxShadow: selected
-                    ? [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
-                          blurRadius: 6,
-                          offset: const Offset(0, 1),
-                        ),
-                      ]
-                    : null,
               ),
               child: Text(
                 label,
                 style: context.text.labelLarge?.copyWith(
                   fontSize: 14,
-                  color: selected ? tp.text : tp.textSecondary,
+                  color: selected ? tp.onAccent : tp.textSecondary,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
