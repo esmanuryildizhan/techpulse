@@ -42,6 +42,7 @@ describe('util', () => {
 
   it('cleanText etiketleri ve HTML varlıklarını temizler', () => {
     assert.equal(cleanText('<p>Hello&nbsp;<b>world</b> &amp; more</p>'), 'Hello world & more');
+    assert.equal(cleanText('<p>Built with .NET and Node .js , fast</p>'), 'Built with .NET and Node .js, fast');
     assert.equal(cleanText('&lt;p&gt;double&lt;/p&gt;'), 'double');
     assert.equal(cleanText(null), '');
   });

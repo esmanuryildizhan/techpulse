@@ -50,7 +50,7 @@ export function cleanText(input: unknown): string {
   text = text.replace(/<br\s*\/?>/gi, ' ').replace(/<\/p>/gi, ' ');
   text = text.replace(INLINE_TAG_RE, '').replace(TAG_RE, ' ');
   text = decodeHTML(text);
-  text = text.replace(/\s+/g, ' ').replace(/\s+([,.;:!?)])/g, '$1').trim();
+  text = text.replace(/\s+/g, ' ').replace(/\s+([,.;:!?)])(?![\p{L}\p{N}])/gu, '$1').trim();
   for (const footer of FEED_FOOTERS) text = text.replace(footer, '').trim();
   return text;
 }

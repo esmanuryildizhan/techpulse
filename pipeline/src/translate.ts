@@ -46,7 +46,8 @@ const GLOSSARY: [RegExp, string | ((match: string, ...groups: string[]) => strin
   [/(?<!\p{L})sömürülmüş(?!\p{L})/gu, 'istismar edilmiş'],
   [/(\p{L})%\s?(\d)/gu, '$1 %$2'],
   [/%\s+(\d)/g, '%$1'],
-  [/\s+([,.;:!?])/g, '$1'],
+  // Noktalama işaretinden önceki boşluğu sil; ".NET", ".js" gibi adlardaki noktaya dokunma.
+  [/\s+([,.;:!?])(?![\p{L}\p{N}])/gu, '$1'],
 ];
 
 export function polishTurkish(text: string): string {

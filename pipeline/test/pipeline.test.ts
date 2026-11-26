@@ -98,6 +98,7 @@ describe('çeviri düzeltmeleri', () => {
     );
     assert.equal(polishTurkish('Şirket, kaynağa göre, satışı durdurdu.'), 'Şirket satışı durdurdu.');
     assert.equal(polishTurkish('Microsoft’a göre sorun çözüldü.'), 'Microsoft’a göre sorun çözüldü.');
+    assert.equal(polishTurkish('Sahte projeler üzerinden .NET geliştiricileri hedef alındı .'), 'Sahte projeler üzerinden .NET geliştiricileri hedef alındı.');
   });
 
   it('indirim ve teknolojiyle ilgisiz haberleri ayıklar', () => {
