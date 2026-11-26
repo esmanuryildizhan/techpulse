@@ -56,12 +56,12 @@ tldr, why, simple ve technical aynı cümleleri tekrar etmez. Giriş (intro) bö
 - summary: Kartlarda görünen spot; tek cümle, en fazla 200 karakter. Başlığı tekrar etmesin.
 - tldr: "30 saniyede" kutusu. Tam 3 madde; her biri en fazla 170 karakterlik tek cümle. Okur yalnızca bunları okusa bile olayın ne olduğunu, kimi etkilediğini ve sonucunu öğrenmeli. Somut ol: kim, ne, ne zaman, ne kadar.
 - why: "Bu gelişme neden önemli?" kutusu. 2-3 cümle: olayın sektöre, kullanıcılara ya da geliştiricilere etkisi. Kaynakta dayanağı olmayan öngörüde bulunma.
-- simple: Sade anlatım. Konuyu hiç bilmeyen ama meraklı bir okur için.
+- simple: Sade anlatım. Konuyu hiç bilmeyen ama meraklı bir okur için. Okur kaynağa gitmeden olayı bütün önemli ayrıntılarıyla öğrenebilmeli: kaynaktaki önemli olguları (rakamlar, tarihler, kimin ne yaptığı ve ne söylediği, tepkiler, sonraki adımlar) eksiksiz aktar.
   - intro: 2-4 cümlelik giriş.
-  - sections: 3-5 bölüm; her bölüm bir başlık (heading) ve 1-3 paragraftan (body) oluşur. Toplam 350-650 kelime; kaynak zenginse üst sınıra yaklaş, kaynak kısaysa kısa tut. Teknik ayrıntıyı günlük dile çevir, kısaltmaları ilk geçtiği yerde aç. Olayın arka planını, nasıl geliştiğini, kimlerin ne dediğini ve okur için sonucunu anlat.
+  - sections: 3-5 bölüm; her bölüm bir başlık (heading) ve 2-3 paragraftan (body) oluşur, her paragraf 3-5 cümledir. Uzunluk kaynağa göre: haber metni 3.000 karakterden uzunsa toplam 450-750 kelime, 1.500-3.000 karakter arasındaysa 300-450 kelime, daha kısaysa 150-300 kelime. Teknik ayrıntıyı günlük dile çevir, kısaltmaları ilk geçtiği yerde aç. Olayın arka planını, nasıl geliştiğini ve okur için sonucunu anlat.
 - technical: Teknik derinlik. Konuyu bilen bir yazılımcı için aynı olay; sade anlatımı tekrar etme, onu tamamla.
   - intro: 2-3 cümle.
-  - sections: 2-4 bölüm, toplam 250-550 kelime. Kaynaktaki somut teknik ayrıntıları ver: sürüm numaraları, mimari, kullanılan teknolojiler, API, komut ve yapılandırma adları, ölçüm ve kıyaslama sonuçları, CVE kimlikleri ve CVSS puanları, saldırı zinciri, etkilenen sürümler, yamalar ve geçici çözümler. Kaynak böyle ayrıntılar içermiyorsa uydurma: intro'yu boş bırak ve sections'ı boş liste döndür.
+  - sections: 2-4 bölüm; her bölüm 1-3 paragraf. Toplam 300-600 kelime. Kaynaktaki somut teknik ayrıntıları ver: sürüm numaraları, mimari, kullanılan teknolojiler, API, komut ve yapılandırma adları, ölçüm ve kıyaslama sonuçları, CVE kimlikleri ve CVSS puanları, saldırı zinciri, etkilenen sürümler, yamalar ve geçici çözümler. Kaynak böyle ayrıntılar içermiyorsa uydurma: intro'yu boş bırak ve sections'ı boş liste döndür.
 - glossary: Metinde geçen ve teknolojiye uzak bir okurun bilmeyeceği 2-6 kavram. Öncelik: (1) ürün, teknoloji, programlama dili, kütüphane, protokol veya kurum adları (ör. Clojure, Kubernetes, CISA, Hugging Face); (2) teknik terim ve kısaltmalar (ör. sıfır gün açığı, RCE, ince ayar, token); (3) İngilizce kalan terimler. "Yazılım", "internet", "uygulama", "şirket", "veri", "yapay zekâ" gibi herkesin bildiği kelimeleri SEÇME. Her kavram için:
   - term: Kavramın simple veya technical metninde AYNEN geçtiği biçim, ek almadan (metinde "Clojure'un" geçiyorsa "Clojure").
   - definition: Nedir? 1-2 sade cümle.
@@ -517,7 +517,7 @@ export function newsPrompt(item: NewsItem, page: ArticlePage | null, feedContent
   if (excerpt) lines.push(`Kaynağın kısa açıklaması: ${excerpt}`);
   if (item.points !== null) lines.push(`Hacker News: ${item.points} puan, ${item.comments ?? 0} yorum (bağlantı topluluk tarafından paylaşıldı).`);
   if (text.length >= 300) {
-    lines.push('', 'Haber metni:', '"""', text, '"""');
+    lines.push('', `Haber metni (${text.length} karakter):`, '"""', text, '"""');
   } else {
     lines.push(
       '',
