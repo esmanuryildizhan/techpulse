@@ -8,7 +8,7 @@ import { extractArticle } from '../src/article.ts';
 import { anthropicClient, LlmFatalError, type LlmClient, type LlmRequest } from '../src/llm.ts';
 import { runPipeline, type Fetchers } from '../src/pipeline.ts';
 import { FEEDS } from '../src/sources/feeds.ts';
-import { parseRepos } from '../src/sources/github.ts';
+import { cleanReadme, parseRepos } from '../src/sources/github.ts';
 import { parseHackerNews } from '../src/sources/hackernews.ts';
 import { parseDailyPapers, parseTrendingModels } from '../src/sources/huggingface.ts';
 import { parseKev } from '../src/sources/kev.ts';
@@ -37,6 +37,11 @@ function fetchers(): Fetchers {
       if (url.includes('phi-5')) return extractArticle(fixture('article.html'), url);
       throw new Error('HTTP 403');
     },
+    // İlk projenin README'si okunur, diğerleri için yalnızca kısa açıklama kalır.
+    readme: async (repo) =>
+      repo.id === parseRepos(JSON.parse(fixture('github-search.json')))[0].id
+        ? `# ${repo.name}\n\nThis toolkit lets you run local AI agents with tools, memory and a small web UI. `.repeat(3)
+        : '',
   };
 }
 
@@ -53,15 +58,28 @@ function fakeEditor(options: { irrelevant?: (user: string) => boolean; fatalAfte
       const title = /Orijinal başlık: (.*)/.exec(request.user)?.[1] ?? /Makale başlığı: (.*)/.exec(request.user)?.[1] ?? 'kayıt';
       let data: unknown;
       if (request.schema === NEWS_SCHEMA) {
+        const limited = request.user.includes('Haber metnine ulaşılamadı');
         data = {
           relevant: !(options.irrelevant?.(request.user) ?? false),
           title: `**Türkçe:** ${title}`,
           summary: 'Kısa ve anlaşılır bir spot cümlesi.',
-          intro: 'Giriş paragrafı yapay zeka ile yazıldı.',
-          primer: [{ term: 'Parametre', explanation: 'Modelin öğrendiği sayısal değerler.' }, { term: '', explanation: 'boş terim atılmalı' }],
-          sections: [
-            { heading: 'Ne oldu?', body: 'Birinci paragraf.\n\nİkinci paragraf.' },
-            { heading: 'Bu neden önemli?:', body: '- Madde işaretli satır temizlenmeli.' },
+          tldr: ['Birinci önemli bilgi.', 'İkinci önemli bilgi.', 'Üçüncü önemli bilgi.', 'Fazla madde atılmalı.'],
+          why: 'Bu gelişme geliştiricilerin model seçimini etkileyebilir.',
+          simple: {
+            intro: 'Giriş paragrafı yapay zeka ile yazıldı ve Phi-5 modelinden söz ediyor.',
+            sections: [
+              { heading: 'Küçük model nasıl akıl yürütüyor?', body: 'Birinci paragraf.\n\nİkinci paragraf parametre sayısını anlatıyor.' },
+              { heading: 'Lisans ne anlama geliyor?:', body: '- Madde işaretli satır temizlenmeli.' },
+            ],
+          },
+          technical: limited
+            ? { intro: '', sections: [] }
+            : { intro: 'Teknik giriş.', sections: [{ heading: 'Mimari ve eğitim verisi', body: 'Yedi milyar parametreli model.' }] },
+          glossary: [
+            { term: 'Phi-5', definition: 'Microsoft\'un küçük dil modeli.', analogy: '', usage: 'Telefonda çalışan asistanlarda.', origin: '' },
+            { term: 'parametre', definition: 'Modelin öğrendiği sayısal değerler.', analogy: 'Bir mikserdeki düğmeler gibi.', usage: '', origin: '' },
+            { term: 'Kuantum dolanıklık', definition: 'Metinde geçmeyen kavram atılmalı.', analogy: '', usage: '', origin: '' },
+            { term: '', definition: 'Boş terim atılmalı.', analogy: '', usage: '', origin: '' },
           ],
           category: 'ai',
           topics: ['dil modelleri', 'Dil Modelleri', 'Açık kaynak', 'Phi-5', 'Fazla etiket'],
@@ -79,7 +97,14 @@ function fakeEditor(options: { irrelevant?: (user: string) => boolean; fatalAfte
       } else if (request.schema === MODEL_SCHEMA) {
         data = { summary: 'Görüntüleri bölütleyen açık bir model.', highlights: ['Görsel girdi alıyor.', 'Apache 2.0 lisanslı'] };
       } else if (request.schema === REPO_SCHEMA) {
-        data = { description: 'Yerel yapay zekâ ajanları için araç seti.' };
+        data = {
+          summary: 'Yerel yapay zekâ ajanları için araç seti.',
+          what: 'Ajanları bilgisayarda çalıştıran bir araç seti.',
+          why: 'Proje, kısa sürede yıldız topladı.',
+          useCases: ['Yerel ajan kurmak.', 'Araç çağrısı denemek', ''],
+          audience: '',
+          caution: '',
+        };
       } else if (request.schema === KEV_SCHEMA) {
         data = {
           name: 'fortinet FortiOS sınır dışı yazma açığı',
@@ -126,6 +151,15 @@ describe('akış görselleri', () => {
   });
 });
 
+describe('README', () => {
+  it('rozetleri, görselleri, HTML ve kod bloklarını atar, metni korur', () => {
+    const text = cleanReadme(
+      '# Ajan Kiti\n\n[![CI](https://x/b.svg)](https://x)\n![logo](logo.png)\n<p align="center">Yerel <b>ajanlar</b></p>\n\n```bash\npip install kit\n```\n\nAyrıntı için [belgeler](https://docs).',
+    );
+    assert.equal(text, '# Ajan Kiti\n\n \n \n Yerel ajanlar \n\n [kod örneği] \n\nAyrıntı için belgeler.');
+  });
+});
+
 describe('editör çıktısının temizliği', () => {
   it('markdown işaretlerini ve tırnakları atar, yazımı düzeltir', () => {
     assert.equal(plain('**Başlık:** "yapay zeka" haberi', 100), 'Başlık: "yapay zekâ" haberi');
@@ -137,10 +171,12 @@ describe('editör çıktısının temizliği', () => {
     const ok = applyNews(item, {
       relevant: true,
       title: 'Başlık',
-      summary: '',
-      intro: 'Giriş',
-      primer: [],
-      sections: [],
+      summary: 'Spot',
+      tldr: ['Tek madde yetmez.'],
+      why: 'Neden',
+      simple: { intro: 'Giriş', sections: [{ heading: 'Bölüm', body: 'Metin' }] },
+      technical: { intro: '', sections: [] },
+      glossary: [],
       category: 'ai',
       topics: [],
       importance: 3,
@@ -158,19 +194,33 @@ describe('yapay zekâ editörü', () => {
 
     const news = await readEnvelope<NewsItem>(out, 'news');
     assert.equal(news.items.length, 6);
-    assert.ok(news.items.every((n) => n.writer === 'ai' && n.translated && n.article !== null));
+    assert.ok(news.items.every((n) => n.writer === 'ai' && n.writerVersion === 2 && n.translated && n.story !== null && n.article !== null));
     const phi = news.items.find((n) => n.titleOriginal.startsWith('Introducing Phi-5'))!;
     assert.equal(phi.titleTr, 'Türkçe: Introducing Phi-5: a small model that reasons & codes');
     assert.equal(phi.imageUrl, 'https://cdn.example.com/images/phi-5-cover.jpg');
-    assert.equal(phi.article!.intro, 'Giriş paragrafı yapay zekâ ile yazıldı.');
-    assert.deepEqual(phi.article!.primer, [{ term: 'Parametre', explanation: 'Modelin öğrendiği sayısal değerler.' }]);
-    assert.equal(phi.article!.sections[0].body, 'Birinci paragraf.\n\nİkinci paragraf.');
-    assert.equal(phi.article!.sections[1].heading, 'Bu neden önemli?');
-    assert.equal(phi.article!.sections[1].body, 'Madde işaretli satır temizlenmeli.');
+    const story = phi.story!;
+    assert.equal(story.basis, 'full');
+    assert.deepEqual(story.tldr, ['Birinci önemli bilgi.', 'İkinci önemli bilgi.', 'Üçüncü önemli bilgi.']);
+    assert.equal(story.simple.intro, 'Giriş paragrafı yapay zekâ ile yazıldı ve Phi-5 modelinden söz ediyor.');
+    assert.equal(story.simple.sections[0].body, 'Birinci paragraf.\n\nİkinci paragraf parametre sayısını anlatıyor.');
+    assert.equal(story.simple.sections[1].heading, 'Lisans ne anlama geliyor?');
+    assert.equal(story.simple.sections[1].body, 'Madde işaretli satır temizlenmeli.');
+    assert.equal(story.technical?.sections[0].heading, 'Mimari ve eğitim verisi');
+    // Metinde geçmeyen ve boş kavramlar atılır.
+    assert.deepEqual(story.glossary.map((g) => g.term), ['Phi-5', 'parametre']);
+    assert.equal(story.glossary[1].analogy, 'Bir mikserdeki düğmeler gibi.');
+    // Eski uygulama sürümleri için sade anlatım eski biçimde de yazılır.
+    assert.equal(phi.article!.intro, story.simple.intro);
+    assert.deepEqual(phi.article!.primer[0], { term: 'Phi-5', explanation: 'Microsoft\'un küçük dil modeli.' });
     assert.deepEqual(phi.topics, ['Dil modelleri', 'Açık kaynak', 'Phi-5', 'Fazla etiket']);
     assert.equal(phi.importance, 5);
     assert.equal(phi.readingMinutes, 1);
     assert.equal(phi.category, 'ai');
+
+    // Sayfası okunamayan haber kısa yazılır ve teknik anlatım içermez.
+    const hn = news.items.find((n) => n.sourceId === 'hacker-news')!;
+    assert.equal(hn.story!.basis, 'excerpt');
+    assert.equal(hn.story!.technical, null);
 
     // Haber isteği sayfa metnini içerir; sayfası okunamayan haber için kısa yazma talimatı verilir.
     const phiRequest = requests.find((r) => r.user.includes('Introducing Phi-5'))!;
@@ -189,7 +239,12 @@ describe('yapay zekâ editörü', () => {
     assert.equal(models.items[0].cardExcerpt, '');
 
     const repos = await readEnvelope<Repo>(out, 'repos');
-    assert.ok(repos.items.every((r) => r.writer === 'ai' && r.imageUrl?.startsWith('https://opengraph.githubassets.com/1/')));
+    assert.ok(repos.items.every((r) => r.writer === 'ai' && r.writerVersion === 2 && r.imageUrl?.startsWith('https://opengraph.githubassets.com/1/')));
+    assert.ok(repos.items.every((r) => r.descriptionTr === 'Yerel yapay zekâ ajanları için araç seti.'));
+    assert.deepEqual(repos.items[0].story!.useCases, ['Yerel ajan kurmak', 'Araç çağrısı denemek']);
+    const repoRequest = requests.find((r) => r.schema === REPO_SCHEMA)!;
+    assert.match(repoRequest.user, /README:|README okunamadı/);
+    assert.ok(repos.items.some((r) => r.story!.basis === 'readme'));
 
     const security = await readEnvelope<Vulnerability>(out, 'security');
     assert.equal(security.items[0].nameTr, 'Fortinet FortiOS sınır dışı yazma açığı');

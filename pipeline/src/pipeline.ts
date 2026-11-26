@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { mergeKev, mergeModels, mergeNews, mergePapers, mergeRepos } from './merge.ts';
 import { FEEDS, findSource, HACKER_NEWS } from './sources/feeds.ts';
-import { fetchTrendingRepos } from './sources/github.ts';
+import { fetchReadme, fetchTrendingRepos } from './sources/github.ts';
 import { fetchHackerNews } from './sources/hackernews.ts';
 import { enrichModel, fetchDailyPapers, fetchTrendingModels } from './sources/huggingface.ts';
 import { fetchKev } from './sources/kev.ts';
@@ -28,6 +28,8 @@ export interface Fetchers {
   kev: () => Promise<Vulnerability[]>;
   /** Haber sayfası (kapak görseli ve metin). */
   page: (url: string) => Promise<ArticlePage>;
+  /** Projenin sadeleştirilmiş README metni. */
+  readme: (repo: Repo) => Promise<string>;
 }
 
 export interface PipelineOptions {
@@ -91,6 +93,7 @@ function defaultFetchers(token: string | undefined): Fetchers {
     repos: () => fetchTrendingRepos(token),
     kev: () => fetchKev(),
     page: (url) => fetchArticle(url),
+    readme: (repo) => fetchReadme(repo, token),
   };
 }
 
@@ -190,6 +193,7 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
       deadlineMs: options.aiDeadlineMs,
       feedContent,
       fetchPage: fetchers.page,
+      fetchReadme: fetchers.readme,
     });
   } else {
     await fetchNewImages(state, fetchers, now);

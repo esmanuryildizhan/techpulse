@@ -1,7 +1,7 @@
 import { classify } from './classify.ts';
 import type { TranslateFn } from './mt.ts';
 import { findSource } from './sources/feeds.ts';
-import type { Article, State } from './types.ts';
+import type { Article, State, StoryVersion } from './types.ts';
 import { MODEL_SUMMARY_VERSION } from './types.ts';
 import { errorMessage, log, truncate } from './util.ts';
 
@@ -172,10 +172,21 @@ export function polishState(state: State): void {
     article.primer = article.primer.map((p) => ({ term: p.term, explanation: polishTurkish(p.explanation) }));
     article.sections = article.sections.map((s) => ({ heading: s.heading, body: polishTurkish(s.body) }));
   };
+  const fixVersion = (v: StoryVersion | null): StoryVersion | null =>
+    v ? { intro: polishTurkish(v.intro), sections: v.sections.map((s) => ({ heading: s.heading, body: polishTurkish(s.body) })) } : v;
   for (const n of state.news) {
     n.titleTr = fix(n.titleTr);
     n.summaryTr = fix(n.summaryTr);
     fixArticle(n.article);
+    if (n.story) {
+      n.story = {
+        ...n.story,
+        tldr: n.story.tldr.map((t) => polishTurkish(t)),
+        why: polishTurkish(n.story.why),
+        simple: fixVersion(n.story.simple)!,
+        technical: fixVersion(n.story.technical),
+      };
+    }
   }
   for (const p of state.papers) {
     p.titleTr = fix(p.titleTr);

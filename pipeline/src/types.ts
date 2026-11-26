@@ -9,6 +9,13 @@ export const MODEL_SUMMARY_VERSION = 2;
 /** Yapay zekâ yazarının talimatı değişince artırılır; eski metinler sırayla yeniden yazılır. */
 export const WRITER_VERSION = 1;
 
+/**
+ * Haber ve proje yazılarının biçim sürümleri. 2: haberlerde "30 saniyede", "neden önemli", sade ve teknik
+ * anlatım ile kavram sözlüğü (story); projelerde README'ye dayanan kısa tanıtım yazısı.
+ */
+export const NEWS_WRITER_VERSION = 2;
+export const REPO_WRITER_VERSION = 2;
+
 export type Category = 'ai' | 'security' | 'dev' | 'data' | 'hardware' | 'cloud' | 'mobile' | 'science' | 'industry';
 export const CATEGORIES: readonly Category[] = ['ai', 'security', 'dev', 'data', 'hardware', 'cloud', 'mobile', 'science', 'industry'];
 
@@ -31,6 +38,55 @@ export interface Article {
   intro: string;
   primer: Primer[];
   sections: ArticleSection[];
+}
+
+/** Metindeki altı çizili kavrama dokununca açılan sade açıklama. Boş alanlar uygulamada gösterilmez. */
+export interface GlossaryEntry {
+  /** Kavramın metinde geçtiği biçim (ör. "Clojure"). */
+  term: string;
+  /** Nedir? */
+  definition: string;
+  /** Günlük hayattan benzetme. */
+  analogy: string;
+  /** Nerede, ne için kullanılır? */
+  usage: string;
+  /** Kim geliştirdi, nereden çıktı? */
+  origin: string;
+}
+
+export interface StoryVersion {
+  intro: string;
+  sections: ArticleSection[];
+}
+
+/** Haberin iki seviyeli anlatımı (biçim sürümü 2). */
+export interface Story {
+  /** "30 saniyede": en önemli 3 bilgi. */
+  tldr: string[];
+  /** "Bu gelişme neden önemli?" */
+  why: string;
+  /** Sade anlatım: konuya yabancı okur için. */
+  simple: StoryVersion;
+  /** Teknik derinlik: konuyu bilen geliştirici için; kaynak yeterli ayrıntı vermiyorsa null. */
+  technical: StoryVersion | null;
+  glossary: GlossaryEntry[];
+  /** Anlatım haberin tam metnine mi, yalnızca kısa açıklamasına mı dayanıyor? */
+  basis: 'full' | 'excerpt';
+}
+
+/** GitHub projesinin README'ye dayanan kısa tanıtımı. */
+export interface RepoStory {
+  /** Ne işe yarıyor? */
+  what: string;
+  /** Neden ilgi görüyor? (yalnızca açılış tarihi, yıldız ve README'deki iddialara dayanır) */
+  why: string;
+  /** Neler yapılabilir? */
+  useCases: string[];
+  /** Kimin işine yarar? (boş olabilir) */
+  audience: string;
+  /** Güvenlik veya telif açısından dikkat notu (boş olabilir). */
+  caution: string;
+  basis: 'readme' | 'description';
 }
 
 export type SourceKind = 'official' | 'news' | 'community';
@@ -84,8 +140,10 @@ export interface NewsItem {
   discussionUrl: string | null;
   /** Haberin kapak görseli (yayıncının og:image'i veya akıştaki görsel). */
   imageUrl: string | null;
-  /** Yapay zekâ editörünün yazdığı ayrıntılı anlatım; makine çevirisinde null. */
+  /** Yapay zekâ editörünün yazdığı ayrıntılı anlatım; makine çevirisinde null. Eski uygulama sürümleri bunu okur. */
   article: Article | null;
+  /** İki seviyeli anlatım (biçim sürümü 2); yeni uygulama bunu okur. */
+  story: Story | null;
   /** 2-4 kısa Türkçe konu etiketi (Keşfet'teki trend konular bunlardan çıkar). */
   topics: string[];
   /** 1 (niş) - 5 (sektörü etkileyen) önem puanı; öne çıkan haberler bununla seçilir. */
@@ -164,6 +222,9 @@ export interface Repo {
   translated: boolean;
   imageUrl: string | null;
   writer: Writer;
+  writerVersion: number;
+  /** README'ye dayanan kısa tanıtım yazısı; henüz yazılmadıysa null. */
+  story: RepoStory | null;
 }
 
 export interface Vulnerability {

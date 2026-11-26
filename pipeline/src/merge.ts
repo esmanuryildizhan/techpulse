@@ -55,6 +55,7 @@ export function mergeNews(previous: NewsItem[], fresh: RawNews[], now: Date): Ne
       discussionUrl: raw.discussionUrl ?? null,
       imageUrl: raw.imageUrl ?? null,
       article: null,
+      story: null,
       topics: [],
       importance: null,
       readingMinutes: null,
@@ -117,7 +118,14 @@ export function mergeRepos(previous: Repo[], fresh: Repo[]): Repo[] {
   return fresh.map((repo) => {
     const before = old.get(repo.id);
     if (before && before.descriptionOriginal === repo.descriptionOriginal) {
-      return { ...repo, descriptionTr: before.descriptionTr, translated: before.translated, writer: before.writer };
+      return {
+        ...repo,
+        descriptionTr: before.descriptionTr,
+        translated: before.translated,
+        writer: before.writer,
+        writerVersion: before.writerVersion,
+        story: before.story,
+      };
     }
     return repo;
   });

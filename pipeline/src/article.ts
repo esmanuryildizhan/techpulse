@@ -14,7 +14,7 @@ export interface ArticlePage {
   description: string;
 }
 
-export const ARTICLE_TEXT_LIMIT = 7000;
+export const ARTICLE_TEXT_LIMIT = 12000;
 const MAX_HTML_BYTES = 2_500_000;
 
 function meta(document: Document, selectors: string[]): string {

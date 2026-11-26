@@ -40,6 +40,43 @@ function isArticle(value: unknown): boolean {
   );
 }
 
+function isSections(value: unknown, allowEmpty: boolean): boolean {
+  return (
+    Array.isArray(value) &&
+    (allowEmpty || value.length > 0) &&
+    value.every((s) => conforms(s, { heading: isNonEmpty, body: isNonEmpty }))
+  );
+}
+
+function isStoryVersion(value: unknown): boolean {
+  return conforms(value, { intro: isNonEmpty }) && isSections((value as Record<string, unknown>)['sections'], false);
+}
+
+function isStory(value: unknown): boolean {
+  if (value === null) return true;
+  if (!value || typeof value !== 'object') return false;
+  const s = value as Record<string, unknown>;
+  return (
+    isStringArray(s['tldr']) &&
+    isNonEmpty(s['why']) &&
+    isStoryVersion(s['simple']) &&
+    (s['technical'] === null || isStoryVersion(s['technical'])) &&
+    Array.isArray(s['glossary']) &&
+    (s['glossary'] as unknown[]).every((g) =>
+      conforms(g, { term: isNonEmpty, definition: isNonEmpty, analogy: isString, usage: isString, origin: isString }),
+    ) &&
+    (s['basis'] === 'full' || s['basis'] === 'excerpt')
+  );
+}
+
+function isRepoStory(value: unknown): boolean {
+  if (value === null) return true;
+  return (
+    conforms(value, { what: isNonEmpty, why: isNonEmpty, useCases: isStringArray, audience: isString, caution: isString }) &&
+    ['readme', 'description'].includes((value as Record<string, unknown>)['basis'] as string)
+  );
+}
+
 function conforms(value: unknown, shape: Record<string, Check>): boolean {
   if (!value || typeof value !== 'object') return false;
   const obj = value as Record<string, unknown>;
@@ -66,6 +103,7 @@ const NEWS_SHAPE: Record<string, Check> = {
   discussionUrl: (v) => v === null || isHttps(v),
   imageUrl: isNullableHttps,
   article: isArticle,
+  story: isStory,
   topics: isStringArray,
   importance: isNullableNumber,
   readingMinutes: isNullableNumber,
@@ -137,6 +175,8 @@ const REPO_SHAPE: Record<string, Check> = {
   translated: isBool,
   imageUrl: isNullableHttps,
   writer: isWriter,
+  writerVersion: isInt,
+  story: isRepoStory,
 };
 
 const KEV_SHAPE: Record<string, Check> = {
@@ -205,6 +245,7 @@ export const upgrade = {
     return withDefaults(item, {
       imageUrl: null,
       article: null,
+      story: null,
       topics: [],
       importance: null,
       readingMinutes: null,
@@ -233,7 +274,7 @@ export const upgrade = {
   repos(value: unknown): unknown {
     const item = obj(value);
     if (!item) return value;
-    return withDefaults(item, { imageUrl: null, writer: writerOf(item) });
+    return withDefaults(item, { imageUrl: null, writer: writerOf(item), writerVersion: 0, story: null });
   },
   security(value: unknown): unknown {
     const item = obj(value);

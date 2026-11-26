@@ -54,6 +54,7 @@ function fixtureFetchers(): Fetchers {
       if (url.includes('phi-5')) return { imageUrl: 'https://cdn.example.com/phi.jpg', text: '', description: '' };
       throw new Error('HTTP 403');
     },
+    readme: async () => '',
   };
 }
 
