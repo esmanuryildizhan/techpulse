@@ -14,6 +14,7 @@ import { parseDailyPapers, parseTrendingModels } from '../src/sources/huggingfac
 import { parseKev } from '../src/sources/kev.ts';
 import { normalizeImageUrl, parseFeed } from '../src/sources/rss.ts';
 import type { AiModel, Envelope, NewsItem, Paper, Repo, Vulnerability } from '../src/types.ts';
+import { REPO_WRITER_VERSION } from '../src/types.ts';
 import { applyNews, KEV_SCHEMA, MODEL_SCHEMA, NEWS_SCHEMA, PAPER_SCHEMA, paragraphs, plain, REPO_SCHEMA } from '../src/writer.ts';
 
 const fixture = (name: string) => readFileSync(new URL(`./fixtures/${name}`, import.meta.url), 'utf8');
@@ -239,7 +240,7 @@ describe('yapay zekâ editörü', () => {
     assert.equal(models.items[0].cardExcerpt, '');
 
     const repos = await readEnvelope<Repo>(out, 'repos');
-    assert.ok(repos.items.every((r) => r.writer === 'ai' && r.writerVersion === 2 && r.imageUrl?.startsWith('https://opengraph.githubassets.com/1/')));
+    assert.ok(repos.items.every((r) => r.writer === 'ai' && r.writerVersion === REPO_WRITER_VERSION && r.imageUrl?.startsWith('https://opengraph.githubassets.com/1/')));
     assert.ok(repos.items.every((r) => r.descriptionTr === 'Yerel yapay zekâ ajanları için araç seti.'));
     assert.deepEqual(repos.items[0].story!.useCases, ['Yerel ajan kurmak', 'Araç çağrısı denemek']);
     const repoRequest = requests.find((r) => r.schema === REPO_SCHEMA)!;

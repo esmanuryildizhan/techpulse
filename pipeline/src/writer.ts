@@ -100,7 +100,7 @@ ${STYLE_RULES}
 ## Alanlar
 - summary: Kartta görünen 1-2 cümle, en fazla 220 karakter: proje ne yapıyor.
 - what: "Ne işe yarıyor?" 2-4 cümle: projenin ne olduğu, nasıl çalıştığı ve hangi teknolojilerle yazıldığı.
-- why: "Neden ilgi görüyor?" 1-3 cümle. Yalnızca verilen verilere dayan: projenin açılış tarihi, yıldız sayısı, konusu ve README'deki iddialar. İlginin gerçek nedenini bilemezsin; "proje, ... vaadiyle dikkat çekiyor" gibi temkinli yaz, uydurma neden ekleme.
+- why: "Neden ilgi görüyor?" 2-3 cümle. Projenin hangi ihtiyaca, eksikliğe veya merağa cevap verdiğini README'ye ve verilen sayılara dayanarak açıkla; kaç günde kaç yıldız topladığını an (ör. "GTA VI'nın bilgisayar sürümü henüz yok; proje bu boşluğu doldurmayı vaat ettiği için birkaç günde 12 binden fazla yıldız topladı."). Kaynakta olmayan olay, kişi, rakam veya alıntı uydurma; README'deki iddiaları "... vaat ediyor", "... olduğunu söylüyor" diye aktar. Okura bilgi vermeyen "ilginin nedeni bilinemez", "kaynakta açıkça yazmıyor" gibi cümleler kurma.
 - useCases: 2-4 madde; bu projeyle neler yapılabilir. Her biri en fazla 120 karakterlik tek cümle; README'de yazanlara dayan.
 - audience: Kimin işine yarar? 1 cümle; belirsizse boş metin.
 - caution: Gerekiyorsa 1-2 cümlelik dikkat notu. Proje resmî olmayan bir üçüncü taraf çalışmasıysa, telifli bir ürünü kopyaladığını ya da çalıştırdığını iddia ediyorsa, kullanıcıdan bilinmeyen bir çalıştırılabilir dosya indirmesini, parola veya anahtar girmesini ya da güvenlik yazılımını kapatmasını istiyorsa veya gerçek olamayacak kadar iyi görünen iddialar taşıyorsa okuru açıkça uyar. Böyle bir durum yoksa boş metin.`;
