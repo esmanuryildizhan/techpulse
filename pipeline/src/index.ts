@@ -31,7 +31,7 @@ async function main(): Promise<void> {
     maxTranslationTexts: Number.parseInt(process.env.MAX_TRANSLATION_TEXTS ?? '600', 10),
     llm,
     aiMaxItems: Number.parseInt(process.env.AI_MAX_ITEMS || '150', 10),
-    aiConcurrency: Number.parseInt(process.env.AI_CONCURRENCY || '4', 10),
+    aiConcurrency: Number.parseInt(process.env.AI_CONCURRENCY || '6', 10),
   });
 
   const failed = meta.sources.filter((s) => !s.ok);

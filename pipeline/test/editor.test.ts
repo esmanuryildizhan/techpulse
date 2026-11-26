@@ -14,8 +14,8 @@ import { parseDailyPapers, parseTrendingModels } from '../src/sources/huggingfac
 import { parseKev } from '../src/sources/kev.ts';
 import { normalizeImageUrl, parseFeed } from '../src/sources/rss.ts';
 import type { AiModel, Envelope, NewsItem, Paper, Repo, Vulnerability } from '../src/types.ts';
-import { REPO_WRITER_VERSION } from '../src/types.ts';
-import { applyNews, KEV_SCHEMA, MODEL_SCHEMA, NEWS_SCHEMA, PAPER_SCHEMA, paragraphs, plain, REPO_SCHEMA } from '../src/writer.ts';
+import { NEWS_WRITER_VERSION, PAPER_WRITER_VERSION, REPO_WRITER_VERSION } from '../src/types.ts';
+import { applyNews, arxivHtmlUrl, DEEP_SCHEMA, KEV_SCHEMA, MODEL_SCHEMA, NEWS_SCHEMA, PAPER_SCHEMA, paragraphs, plain, REPO_SCHEMA } from '../src/writer.ts';
 
 const fixture = (name: string) => readFileSync(new URL(`./fixtures/${name}`, import.meta.url), 'utf8');
 const NOW = new Date('2026-11-25T12:00:00Z');
@@ -36,6 +36,9 @@ function fetchers(): Fetchers {
     kev: async () => parseKev(JSON.parse(fixture('kev.json'))),
     page: async (url) => {
       if (url.includes('phi-5')) return extractArticle(fixture('article.html'), url);
+      if (url.startsWith('https://arxiv.org/html/')) {
+        return { imageUrl: null, description: '', text: 'We introduce a promptable segmentation method. '.repeat(60) };
+      }
       throw new Error('HTTP 403');
     },
     // İlk projenin README'si okunur, diğerleri için yalnızca kısa açıklama kalır.
@@ -59,7 +62,6 @@ function fakeEditor(options: { irrelevant?: (user: string) => boolean; fatalAfte
       const title = /Orijinal başlık: (.*)/.exec(request.user)?.[1] ?? /Makale başlığı: (.*)/.exec(request.user)?.[1] ?? 'kayıt';
       let data: unknown;
       if (request.schema === NEWS_SCHEMA) {
-        const limited = request.user.includes('Haber metnine ulaşılamadı');
         data = {
           relevant: !(options.irrelevant?.(request.user) ?? false),
           title: `**Türkçe:** ${title}`,
@@ -73,9 +75,6 @@ function fakeEditor(options: { irrelevant?: (user: string) => boolean; fatalAfte
               { heading: 'Lisans ne anlama geliyor?:', body: '- Madde işaretli satır temizlenmeli.' },
             ],
           },
-          technical: limited
-            ? { intro: '', sections: [] }
-            : { intro: 'Teknik giriş.', sections: [{ heading: 'Mimari ve eğitim verisi', body: 'Yedi milyar parametreli model.' }] },
           glossary: [
             { term: 'Phi-5', definition: 'Microsoft\'un küçük dil modeli.', analogy: '', usage: 'Telefonda çalışan asistanlarda.', origin: '' },
             { term: 'parametre', definition: 'Modelin öğrendiği sayısal değerler.', analogy: 'Bir mikserdeki düğmeler gibi.', usage: '', origin: '' },
@@ -86,13 +85,26 @@ function fakeEditor(options: { irrelevant?: (user: string) => boolean; fatalAfte
           topics: ['dil modelleri', 'Dil Modelleri', 'Açık kaynak', 'Phi-5', 'Fazla etiket'],
           importance: 9,
         };
+      } else if (request.schema === DEEP_SCHEMA) {
+        // Yalnızca kısa açıklaması olan kayıtta teknik boyut yok sayılır.
+        data = request.user.includes('yalnızca kısa açıklama var')
+          ? { intro: '', sections: [], glossary: [] }
+          : {
+              intro: 'Teknik giriş transformer mimarisini anlatıyor.',
+              sections: [{ heading: 'Mimari ve eğitim verisi', body: 'Yedi milyar parametreli model.\n\nİkinci teknik paragraf.' }],
+              glossary: [
+                { term: 'transformer', definition: 'Dikkat mekanizmasına dayanan mimari.', analogy: '', usage: '', origin: '' },
+                { term: 'Phi-5', definition: 'Tekrarlanan kavram atılmalı.', analogy: '', usage: '', origin: '' },
+              ],
+            };
       } else if (request.schema === PAPER_SCHEMA) {
         data = {
           title: `Makale: ${title}`,
           summary: 'Makalenin spotu.',
-          intro: 'Makalenin girişi.',
-          primer: [],
-          sections: [{ heading: 'Makale ne yapıyor?', body: 'Açıklama.' }],
+          tldr: ['Sorun.', 'Yöntem.', 'Sonuç.'],
+          why: 'Görüntü işlemede yeni bir yol açıyor.',
+          simple: { intro: 'Makalenin girişi.', sections: [{ heading: 'Yöntem nasıl çalışıyor?', body: 'Açıklama.' }] },
+          glossary: [],
           topics: ['Görüntü işleme'],
         };
       } else if (request.schema === MODEL_SCHEMA) {
@@ -162,6 +174,11 @@ describe('README', () => {
 });
 
 describe('editör çıktısının temizliği', () => {
+  it('arXiv adresinden tam metin adresini çıkarır', () => {
+    assert.equal(arxivHtmlUrl('https://arxiv.org/abs/2511.01234v2'), 'https://arxiv.org/html/2511.01234');
+    assert.equal(arxivHtmlUrl('https://example.com/paper'), null);
+  });
+
   it('markdown işaretlerini ve tırnakları atar, yazımı düzeltir', () => {
     assert.equal(plain('**Başlık:** "yapay zeka" haberi', 100), 'Başlık: "yapay zekâ" haberi');
     assert.equal(paragraphs('# Bir\n\n- iki\nüç', 100), 'Bir\n\niki\n\nüç');
@@ -176,7 +193,6 @@ describe('editör çıktısının temizliği', () => {
       tldr: ['Tek madde yetmez.'],
       why: 'Neden',
       simple: { intro: 'Giriş', sections: [{ heading: 'Bölüm', body: 'Metin' }] },
-      technical: { intro: '', sections: [] },
       glossary: [],
       category: 'ai',
       topics: [],
@@ -195,7 +211,7 @@ describe('yapay zekâ editörü', () => {
 
     const news = await readEnvelope<NewsItem>(out, 'news');
     assert.equal(news.items.length, 6);
-    assert.ok(news.items.every((n) => n.writer === 'ai' && n.writerVersion === 2 && n.translated && n.story !== null && n.article !== null));
+    assert.ok(news.items.every((n) => n.writer === 'ai' && n.writerVersion === NEWS_WRITER_VERSION && n.translated && n.story !== null && n.article !== null));
     const phi = news.items.find((n) => n.titleOriginal.startsWith('Introducing Phi-5'))!;
     assert.equal(phi.titleTr, 'Türkçe: Introducing Phi-5: a small model that reasons & codes');
     assert.equal(phi.imageUrl, 'https://cdn.example.com/images/phi-5-cover.jpg');
@@ -207,8 +223,9 @@ describe('yapay zekâ editörü', () => {
     assert.equal(story.simple.sections[1].heading, 'Lisans ne anlama geliyor?');
     assert.equal(story.simple.sections[1].body, 'Madde işaretli satır temizlenmeli.');
     assert.equal(story.technical?.sections[0].heading, 'Mimari ve eğitim verisi');
-    // Metinde geçmeyen ve boş kavramlar atılır.
-    assert.deepEqual(story.glossary.map((g) => g.term), ['Phi-5', 'parametre']);
+    // Metinde geçmeyen, boş ve tekrarlanan kavramlar atılır; teknik yazının yeni kavramı eklenir.
+    assert.deepEqual(story.glossary.map((g) => g.term), ['Phi-5', 'parametre', 'transformer']);
+    assert.equal(story.technical?.sections[0].body, 'Yedi milyar parametreli model.\n\nİkinci teknik paragraf.');
     assert.equal(story.glossary[1].analogy, 'Bir mikserdeki düğmeler gibi.');
     // Eski uygulama sürümleri için sade anlatım eski biçimde de yazılır.
     assert.equal(phi.article!.intro, story.simple.intro);
@@ -229,9 +246,17 @@ describe('yapay zekâ editörü', () => {
     assert.match(phiRequest.system, /Doğruluk kuralları/);
     const hnRequest = requests.find((r) => r.user.includes('Hacker News:'))!;
     assert.match(hnRequest.user, /Haber metnine ulaşılamadı/);
+    // Teknik derinlik ayrı istekte, sade anlatımın başlıklarıyla birlikte istenir.
+    const deepRequest = requests.find((r) => r.schema === DEEP_SCHEMA && r.user.includes('seven billion'))!;
+    assert.match(deepRequest.user, /Sade anlatımın bölüm başlıkları: "Küçük model nasıl akıl yürütüyor\?"/);
+    assert.equal(deepRequest.maxTokens, 16_000);
 
     const papers = await readEnvelope<Paper>(out, 'papers');
-    assert.ok(papers.items.every((p) => p.writer === 'ai' && p.article?.sections.length === 1));
+    assert.ok(papers.items.every((p) => p.writer === 'ai' && p.writerVersion === PAPER_WRITER_VERSION && p.article?.sections.length === 1));
+    // Makalenin arXiv tam metni okunur ve teknik inceleme yazılır.
+    assert.equal(papers.items[0].story!.basis, 'full');
+    assert.equal(papers.items[0].story!.technical?.sections.length, 1);
+    assert.match(requests.find((r) => r.schema === PAPER_SCHEMA)!.user, /Makale metni \(/);
     assert.match(papers.items[0].imageUrl ?? '', /^https:\/\/cdn-thumbnails\.huggingface\.co\//);
 
     const models = await readEnvelope<AiModel>(out, 'models');
@@ -253,7 +278,9 @@ describe('yapay zekâ editörü', () => {
 
     assert.equal(meta.editor.model, 'test/editor');
     assert.equal(meta.editor.pending, 0);
-    assert.equal(meta.editor.written, requests.length);
+    // Haber ve makalelerde iki istek (sade + teknik), diğerlerinde bir istek yapılır.
+    const jobs = requests.filter((r) => r.schema !== DEEP_SCHEMA).length;
+    assert.equal(meta.editor.written, jobs);
     assert.equal(meta.editor.inputTokens, requests.length * 1000);
     assert.equal(meta.translator.model, null);
 
@@ -282,7 +309,7 @@ describe('yapay zekâ editörü', () => {
     const out = await mkdtemp(join(tmpdir(), 'tp-ai-'));
     const budget = fakeEditor();
     const { meta } = await runPipeline({ outDir: out, now: NOW, fetchers: fetchers(), llm: budget.client, aiMaxItems: 3, aiConcurrency: 1 });
-    assert.equal(budget.requests.length, 3);
+    assert.equal(budget.requests.filter((r) => r.schema === NEWS_SCHEMA).length, 3);
     assert.equal(meta.editor.written, 3);
     assert.ok(meta.editor.pending > 0);
     const news = await readEnvelope<NewsItem>(out, 'news');
@@ -300,7 +327,8 @@ describe('yapay zekâ editörü', () => {
       llm: fatal.client,
       aiConcurrency: 1,
     });
-    assert.equal(result.meta.editor.written, 1);
+    // İlk haberin sade anlatımı yazıldı ama teknik yazısı ölümcül hataya takıldı: haber sonraki çalışmada yeniden yazılır.
+    assert.equal(result.meta.editor.written, 0);
     assert.match(result.meta.editor.note ?? '', /bakiye/);
     assert.equal(fatal.requests.length, 2, 'ölümcül hatadan sonra yeni istek gönderilmemeli');
   });

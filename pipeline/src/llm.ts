@@ -60,7 +60,7 @@ export function anthropicClient(options: AnthropicOptions): LlmClient {
   const baseUrl = (options.baseUrl ?? 'https://api.anthropic.com').replace(/\/+$/, '');
   const doFetch = options.fetchImpl ?? fetch;
   const maxAttempts = options.maxAttempts ?? 5;
-  const timeoutMs = options.timeoutMs ?? 120_000;
+  const timeoutMs = options.timeoutMs ?? 300_000;
 
   async function call(request: LlmRequest, maxTokens: number): Promise<{ response: AnthropicResponse; status: number; retryAfter: number | null }> {
     const body = {
@@ -126,7 +126,7 @@ export function anthropicClient(options: AnthropicOptions): LlmClient {
 
         if (response.stop_reason === 'max_tokens') {
           lastError = 'Yanıt yarıda kesildi (max_tokens)';
-          maxTokens = Math.min(maxTokens * 2, 16_000);
+          maxTokens = Math.min(maxTokens * 2, 32_000);
           continue;
         }
         if (response.stop_reason === 'refusal') throw new Error('Model bu içeriği yazmayı reddetti');

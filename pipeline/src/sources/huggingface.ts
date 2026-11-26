@@ -225,6 +225,7 @@ export function parseDailyPapers(list: HfDailyPaper[]): Paper[] {
           ? entry.thumbnail
           : `https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/${encodeURIComponent(id)}.png`,
       article: null,
+      story: null,
       topics: [],
       readingMinutes: null,
       writer: null,

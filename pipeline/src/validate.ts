@@ -153,6 +153,7 @@ const PAPER_SHAPE: Record<string, Check> = {
   translated: isBool,
   imageUrl: isNullableHttps,
   article: isArticle,
+  story: isStory,
   topics: isStringArray,
   readingMinutes: isNullableNumber,
   writer: isWriter,
@@ -265,6 +266,7 @@ export const upgrade = {
     return withDefaults(item, {
       imageUrl: null,
       article: null,
+      story: null,
       topics: [],
       readingMinutes: null,
       writer: writerOf(item),

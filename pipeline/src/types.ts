@@ -13,8 +13,15 @@ export const WRITER_VERSION = 1;
  * Haber ve proje yazılarının biçim sürümleri. 2: haberlerde "30 saniyede", "neden önemli", sade ve teknik
  * anlatım ile kavram sözlüğü (story); projelerde README'ye dayanan kısa tanıtım yazısı.
  */
-export const NEWS_WRITER_VERSION = 2;
+export const NEWS_WRITER_VERSION = 3;
 export const REPO_WRITER_VERSION = 3;
+
+/**
+ * 3: haberler ve makaleler uzun biçimde yazılır. Sade anlatım olayın tamamını anlatır (700-1.200 kelime);
+ * teknik derinlik ayrı bir istekle, bir mühendislik dergisi yazısı uzunluğunda (1.800-3.200 kelime) yazılır.
+ * Makalelerde arXiv'deki tam metin okunur.
+ */
+export const PAPER_WRITER_VERSION = 3;
 
 export type Category = 'ai' | 'security' | 'dev' | 'data' | 'hardware' | 'cloud' | 'mobile' | 'science' | 'industry';
 export const CATEGORIES: readonly Category[] = ['ai', 'security', 'dev', 'data', 'hardware', 'cloud', 'mobile', 'science', 'industry'];
@@ -200,6 +207,8 @@ export interface Paper {
   translated: boolean;
   imageUrl: string | null;
   article: Article | null;
+  /** Haberlerle aynı biçimde uzun anlatım (3. sürüm). */
+  story: Story | null;
   topics: string[];
   readingMinutes: number | null;
   writer: Writer;

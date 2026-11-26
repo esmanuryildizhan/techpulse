@@ -5,7 +5,7 @@ import { LlmFatalError, type LlmClient, type LlmUsage } from './llm.ts';
 import { findSource } from './sources/feeds.ts';
 import { polishTurkish } from './translate.ts';
 import type { AiModel, Article, Category, GlossaryEntry, NewsItem, Paper, Repo, RepoStory, State, Story, StoryVersion, Vulnerability } from './types.ts';
-import { NEWS_WRITER_VERSION, REPO_WRITER_VERSION, WRITER_VERSION } from './types.ts';
+import { NEWS_WRITER_VERSION, PAPER_WRITER_VERSION, REPO_WRITER_VERSION } from './types.ts';
 import { errorMessage, log, mapLimit, truncate } from './util.ts';
 
 /**
@@ -18,72 +18,122 @@ import { errorMessage, log, mapLimit, truncate } from './util.ts';
 // Talimatlar
 
 const STYLE_RULES = `## Doğruluk kuralları (en önemli)
-- Yalnızca kaynak metinde bulunan olguları yaz. Kaynakta olmayan sayı, tarih, isim, alıntı, fiyat, sürüm numarası veya olay uydurma.
-- Kaynakta belirtilmeyen bir şeyi tahmin etme; bilmediğin ayrıntıya hiç değinme.
-- Teknik terimleri ve genel arka planı açıklamak için genel bilgini kullanabilirsin (ör. "fidye yazılımı nedir"), ama bu habere ait yeni bir olgu eklemek için kullanamazsın.
-- İddiaları kime ait olduğunu belirterek aktar ("Microsoft'a göre", "araştırmacıların açıklamasına göre"). "Kaynağa göre" ya da "kaynak metne göre" gibi ifadeleri kullanma; bilgiyi sahibine (şirket, kurum, yayın, kişi) dayandır.
-- Kaynak metin kısaysa kısa yaz; uzatmak için tekrar etme, içi boş genel cümleler kurma.
+- Habere ya da makaleye ait her olgu (rakam, tarih, isim, sürüm, fiyat, alıntı, kimin ne yaptığı veya söylediği) yalnızca verilen kaynak metinden gelir. Kaynakta olmayan olgu uydurma.
+- Konuyu anlatmak için mühendislik bilgini kullan: kavramların ne olduğu, bir teknolojinin nasıl çalıştığı, tarihsel arka plan, bilinen alternatifler, yaygın kabul gören uygulamalar. Bunu yalnızca ders kitabı düzeyinde ve emin olduğun bilgiler için yap. Genel bilgiyi habere ait yeni bir olgu gibi sunma; "bu tür sistemlerde genellikle", "klasik yaklaşımda" gibi ifadelerle ayır.
+- Kaynakta adı geçen ama tanımadığın yeni bir ürün, model, şirket ya da kişi hakkında kaynakta yazmayan ayrıntı verme.
+- Yorumu olgudan ayır: çıkarım yaparken bunun bir değerlendirme olduğunu belli et ("bu, ... anlamına gelebilir"). Kaynakta dayanağı olmayan kesin öngörüde bulunma.
+- İddiaları sahibine dayandır ("Microsoft'a göre", "araştırmacıların ölçümlerine göre"). "Kaynağa göre" ya da "kaynak metne göre" deme; bilgiyi sahibine (şirket, kurum, yayın, kişi) bağla.
+- Uzunluğu tekrarla ya da içi boş genel cümlelerle doldurma. Her paragraf okura yeni bir bilgi, açıklama, örnek ya da değerlendirme vermeli.
 
 ## Dil ve üslup
 - Doğal, akıcı ve doğru bir Türkçeyle yaz; TDK yazım kurallarına uy. Çeviri kokan cümle yapılarından, gereksiz edilgen yapılardan ve uzun tamlama zincirlerinden kaçın.
-- Kaynağı cümle cümle çevirme ve kaynağın paragraf sırasını kopyalama. Olayı anla ve deneyimli bir Türk haber editörü gibi kendi kurgunla, kendi cümlelerinle anlat. Doğrudan alıntı gerekiyorsa en fazla bir kısa alıntı kullan.
-- Okur konuya yabancı olabilir: teknik kavramları ilk geçtikleri yerde kısaca açıkla, ama uzman okuru da sıkma.
+- Ton: saygın bir teknoloji dergisinin yazısı. Ciddi, açık, örneklerle anlatan. Blog samimiyeti, birinci tekil şahıs ("ben", "bence"), okura seslenme ("arkadaşlar", "hadi bakalım") ve reklam dili yok.
+- Kaynağı cümle cümle çevirme ve kaynağın paragraf sırasını kopyalama. Konuyu anla, kendi kurgunla ve kendi cümlelerinle anlat. Doğrudan alıntı gerekiyorsa en fazla bir kısa alıntı kullan.
+- Her teknik terimi, kısaltmayı ve İngilizce kalan kavramı ilk geçtiği cümlede açıkla (ör. "RAG, yani modelin yanıt vermeden önce dış belgelerden bilgi getirmesi"). Soyut anlatımı somut bir örnekle ya da günlük hayattan bir benzetmeyle destekle.
 - Özel adları çevirme: şirket, ürün, model, programlama dili, kütüphane, işletim sistemi ve CVE adları aynen kalır (ör. Rust, Go, llama.cpp, Windows 11, GPT-5, CVE-2026-1234).
-- Yerleşmiş Türkçe karşılığı olan terimleri Türkçe kullan: vulnerability → güvenlik açığı, exploit → istismar etmek, data breach → veri ihlali, ransomware → fidye yazılımı, open source → açık kaynak, release → sürüm, inference → çıkarım, fine-tuning → ince ayar, wire fraud → elektronik dolandırıcılık, indictment → iddianame. Yerleşmemiş terimlerde İngilizcesini koru ve gerekirse kısaca açıkla; kelimesi kelimesine çeviri uydurma.
+- Yerleşmiş Türkçe karşılığı olan terimleri Türkçe kullan: vulnerability → güvenlik açığı, exploit → istismar etmek, data breach → veri ihlali, ransomware → fidye yazılımı, open source → açık kaynak, release → sürüm, inference → çıkarım, fine-tuning → ince ayar, benchmark → kıyaslama testi, wire fraud → elektronik dolandırıcılık, indictment → iddianame. Yerleşmemiş terimlerde İngilizcesini koru ve açıkla; kelimesi kelimesine çeviri uydurma.
 - "Yapay zekâ" yaz. Yüzdeleri "%40", ondalıkları "1,5", büyük sayıları "2,3 milyar dolar" biçiminde, tarihleri "25 Kasım" biçiminde yaz.
 - Markdown, madde işareti, emoji, yıldız veya diyez kullanma; düz metin yaz. Paragrafları boş satırla ayır.
-- Abartıdan, tık tuzağından, ünlemden ve soru biçimindeki başlıklardan kaçın; ilgiyi olgularla uyandır.`;
+- Abartıdan, tık tuzağından, ünlemden ve soru biçimindeki başlıklardan kaçın; ilgiyi olgularla uyandır.
+
+## Bölüm başlıkları
+İçeriğe özgü, okura o bölümde ne öğreneceğini söyleyen kısa başlıklar yaz (en fazla 70 karakter). "Ne oldu?", "Neden önemli?", "Bu neden önemli?", "Arka plan", "Detaylar", "Sonuç", "Özet", "Giriş", "Kimler etkileniyor?", "Teknik ayrıntılar", "Bundan sonra ne olacak?" gibi her yazıya uyan kalıp başlıkları KULLANMA.
+  Kalıp (yasak): "Ne oldu?"   Özgün: "Saldırganlar kaynak koduna nasıl ulaştı?"
+  Kalıp (yasak): "Teknik ayrıntılar"   Özgün: "Parola özetleri neden hâlâ risk altında?"`;
+
+const PERSONA = `Sen TechPulse'un baş editörüsün: bilgisayar mühendisliği mezunu, yıllardır teknoloji dergilerinde yazılar ve hakemli makaleler yayımlamış, kendi teknik blogunu yürüten kıdemli bir mühendis-yazarsın. TechPulse'u yazılımcılar, mühendisler, araştırmacılar ve teknolojiye meraklı okurlar kullanıyor. Okur konuyu kaynağa gitmeden, yalnızca senin yazından eksiksiz öğrenmeli; yazıyı bitirdiğinde "havada kalan" hiçbir soru kalmamalı.`;
+
+const GLOSSARY_RULES = `Metinde geçen ve teknolojiye uzak bir okurun bilmeyeceği kavramlar. Öncelik: (1) ürün, teknoloji, programlama dili, kütüphane, protokol, standart veya kurum adları (ör. Clojure, Kubernetes, CISA, Hugging Face); (2) teknik terim ve kısaltmalar (ör. sıfır gün açığı, RCE, ince ayar, token); (3) İngilizce kalan terimler. "Yazılım", "internet", "uygulama", "şirket", "veri", "yapay zekâ" gibi herkesin bildiği kelimeleri SEÇME. Her kavram için:
+  - term: Kavramın metinde AYNEN geçtiği biçim, ek almadan (metinde "Clojure'un" geçiyorsa "Clojure").
+  - definition: Nedir? 1-2 sade cümle.
+  - analogy: Günlük hayattan bir benzetme, 1 cümle. Benzetme zorlama olacaksa boş metin.
+  - usage: Nerede, ne için kullanılır? 1 cümle; gereksizse boş metin.
+  - origin: Kim geliştirdi, ne zaman ortaya çıktı? Yalnızca yaygın bilinen ve emin olduğun bir bilgiyse 1 cümle; değilse boş metin.`;
 
 const CATEGORY_LIST = CATEGORY_INFO.map((c) => `  - ${c.id}: ${c.label}. ${c.scope}`).join('\n');
 
-export const NEWS_SYSTEM = `Sen TechPulse'un kıdemli teknoloji editörüsün. TechPulse; yoğun çalışan yazılımcıların, mühendislerin ve teknolojiye meraklı herkesin dünya teknoloji gündemini Türkçe takip ettiği bir mobil uygulamadır. Okur haberi yalnızca senin metninden, bir haber sitesinde okuyormuş gibi ayrıntısıyla öğrenebilmeli; kaynağa yalnızca daha da derine inmek isterse gider.
+export const NEWS_SYSTEM = `${PERSONA}
 
-Görevin: Kaynak haberi (çoğunlukla İngilizce) okuyup aynı olayı iki seviyede anlatan özgün bir Türkçe haber dosyası hazırlamak: konuya yabancı okur için "sade anlatım", konuyu bilen geliştirici için "teknik derinlik".
+Bu istekte bir haberin "sade anlatım" yazısını hazırlıyorsun: konuya yabancı ama meraklı bir okurun olayı baştan sona anlayacağı, eksiksiz bir haber-açıklama yazısı. Teknik derinlik yazısı ayrı bir istekte yazılacak; burada amaç okurun olayın tamamını kavraması.
 
 ${STYLE_RULES}
 
 ## Tekrar yasağı
-tldr, why, simple ve technical aynı cümleleri tekrar etmez. Giriş (intro) bölümlerin ilk cümlesini tekrar etmez. Bölümler tldr'deki bilgiyi aynı sözlerle yeniden söylemez; her bölüm okura yeni bir şey öğretir.
-
-## Bölüm başlıkları
-İçeriğe özgü, okura o bölümde ne öğreneceğini söyleyen kısa başlıklar yaz (en fazla 60 karakter). "Ne oldu?", "Neden önemli?", "Bu neden önemli?", "Arka plan", "Detaylar", "Sonuç", "Kimler etkileniyor?", "Teknik ayrıntılar", "Bundan sonra ne olacak?" gibi her habere uyan kalıp başlıkları KULLANMA.
-  Kalıp (yasak): "Ne oldu?"   Özgün: "Saldırganlar kaynak koduna nasıl ulaştı?"
-  Kalıp (yasak): "Teknik ayrıntılar"   Özgün: "Parola özetleri neden hâlâ risk altında?"
+tldr, why ve simple aynı cümleleri tekrar etmez. Giriş (intro) bölümlerin ilk cümlesini tekrar etmez. Bölümler tldr'deki bilgiyi aynı sözlerle yeniden söylemez.
 
 ## Alanlar
 - relevant: Haber teknoloji, yazılım, bilim, internet, dijital ürünler veya teknoloji şirketleriyle ilgiliyse true. İndirim, kampanya ve alışveriş önerisi; dizi, film veya oyun eleştirisi; spor; teknolojiyle ilgisi olmayan siyaset ve magazin ise false. false ise diğer metin alanlarını birer kısa cümleyle doldur, listeleri boş bırak.
-- title: En fazla 90 karakterlik Türkçe başlık. Haberin özünü ve okur için neden ilginç olduğunu söylesin; doğru ve dikkat çekici olsun ama yanıltıcı olmasın. Soru biçiminde olmasın. Gerekmedikçe iki nokta üst üste kullanma.
+- title: En fazla 90 karakterlik Türkçe başlık. Haberin özünü söylesin; doğru ve dikkat çekici olsun ama yanıltıcı olmasın. Soru biçiminde olmasın. Gerekmedikçe iki nokta üst üste kullanma.
 - summary: Kartlarda görünen spot; tek cümle, en fazla 200 karakter. Başlığı tekrar etmesin.
-- tldr: "30 saniyede" kutusu. Tam 3 madde; her biri en fazla 170 karakterlik tek cümle. Okur yalnızca bunları okusa bile olayın ne olduğunu, kimi etkilediğini ve sonucunu öğrenmeli. Somut ol: kim, ne, ne zaman, ne kadar.
-- why: "Bu gelişme neden önemli?" kutusu. 2-3 cümle: olayın sektöre, kullanıcılara ya da geliştiricilere etkisi. Kaynakta dayanağı olmayan öngörüde bulunma.
-- simple: Sade anlatım. Konuyu hiç bilmeyen ama meraklı bir okur için. Okur kaynağa gitmeden olayı bütün önemli ayrıntılarıyla öğrenebilmeli: kaynaktaki önemli olguları (rakamlar, tarihler, kimin ne yaptığı ve ne söylediği, tepkiler, sonraki adımlar) eksiksiz aktar.
-  - intro: 2-4 cümlelik giriş.
-  - sections: 3-5 bölüm; her bölüm bir başlık (heading) ve 2-3 paragraftan (body) oluşur, her paragraf 3-5 cümledir. Uzunluk kaynağa göre: haber metni 3.000 karakterden uzunsa toplam 450-750 kelime, 1.500-3.000 karakter arasındaysa 300-450 kelime, daha kısaysa 150-300 kelime. Teknik ayrıntıyı günlük dile çevir, kısaltmaları ilk geçtiği yerde aç. Olayın arka planını, nasıl geliştiğini ve okur için sonucunu anlat.
-- technical: Teknik derinlik. Konuyu bilen bir yazılımcı için aynı olay; sade anlatımı tekrar etme, onu tamamla.
-  - intro: 2-3 cümle.
-  - sections: 2-4 bölüm; her bölüm 1-3 paragraf. Toplam 300-600 kelime. Kaynaktaki somut teknik ayrıntıları ver: sürüm numaraları, mimari, kullanılan teknolojiler, API, komut ve yapılandırma adları, ölçüm ve kıyaslama sonuçları, CVE kimlikleri ve CVSS puanları, saldırı zinciri, etkilenen sürümler, yamalar ve geçici çözümler. Kaynak böyle ayrıntılar içermiyorsa uydurma: intro'yu boş bırak ve sections'ı boş liste döndür.
-- glossary: Metinde geçen ve teknolojiye uzak bir okurun bilmeyeceği 2-6 kavram. Öncelik: (1) ürün, teknoloji, programlama dili, kütüphane, protokol veya kurum adları (ör. Clojure, Kubernetes, CISA, Hugging Face); (2) teknik terim ve kısaltmalar (ör. sıfır gün açığı, RCE, ince ayar, token); (3) İngilizce kalan terimler. "Yazılım", "internet", "uygulama", "şirket", "veri", "yapay zekâ" gibi herkesin bildiği kelimeleri SEÇME. Her kavram için:
-  - term: Kavramın simple veya technical metninde AYNEN geçtiği biçim, ek almadan (metinde "Clojure'un" geçiyorsa "Clojure").
-  - definition: Nedir? 1-2 sade cümle.
-  - analogy: Günlük hayattan bir benzetme, 1 cümle. Benzetme zorlama olacaksa boş metin.
-  - usage: Nerede, ne için kullanılır? 1 cümle; gereksizse boş metin.
-  - origin: Kim geliştirdi, ne zaman ortaya çıktı? Yalnızca yaygın bilinen ve emin olduğun bir bilgiyse 1 cümle; değilse boş metin.
+- tldr: "30 saniyede" kutusu. Tam 3 madde; her biri en fazla 180 karakterlik tek cümle. Okur yalnızca bunları okusa bile olayın ne olduğunu, kimi etkilediğini ve sonucunu öğrenmeli. Somut ol: kim, ne, ne zaman, ne kadar.
+- why: "Bu gelişme neden önemli?" kutusu. 2-4 cümle: olayın sektöre, kullanıcılara ya da geliştiricilere etkisi ve büyük resimdeki yeri.
+- simple: Sade anlatım. Okur yazının sonunda şu soruların hepsini cevaplayabilmeli: Ne oldu, kim yaptı, ne zaman? Konu olan teknoloji ya da ürün nedir ve günlük dille nasıl çalışır? Bu gelişmeden önce durum neydi? Önemli ayrıntılar ve rakamlar neler? Kim nasıl etkileniyor, tepkiler neler? Sırada ne var, okur ne yapmalı? Kaynaktaki önemli olguların hiçbirini atlama.
+  - intro: 3-5 cümlelik giriş paragrafı; olayın özünü ve okur için anlamını söyler.
+  - sections: 5-7 bölüm; her bölüm 2-4 paragraf, her paragraf 3-6 cümle. Haber metni verildiyse toplam 700-1.200 kelime. Yalnızca kısa açıklama verildiyse 300-500 kelime: bilinen olguları aktar, konu olan teknolojiyi genel bilginle açıkla, habere ait yeni olgu ekleme.
+- glossary: 3-6 kavram. ${GLOSSARY_RULES}
 - category: Haberin ana konusu; şu kimliklerden biri:
 ${CATEGORY_LIST}
 - topics: 2-4 kısa konu etiketi (1-3 kelime, ilk harfi büyük; ör. "Büyük dil modelleri", "Fidye yazılımı", "Windows", "Kuantum bilgisayar").
 - importance: 1-5 arası önem puanı. 5: sektörü etkileyen büyük gelişme (önemli bir model ya da ürün lansmanı, yaygın kullanılan bir yazılımda aktif istismar edilen kritik açık, büyük şirket hamlesi). 4: geniş kitleyi ilgilendiren önemli haber. 3: ilgi çekici standart haber. 2: dar bir kitleyi ilgilendiren duyuru. 1: çok niş içerik, tanıtım veya kişisel not.`;
 
-export const PAPER_SYSTEM = `Sen TechPulse'un bilim editörüsün. Hugging Face'te günün öne çıkan yapay zekâ makalelerinden birini, yapay zekâ ile ilgilenen ama akademisyen olmayan bir okurun anlayacağı sade bir Türkçeyle tanıtacaksın.
+export const NEWS_DEEP_SYSTEM = `${PERSONA}
+
+Bu istekte bir haberin "teknik derinlik" yazısını hazırlıyorsun: konuyu bilen yazılımcı, mühendis ve araştırmacılar için, saygın bir mühendislik dergisinde yayımlanacak uzun bir inceleme yazısı. Okur yazıyı bitirdiğinde konuyu bir meslektaşına ayrıntısıyla anlatabilecek kadar kavramalı. Sade anlatım ayrıca yazıldı; başlıklarını aşağıda veriyorum, aynı bilgileri aynı biçimde tekrar etme, onları teknik olarak derinleştir.
+
+${STYLE_RULES}
+
+## İçerik
+Haberin konusuna uyanları seç ve derinlemesine işle:
+- Sorun ve bağlam: Bu gelişme hangi teknik sorunu çözüyor ya da hangi riski doğuruyor; daha önce nasıl ele alınıyordu, neden yetersizdi?
+- Çalışma mantığı: Teknoloji, yöntem, saldırı ya da mimari adım adım nasıl işliyor? Bileşenler, veri akışı, algoritmalar, protokoller, saldırı zinciri.
+- Uygulama ayrıntıları: Kaynakta geçen sürüm numaraları, API, komut ve yapılandırma adları, donanım özellikleri, CVE kimlikleri ve CVSS puanları, etkilenen sürümler, yamalar ve geçici çözümler.
+- Ölçümler: Kaynaktaki rakamlar ve kıyaslamalar; ne anlama geldikleri, neyle kıyaslandıkları, hangi koşulda geçerli oldukları ve nasıl yorumlanmaları gerektiği.
+- Karşılaştırma: Bilinen alternatifler ve önceki yaklaşımlarla farkı; performans, maliyet, güvenlik ve karmaşıklık açısından ödünleşimler.
+- Sınırlar ve açık sorular: Kaynağın kabul ettiği sınırlamalar, henüz bilinmeyenler, dikkat edilmesi gereken riskler.
+- Uygulayıcı için: Bir mühendis bu gelişme karşısında ne yapmalı; nasıl değerlendirmeli, nasıl denemeli, nelere dikkat etmeli?
+
+## Alanlar
+- intro: 4-6 cümlelik giriş; konunun teknik özünü ve yazının neleri ele alacağını söyler.
+- sections: Önem puanı 3 ve üzeri olan ve haber metni verilen haberlerde 7-10 bölüm, toplam 1.800-3.200 kelime. Önem puanı 1-2 olan ya da yalnızca kısa açıklaması olan haberlerde 4-6 bölüm, toplam 900-1.500 kelime. Her bölüm 3-5 paragraf, her paragraf 4-7 cümle.
+- glossary: Teknik yazıda geçen ve aşağıda verilen sade anlatım kavramları arasında OLMAYAN 2-6 kavram. ${GLOSSARY_RULES}
+- Haberin anlatılabilecek hiçbir teknik boyutu yoksa (ör. yalnızca bir yönetici ataması ya da dava haberi) intro boş metin, sections ve glossary boş liste olsun. Teknoloji şirketlerine dair haberlerin çoğunda ürünün ya da teknolojinin anlatılabilecek bir tarafı vardır; boş bırakmadan önce bunu düşün.`;
+
+export const PAPER_SYSTEM = `${PERSONA}
+
+Bu istekte Hugging Face'te öne çıkan bir yapay zekâ araştırma makalesinin "sade anlatım" yazısını hazırlıyorsun: makaleyi okumamış, yapay zekâya meraklı bir okurun araştırmanın ne yaptığını, neden yapıldığını ve ne bulduğunu eksiksiz anlayacağı bir tanıtım. Teknik inceleme ayrı bir istekte yazılacak.
 
 ${STYLE_RULES}
 
 ## Alanlar
 - title: Makalenin ne yaptığını anlatan, en fazla 100 karakterlik Türkçe başlık. Model ve yöntem adlarını koru.
-- summary: 1-2 cümlelik spot; en fazla 220 karakter.
-- intro: 2-3 cümle; makalenin çözmeye çalıştığı sorunu ve ana fikrini anlatır.
-- primer: Makaleyi anlamak için gereken en fazla 3 terim; her açıklama 1-2 sade cümle. Gerek yoksa boş liste.
-- sections: 2-4 bölüm; örnek başlıklar: "Makale ne yapıyor?", "Nasıl çalışıyor?", "Sonuçlar", "Neden önemli?". Yalnızca özette yazanlara dayan; toplam 120-300 kelime.
+- summary: Tek cümlelik spot; en fazla 220 karakter.
+- tldr: "30 saniyede" kutusu. Tam 3 madde; her biri en fazla 180 karakterlik tek cümle: sorun, yöntem, sonuç.
+- why: "Bu araştırma neden önemli?" kutusu. 2-4 cümle.
+- simple: Sade anlatım. Okur şu soruları cevaplayabilmeli: Araştırmacılar hangi sorunu çözmeye çalışıyor ve bu sorun neden zor? Önceki yöntemler ne yapıyordu? Önerilen fikir günlük dille nasıl çalışıyor? Nasıl denendi, ne bulundu (rakamlarla)? Sınırları neler? Gerçek hayatta ne işe yarayabilir?
+  - intro: 3-5 cümle.
+  - sections: 5-7 bölüm; her bölüm 2-4 paragraf. Makale metni verildiyse toplam 700-1.100 kelime; yalnızca özet verildiyse 350-550 kelime.
+- glossary: 3-6 kavram. ${GLOSSARY_RULES}
 - topics: 2-4 kısa konu etiketi (ör. "Dil modelleri", "Görüntü üretimi", "Pekiştirmeli öğrenme").`;
+
+export const PAPER_DEEP_SYSTEM = `${PERSONA}
+
+Bu istekte bir yapay zekâ araştırma makalesinin "teknik derinlik" yazısını hazırlıyorsun: alanı bilen mühendis ve araştırmacılar için, bir mühendislik dergisinde yayımlanacak ayrıntılı bir makale incelemesi. Sade anlatım ayrıca yazıldı; başlıklarını aşağıda veriyorum, onları tekrar etme, derinleştir.
+
+${STYLE_RULES}
+
+## İçerik
+- Problem tanımı ve önceki çalışmalar: Literatürde bu soruna nasıl yaklaşılıyordu, hangi eksik giderilmek isteniyor?
+- Yöntem: Mimari, eğitim süreci, veri setleri, kayıp fonksiyonu, çıkarım yöntemi; makaledeki adlarıyla ve adım adım.
+- Deneyler: Hangi kıyaslama testleri, hangi temel yöntemlerle karşılaştırma, hangi donanım ve ölçek; sonuçlar rakamlarıyla ve yorumuyla.
+- Ablasyon ve analiz: Hangi bileşen ne kadar katkı sağlıyor (makalede varsa).
+- Sınırlar: Yazarların kabul ettiği sınırlamalar, genellenebilirlik, hesaplama maliyeti, tekrarlanabilirlik (kod ve ağırlıklar paylaşılmış mı).
+- Uygulayıcı için: Bir mühendis bu yöntemi nerede, nasıl kullanabilir; neye dikkat etmeli?
+
+## Alanlar
+- intro: 4-6 cümle.
+- sections: Makale metni verildiyse 7-10 bölüm, toplam 1.800-3.000 kelime; yalnızca özet verildiyse 4-5 bölüm, toplam 800-1.200 kelime ve yalnızca özette yazanlara dayan. Her bölüm 3-5 paragraf.
+- glossary: Teknik yazıda geçen ve sade anlatım kavramları arasında OLMAYAN 2-6 kavram. ${GLOSSARY_RULES}`;
+
 
 export const MODEL_SYSTEM = `Sen TechPulse'un yapay zekâ editörüsün. Hugging Face'te trend olan bir modeli, model kartındaki bilgilere dayanarak Türk geliştiricilere tanıtacaksın.
 
@@ -119,15 +169,6 @@ ${STYLE_RULES}
 // Yanıt şemaları (JSON Schema). Sayı ve uzunluk sınırları talimatta verilir, yanıt geldikten sonra denetlenir.
 
 const stringArray = { type: 'array', items: { type: 'string' } };
-const primerSchema = {
-  type: 'array',
-  items: {
-    type: 'object',
-    additionalProperties: false,
-    properties: { term: { type: 'string' }, explanation: { type: 'string' } },
-    required: ['term', 'explanation'],
-  },
-};
 const sectionsSchema = {
   type: 'array',
   items: {
@@ -170,13 +211,20 @@ export const NEWS_SCHEMA = {
     tldr: stringArray,
     why: { type: 'string' },
     simple: storyVersionSchema,
-    technical: storyVersionSchema,
     glossary: glossarySchema,
     category: { type: 'string', enum: [...CATEGORY_IDS] },
     topics: stringArray,
     importance: { type: 'integer' },
   },
-  required: ['relevant', 'title', 'summary', 'tldr', 'why', 'simple', 'technical', 'glossary', 'category', 'topics', 'importance'],
+  required: ['relevant', 'title', 'summary', 'tldr', 'why', 'simple', 'glossary', 'category', 'topics', 'importance'],
+};
+
+/** Teknik derinlik yazısı (haber ve makale için ayrı istek). */
+export const DEEP_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  properties: { intro: { type: 'string' }, sections: sectionsSchema, glossary: glossarySchema },
+  required: ['intro', 'sections', 'glossary'],
 };
 
 export const PAPER_SCHEMA = {
@@ -185,12 +233,13 @@ export const PAPER_SCHEMA = {
   properties: {
     title: { type: 'string' },
     summary: { type: 'string' },
-    intro: { type: 'string' },
-    primer: primerSchema,
-    sections: sectionsSchema,
+    tldr: stringArray,
+    why: { type: 'string' },
+    simple: storyVersionSchema,
+    glossary: glossarySchema,
     topics: stringArray,
   },
-  required: ['title', 'summary', 'intro', 'primer', 'sections', 'topics'],
+  required: ['title', 'summary', 'tldr', 'why', 'simple', 'glossary', 'topics'],
 };
 
 export const MODEL_SCHEMA = {
@@ -229,10 +278,6 @@ export const KEV_SCHEMA = {
 // ---------------------------------------------------------------------------------------------
 // Yanıtların denetimi ve temizliği
 
-interface PrimerOut {
-  term: string;
-  explanation: string;
-}
 interface SectionOut {
   heading: string;
   body: string;
@@ -248,18 +293,23 @@ export interface NewsOut {
   tldr: string[];
   why: string;
   simple: StoryVersionOut;
-  technical: StoryVersionOut;
   glossary: GlossaryEntry[];
   category: string;
   topics: string[];
   importance: number;
 }
+export interface DeepOut {
+  intro: string;
+  sections: SectionOut[];
+  glossary: GlossaryEntry[];
+}
 export interface PaperOut {
   title: string;
   summary: string;
-  intro: string;
-  primer: PrimerOut[];
-  sections: SectionOut[];
+  tldr: string[];
+  why: string;
+  simple: StoryVersionOut;
+  glossary: GlossaryEntry[];
   topics: string[];
 }
 export interface ModelOut {
@@ -300,20 +350,12 @@ export function paragraphs(value: unknown, max: number): string {
   return truncate(parts.join('\n\n'), max);
 }
 
-function cleanPrimer(list: unknown): Article['primer'] {
-  if (!Array.isArray(list)) return [];
-  return list
-    .map((p) => ({ term: plain((p as PrimerOut)?.term, 60), explanation: plain((p as PrimerOut)?.explanation, 320) }))
-    .filter((p) => p.term && p.explanation)
-    .slice(0, 3);
-}
-
 function cleanSections(list: unknown): Article['sections'] {
   if (!Array.isArray(list)) return [];
   return list
-    .map((s) => ({ heading: plain((s as SectionOut)?.heading, 80).replace(/[.:]$/, ''), body: paragraphs((s as SectionOut)?.body, 3200) }))
+    .map((s) => ({ heading: plain((s as SectionOut)?.heading, 90).replace(/[.:]$/, ''), body: paragraphs((s as SectionOut)?.body, 7000) }))
     .filter((s) => s.heading && s.body)
-    .slice(0, 6);
+    .slice(0, 12);
 }
 
 function cleanTopics(list: unknown): string[] {
@@ -331,16 +373,8 @@ function cleanTopics(list: unknown): string[] {
   return out;
 }
 
-export function readingMinutes(article: Article): number {
-  const words = [article.intro, ...article.primer.map((p) => p.explanation), ...article.sections.map((s) => `${s.heading} ${s.body}`)]
-    .join(' ')
-    .split(/\s+/)
-    .filter(Boolean).length;
-  return Math.max(1, Math.round(words / 180));
-}
-
 const GENERIC_HEADINGS = new Set(
-  ['ne oldu', 'neden önemli', 'bu neden önemli', 'arka plan', 'detaylar', 'ayrıntılar', 'sonuç', 'teknik ayrıntılar', 'kimler etkileniyor']
+  ['ne oldu', 'neden önemli', 'bu neden önemli', 'arka plan', 'detaylar', 'ayrıntılar', 'sonuç', 'özet', 'giriş', 'teknik ayrıntılar', 'kimler etkileniyor']
 );
 
 function cleanVersion(value: unknown, introMax: number): StoryVersion {
@@ -354,9 +388,9 @@ function mentions(haystack: string, term: string): boolean {
   return lower(haystack).includes(lower(term));
 }
 
-function cleanGlossary(list: unknown, text: string): GlossaryEntry[] {
+function cleanGlossary(list: unknown, text: string, existing: GlossaryEntry[] = [], limit = 6): GlossaryEntry[] {
   if (!Array.isArray(list)) return [];
-  const seen = new Set<string>();
+  const seen = new Set<string>(existing.map((g) => g.term.toLocaleLowerCase('tr')));
   const out: GlossaryEntry[] = [];
   for (const raw of list) {
     const g = (raw ?? {}) as Partial<GlossaryEntry>;
@@ -367,7 +401,7 @@ function cleanGlossary(list: unknown, text: string): GlossaryEntry[] {
     if (!term || !definition || seen.has(key) || !mentions(text, term)) continue;
     seen.add(key);
     out.push({ term, definition, analogy: plain(g.analogy, 280), usage: plain(g.usage, 280), origin: plain(g.origin, 280) });
-    if (out.length === 6) break;
+    if (out.length === limit) break;
   }
   return out;
 }
@@ -403,12 +437,10 @@ export function applyNews(item: NewsItem, out: NewsOut, basis: Story['basis'] = 
   const title = plain(out.title, 120);
   const summary = plain(out.summary, 300);
   const tldr = (Array.isArray(out.tldr) ? out.tldr : []).map((t) => plain(t, 240)).filter(Boolean).slice(0, 3);
-  const why = paragraphs(out.why, 800);
-  const simple = cleanVersion(out.simple, 1200);
-  const technicalRaw = cleanVersion(out.technical, 1000);
-  const technical = technicalRaw.intro && technicalRaw.sections.length > 0 ? technicalRaw : null;
+  const why = paragraphs(out.why, 1000);
+  const simple = cleanVersion(out.simple, 1500);
   if (!title || !summary || tldr.length < 2 || !why || !simple.intro || simple.sections.length === 0) return false;
-  const partial = { tldr, why, simple, technical };
+  const partial = { tldr, why, simple, technical: null };
   const story: Story = { ...partial, glossary: cleanGlossary(out.glossary, storyText(partial)), basis };
   item.titleTr = title;
   item.summaryTr = summary;
@@ -431,22 +463,45 @@ export function applyNews(item: NewsItem, out: NewsOut, basis: Story['basis'] = 
   return true;
 }
 
-export function applyPaper(paper: Paper, out: PaperOut): boolean {
+export function applyPaper(paper: Paper, out: PaperOut, basis: Story['basis'] = 'full'): boolean {
   const title = plain(out.title, 140);
   const summary = plain(out.summary, 300);
-  const intro = paragraphs(out.intro, 1000);
-  const sections = cleanSections(out.sections);
-  if (!title || !summary || !intro || sections.length === 0) return false;
-  const article: Article = { intro, primer: cleanPrimer(out.primer), sections };
+  const tldr = (Array.isArray(out.tldr) ? out.tldr : []).map((t) => plain(t, 240)).filter(Boolean).slice(0, 3);
+  const why = paragraphs(out.why, 1000);
+  const simple = cleanVersion(out.simple, 1500);
+  if (!title || !summary || tldr.length < 2 || !why || !simple.intro || simple.sections.length === 0) return false;
+  const partial = { tldr, why, simple, technical: null };
+  const story: Story = { ...partial, glossary: cleanGlossary(out.glossary, storyText(partial)), basis };
   paper.titleTr = title;
   paper.summaryTr = summary;
-  paper.article = article;
+  paper.story = story;
+  // Eski uygulama sürümleri için aynı içeriğin önceki biçimi.
+  paper.article = {
+    intro: simple.intro,
+    primer: story.glossary.slice(0, 3).map((g) => ({ term: g.term, explanation: g.definition })),
+    sections: simple.sections,
+  };
   paper.topics = cleanTopics(out.topics);
-  paper.readingMinutes = readingMinutes(article);
+  paper.readingMinutes = storyMinutes(story);
   paper.translated = true;
   paper.writer = 'ai';
-  paper.writerVersion = WRITER_VERSION;
+  paper.writerVersion = PAPER_WRITER_VERSION;
   return true;
+}
+
+/**
+ * Teknik derinlik yazısını anlatıma ekler; kavram listesine teknik yazıdaki yeni kavramları katar.
+ * Model haberin teknik boyutu olmadığını söyleyip boş döndürdüyse teknik anlatım olmadan kalır.
+ */
+export function applyDeep(story: Story, out: DeepOut): void {
+  const technical = cleanVersion(out, 1500);
+  if (!technical.intro || technical.sections.length === 0) {
+    story.technical = null;
+    return;
+  }
+  story.technical = technical;
+  const text = [technical.intro, ...technical.sections.map((s) => `${s.heading} ${s.body}`)].join(' ');
+  story.glossary = [...story.glossary, ...cleanGlossary(out.glossary, text, story.glossary, 6)];
 }
 
 export function applyModel(model: AiModel, out: ModelOut): boolean {
@@ -506,8 +561,13 @@ export function sourceText(page: ArticlePage | null, feedContent: string | undef
   return pageText.length >= feedText.length ? pageText : feedText;
 }
 
+/** Editöre verilen haber metninin üst sınırı (karakter). */
+export const NEWS_SOURCE_LIMIT = 20000;
+/** Editöre verilen makale metninin üst sınırı (karakter); giriş, yöntem ve deneyler bu sınıra sığar. */
+export const PAPER_SOURCE_LIMIT = 40000;
+
 export function newsPrompt(item: NewsItem, page: ArticlePage | null, feedContent: string | undefined): string {
-  const text = sourceText(page, feedContent);
+  const text = truncate(sourceText(page, feedContent), NEWS_SOURCE_LIMIT);
   const lines = [
     `Kaynak: ${item.sourceName} (${kindLabel(item.sourceKind)})`,
     `Yayın tarihi: ${item.publishedAt.slice(0, 10)}`,
@@ -521,17 +581,24 @@ export function newsPrompt(item: NewsItem, page: ArticlePage | null, feedContent
   } else {
     lines.push(
       '',
-      'Haber metnine ulaşılamadı. Yalnızca başlık ve kısa açıklamaya dayan: tldr yine 3 madde olsun ama yalnızca bilinenleri söylesin; ' +
-        'simple 1-2 bölüm ve en fazla 200 kelime olsun; technical alanında intro boş metin, sections boş liste olsun.',
+      'Haber metnine ulaşılamadı; yalnızca başlık ve kısa açıklama var. tldr yine 3 madde olsun ama yalnızca bilinenleri söylesin. ' +
+        'simple için kısa açıklama kuralını uygula: bilinen olguları aktar, konu olan teknolojiyi genel bilginle açıkla, habere ait yeni olgu ekleme.',
     );
   }
   return lines.join('\n');
 }
 
-export function paperPrompt(paper: Paper): string {
-  return [
+/** arXiv özet sayfasının adresinden makalenin HTML tam metin adresi (arxiv.org/html/<kimlik>). */
+export function arxivHtmlUrl(arxivUrl: string): string | null {
+  const match = /arxiv\.org\/(?:abs|pdf|html)\/([0-9]{4}\.[0-9]{4,5})(v\d+)?/i.exec(arxivUrl);
+  return match ? `https://arxiv.org/html/${match[1]}` : null;
+}
+
+export function paperPrompt(paper: Paper, fullText: string): string {
+  const lines = [
     `Makale başlığı: ${paper.titleOriginal}`,
     `Yazarlar: ${paper.authors.join(', ') || 'belirtilmemiş'}`,
+    `Yayın tarihi: ${paper.publishedAt.slice(0, 10)}`,
     `Hugging Face oyları: ${paper.upvotes}`,
     paper.githubUrl ? `Kod deposu: ${paper.githubUrl}` : '',
     '',
@@ -539,9 +606,35 @@ export function paperPrompt(paper: Paper): string {
     '"""',
     paper.abstractOriginal,
     '"""',
-  ]
-    .filter((l) => l !== '')
-    .join('\n');
+  ].filter((l, i) => l !== '' || i === 5);
+  if (fullText.length >= 2000) {
+    const text = truncate(fullText, PAPER_SOURCE_LIMIT);
+    lines.push('', `Makale metni (${text.length} karakter):`, '"""', text, '"""');
+  } else {
+    lines.push('', 'Makalenin tam metnine ulaşılamadı; yalnızca özet var. Özet için verilen uzunluk kurallarını uygula ve yalnızca özette yazanlara dayan.');
+  }
+  return lines.join('\n');
+}
+
+/** Teknik derinlik isteği: kaynak metin, sade anlatımın başlıkları ve kavramları. */
+export function deepPrompt(options: { kind: 'haber' | 'makale'; title: string; importance: number | null; story: Story; source: string }): string {
+  const { kind, title, importance, story, source } = options;
+  const lines = [
+    `Türkçe başlık: ${title}`,
+    ...(importance !== null ? [`Önem puanı: ${importance}`] : []),
+    `Sade anlatımın bölüm başlıkları: ${story.simple.sections.map((s) => `"${s.heading}"`).join(', ')}`,
+    `Sade anlatımın kavram listesi: ${story.glossary.map((g) => g.term).join(', ') || '(yok)'}`,
+    '',
+    story.basis === 'excerpt'
+      ? `Bu ${kind} için yalnızca kısa açıklama var; kısa açıklama için verilen uzunluğu uygula ve yeni olgu ekleme.`
+      : `${kind === 'haber' ? 'Haber' : 'Makale'} metni verildi; tam uzunluk kuralını uygula.`,
+    '',
+    `Kaynak (${source.length} karakter):`,
+    '"""',
+    source,
+    '"""',
+  ];
+  return lines.join('\n');
 }
 
 export function modelPrompt(model: AiModel): string {
@@ -631,7 +724,7 @@ export function needsNews(item: NewsItem): boolean {
   return item.writer !== 'ai' || item.writerVersion < NEWS_WRITER_VERSION || item.story === null;
 }
 export function needsPaper(paper: Paper): boolean {
-  return paper.writer !== 'ai' || paper.writerVersion < WRITER_VERSION;
+  return paper.writer !== 'ai' || paper.writerVersion < PAPER_WRITER_VERSION || paper.story === null;
 }
 export function needsModel(model: AiModel): boolean {
   return model.writer !== 'ai' && model.cardExcerpt.length > 0;
@@ -680,9 +773,25 @@ export async function runEditor(state: State, llm: LlmClient, options: EditorOpt
         }
         if (page?.imageUrl && !item.imageUrl) item.imageUrl = page.imageUrl;
         const feed = options.feedContent?.get(item.id);
-        const basis = sourceText(page, feed).length >= 300 ? 'full' : 'excerpt';
-        const out = await ask<NewsOut>(NEWS_SYSTEM, newsPrompt(item, page, feed), NEWS_SCHEMA, 8000);
-        return out ? applyNews(item, out, basis) : false;
+        const source = truncate(sourceText(page, feed), NEWS_SOURCE_LIMIT);
+        const basis = source.length >= 300 ? 'full' : 'excerpt';
+        const out = await ask<NewsOut>(NEWS_SYSTEM, newsPrompt(item, page, feed), NEWS_SCHEMA, 10_000);
+        if (!out || !applyNews(item, out, basis)) return false;
+        if (item.hidden || !item.story) return true;
+        // Teknik derinlik ayrı istekte yazılır: uzun yazı tek yanıtta sade anlatımı kısaltmasın.
+        const deep = await ask<DeepOut>(
+          NEWS_DEEP_SYSTEM,
+          deepPrompt({ kind: 'haber', title: item.titleTr ?? item.titleOriginal, importance: item.importance, story: item.story, source: source || item.excerptOriginal }),
+          DEEP_SCHEMA,
+          16_000,
+        );
+        if (!deep) {
+          // Sade anlatım yayımlanır; teknik yazı sonraki çalışmada yeniden denenir.
+          item.writerVersion = NEWS_WRITER_VERSION - 1;
+          return false;
+        }
+        applyDeep(item.story, deep);
+        return true;
       },
     });
   }
@@ -691,8 +800,31 @@ export async function runEditor(state: State, llm: LlmClient, options: EditorOpt
     jobs.push({
       label: `makale ${paper.id}`,
       run: async () => {
-        const out = await ask<PaperOut>(PAPER_SYSTEM, paperPrompt(paper), PAPER_SCHEMA, 2500);
-        return out ? applyPaper(paper, out) : false;
+        let fullText = '';
+        const htmlUrl = arxivHtmlUrl(paper.arxivUrl);
+        if (htmlUrl) {
+          try {
+            fullText = (await fetchPage(htmlUrl)).text;
+          } catch (error) {
+            log.info(`Makalenin tam metni okunamadı (${paper.id}): ${errorMessage(error)}`);
+          }
+        }
+        const basis = fullText.length >= 2000 ? 'full' : 'excerpt';
+        const out = await ask<PaperOut>(PAPER_SYSTEM, paperPrompt(paper, fullText), PAPER_SCHEMA, 10_000);
+        if (!out || !applyPaper(paper, out, basis) || !paper.story) return false;
+        const source = basis === 'full' ? truncate(fullText, PAPER_SOURCE_LIMIT) : paper.abstractOriginal;
+        const deep = await ask<DeepOut>(
+          PAPER_DEEP_SYSTEM,
+          deepPrompt({ kind: 'makale', title: paper.titleTr ?? paper.titleOriginal, importance: null, story: paper.story, source }),
+          DEEP_SCHEMA,
+          16_000,
+        );
+        if (!deep) {
+          paper.writerVersion = PAPER_WRITER_VERSION - 1;
+          return false;
+        }
+        applyDeep(paper.story, deep);
+        return true;
       },
     });
   }

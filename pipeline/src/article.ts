@@ -14,7 +14,8 @@ export interface ArticlePage {
   description: string;
 }
 
-export const ARTICLE_TEXT_LIMIT = 12000;
+/** Sayfadan okunan en uzun metin. Haberlerde editöre 20.000, makalelerde 40.000 karakteri verilir. */
+export const ARTICLE_TEXT_LIMIT = 40000;
 const MAX_HTML_BYTES = 2_500_000;
 
 function meta(document: Document, selectors: string[]): string {
