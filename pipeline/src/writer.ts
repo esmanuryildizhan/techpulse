@@ -78,7 +78,7 @@ ${CATEGORY_LIST}
 
 export const NEWS_DEEP_SYSTEM = `${PERSONA}
 
-Bu istekte bir haberin "teknik derinlik" yazısını hazırlıyorsun: konuyu bilen yazılımcı, mühendis ve araştırmacılar için, saygın bir mühendislik dergisinde yayımlanacak uzun bir inceleme yazısı. Okur yazıyı bitirdiğinde konuyu bir meslektaşına ayrıntısıyla anlatabilecek kadar kavramalı. Sade anlatım ayrıca yazıldı; başlıklarını istekte veriyorum. O başlıkları KULLANMA ve aynı bilgileri aynı biçimde tekrar etme: teknik yazı kendi başlıklarıyla, konuyu bir mühendisin gözünden yeniden kurar.
+Bu istekte bir haberin "teknik derinlik" yazısını hazırlıyorsun: konuyu bilen yazılımcı, mühendis ve araştırmacılar için, saygın bir mühendislik dergisinde yayımlanacak uzun bir inceleme yazısı. Okur yazıyı bitirdiğinde konuyu bir meslektaşına ayrıntısıyla anlatabilecek kadar kavramalı. Sade anlatım ayrıca yazıldı ve olayı günlük dille anlattı; sen olayın hikâyesini baştan anlatma, konuyu bir mühendisin gözünden incele. Bölüm başlıkların teknik odaklı ve sade anlatımdakilerden farklı olsun (ör. "Kurulum sihirbazındaki durum denetimi nasıl atlanıyor?", "Soket tabanlı yakalama neden servis çalışanından daha az kırılgan?").
 
 ${STYLE_RULES}
 
@@ -117,7 +117,7 @@ ${STYLE_RULES}
 
 export const PAPER_DEEP_SYSTEM = `${PERSONA}
 
-Bu istekte bir yapay zekâ araştırma makalesinin "teknik derinlik" yazısını hazırlıyorsun: alanı bilen mühendis ve araştırmacılar için, bir mühendislik dergisinde yayımlanacak ayrıntılı bir makale incelemesi. Sade anlatım ayrıca yazıldı; başlıklarını istekte veriyorum. O başlıkları KULLANMA ve aynı bilgileri tekrar etme; konuyu bir araştırmacının gözünden derinleştir.
+Bu istekte bir yapay zekâ araştırma makalesinin "teknik derinlik" yazısını hazırlıyorsun: alanı bilen mühendis ve araştırmacılar için, bir mühendislik dergisinde yayımlanacak ayrıntılı bir makale incelemesi. Sade anlatım ayrıca yazıldı; araştırmanın hikâyesini baştan anlatma, konuyu bir araştırmacının gözünden derinleştir. Bölüm başlıkların teknik odaklı ve sade anlatımdakilerden farklı olsun.
 
 ${STYLE_RULES}
 
@@ -674,20 +674,69 @@ export function paperPrompt(paper: Paper, fullText: string): string {
   return lines.join('\n');
 }
 
-/** Teknik derinlik isteği: kaynak metin, sade anlatımın başlıkları ve kavramları. */
-export function deepPrompt(options: { kind: 'haber' | 'makale'; title: string; importance: number | null; story: Story; source: string }): string {
-  const { kind, title, importance, story, source } = options;
+/** Teknik yazının bir bölümü (uzun yazılar iki istekte yazılır). */
+export interface DeepPart {
+  /** 1: giriş ve ilk yarı; 2: ikinci yarı. */
+  index: 1 | 2;
+  sections: string;
+  min: number;
+  max: number;
+  focus: string;
+  /** İkinci yarıda, birinci yarının başlıkları (tekrar edilmesin diye). */
+  previousHeadings?: string[];
+}
+
+/**
+ * Teknik yazının planı. Önemli haberlerde ve tam metni okunan makalelerde yazı iki yarıda istenir: model tek
+ * yanıtta 1.500-2.300 kelimenin üstüne pek çıkmıyor; iki yarı 15-20 dakikalık bir inceleme ediyor.
+ */
+export function deepPlan(basis: Story['basis'], importance: number | null, kind: 'haber' | 'makale'): DeepPart[] {
+  const first =
+    kind === 'makale'
+      ? 'problem tanımı ve önceki çalışmalar, yöntemin mimarisi ve eğitim süreci, kullanılan veriler'
+      : 'sorun ve bağlam (daha önce nasıl ele alınıyordu), çalışma mantığı adım adım, uygulama ayrıntıları ve kaynaktaki ölçümler';
+  const second =
+    kind === 'makale'
+      ? 'deneyler ve sonuçların yorumu, temel yöntemlerle karşılaştırma, ablasyonlar, sınırlar ve tekrarlanabilirlik, uygulayıcı için anlamı'
+      : 'alternatiflerle ve önceki yaklaşımlarla karşılaştırma, ödünleşimler (performans, maliyet, güvenlik), sınırlar ve açık sorular, uygulayıcı için somut öneriler';
+  const t = deepTarget(basis, importance, kind);
+  const long = basis === 'full' && (kind === 'makale' || (importance ?? 3) >= 4);
+  if (!long) return [{ index: 1, sections: t.sections, min: t.min, max: t.max, focus: `${first}; ardından ${second}` }];
+  return [
+    { index: 1, sections: '5-6', min: 1300, max: 1800, focus: first },
+    { index: 2, sections: '4-5', min: 1100, max: 1600, focus: second },
+  ];
+}
+
+/** Teknik derinlik isteği: kaynak metin, uzunluk hedefi ve (ikinci yarıda) birinci yarının başlıkları. */
+export function deepPrompt(options: {
+  kind: 'haber' | 'makale';
+  title: string;
+  importance: number | null;
+  story: Story;
+  source: string;
+  part: DeepPart;
+  total: number;
+}): string {
+  const { kind, title, importance, story, source, part, total } = options;
+  const target: LengthTarget = { sections: part.sections, min: part.min, max: part.max };
+  const task =
+    total === 1
+      ? `Bu istekte teknik yazının tamamını yaz. İşlenecek konular: ${part.focus}.`
+      : part.index === 1
+        ? `Teknik yazı iki istekte yazılıyor. Bu istekte BİRİNCİ yarıyı yaz: intro ve şu konuları işleyen bölümler: ${part.focus}. Yazıyı sonuçlandırma; ikinci yarıda karşılaştırma, sınırlar ve uygulama konuları ayrıca yazılacak.`
+        : `Teknik yazı iki istekte yazılıyor; birinci yarı yazıldı. Birinci yarının bölüm başlıkları: ${(part.previousHeadings ?? []).map((h) => `"${h}"`).join(', ')}. Bu istekte İKİNCİ yarıyı yaz: intro boş metin olsun; şu konuları işleyen bölümler: ${part.focus}. Birinci yarıda anlatılanları tekrar etme, o başlıkları kullanma.`;
   const lines = [
-    lengthLine('Teknik derinlik', deepTarget(story.basis, importance, kind)),
+    task,
+    lengthLine(part.index === 2 ? 'Bu ikinci yarı' : total === 1 ? 'Teknik derinlik' : 'Bu birinci yarı', target),
     '',
     `Türkçe başlık: ${title}`,
     ...(importance !== null ? [`Önem puanı: ${importance}`] : []),
-    `Sade anlatımın bölüm başlıkları (bunları KULLANMA): ${story.simple.sections.map((s) => `"${s.heading}"`).join(', ')}`,
-    `Sade anlatımın kavram listesi: ${story.glossary.map((g) => g.term).join(', ') || '(yok)'}`,
+    `Sade anlatımda açıklanan kavramlar (glossary alanına tekrar ekleme): ${story.glossary.map((g) => g.term).join(', ') || '(yok)'}`,
     '',
     story.basis === 'excerpt'
-      ? `Bu ${kind} için yalnızca kısa açıklama var; kısa açıklama için verilen uzunluğu uygula ve yeni olgu ekleme.`
-      : `${kind === 'haber' ? 'Haber' : 'Makale'} metni verildi; tam uzunluk kuralını uygula.`,
+      ? `Bu ${kind} için yalnızca kısa açıklama var; habere ait yeni olgu ekleme, uzunluğu konunun teknik arka planını anlatarak sağla.`
+      : `${kind === 'haber' ? 'Haber' : 'Makale'} metni aşağıda.`,
     '',
     `Kaynak (${source.length} karakter):`,
     '"""',
@@ -695,6 +744,15 @@ export function deepPrompt(options: { kind: 'haber' | 'makale'; title: string; i
     '"""',
   ];
   return lines.join('\n');
+}
+
+/** İki yarıyı tek teknik yazıda birleştirir. */
+export function joinDeep(parts: DeepOut[]): DeepOut {
+  return {
+    intro: parts[0]?.intro ?? '',
+    sections: parts.flatMap((p) => (Array.isArray(p.sections) ? p.sections : [])),
+    glossary: parts.flatMap((p) => (Array.isArray(p.glossary) ? p.glossary : [])),
+  };
 }
 
 export function modelPrompt(model: AiModel): string {
@@ -819,6 +877,30 @@ export async function runEditor(state: State, llm: LlmClient, options: EditorOpt
     }
   }
 
+  /** Teknik yazı: planı tek ya da iki istekte yazar; iki yarıyı birleştirir. */
+  async function writeDeep(
+    system: string,
+    o: { kind: 'haber' | 'makale'; title: string; importance: number | null; story: Story; source: string },
+  ): Promise<DeepOut | null> {
+    const plan = deepPlan(o.story.basis, o.importance, o.kind);
+    const parts: DeepOut[] = [];
+    for (const part of plan) {
+      if (part.index === 2) part.previousHeadings = (parts[0]?.sections ?? []).map((s) => s.heading);
+      const out = await askLong<DeepOut>(
+        (user) => ask<DeepOut>(system, user, DEEP_SCHEMA, 16_000),
+        deepPrompt({ ...o, part, total: plan.length }),
+        (x) => outWords(x),
+        part.index === 2 ? 'yazının ikinci yarısı' : 'teknik yazı',
+        part,
+      );
+      if (!out) return null;
+      // Model haberin teknik boyutu olmadığını söylediyse ikinci yarı istenmez.
+      if (part.index === 1 && (!out.intro || !Array.isArray(out.sections) || out.sections.length === 0)) return out;
+      parts.push(out);
+    }
+    return joinDeep(parts);
+  }
+
   const jobs: Job[] = [];
   const news = state.news.filter(needsNews).sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
   for (const item of news) {
@@ -845,13 +927,13 @@ export async function runEditor(state: State, llm: LlmClient, options: EditorOpt
         if (!out || !applyNews(item, out, basis)) return false;
         if (item.hidden || !item.story) return true;
         // Teknik derinlik ayrı istekte yazılır: uzun yazı tek yanıtta sade anlatımı kısaltmasın.
-        const deep = await askLong<DeepOut>(
-          (user) => ask<DeepOut>(NEWS_DEEP_SYSTEM, user, DEEP_SCHEMA, 16_000),
-          deepPrompt({ kind: 'haber', title: item.titleTr ?? item.titleOriginal, importance: item.importance, story: item.story, source: source || item.excerptOriginal }),
-          (o) => outWords(o),
-          'teknik yazı',
-          deepTarget(basis, item.importance, 'haber'),
-        );
+        const deep = await writeDeep(NEWS_DEEP_SYSTEM, {
+          kind: 'haber',
+          title: item.titleTr ?? item.titleOriginal,
+          importance: item.importance,
+          story: item.story,
+          source: source || item.excerptOriginal,
+        });
         if (!deep) {
           // Sade anlatım yayımlanır; teknik yazı sonraki çalışmada yeniden denenir.
           item.writerVersion = NEWS_WRITER_VERSION - 1;
@@ -886,13 +968,13 @@ export async function runEditor(state: State, llm: LlmClient, options: EditorOpt
         );
         if (!out || !applyPaper(paper, out, basis) || !paper.story) return false;
         const source = basis === 'full' ? truncate(fullText, PAPER_SOURCE_LIMIT) : paper.abstractOriginal;
-        const deep = await askLong<DeepOut>(
-          (user) => ask<DeepOut>(PAPER_DEEP_SYSTEM, user, DEEP_SCHEMA, 16_000),
-          deepPrompt({ kind: 'makale', title: paper.titleTr ?? paper.titleOriginal, importance: null, story: paper.story, source }),
-          (o) => outWords(o),
-          'teknik yazı',
-          deepTarget(basis, null, 'makale'),
-        );
+        const deep = await writeDeep(PAPER_DEEP_SYSTEM, {
+          kind: 'makale',
+          title: paper.titleTr ?? paper.titleOriginal,
+          importance: null,
+          story: paper.story,
+          source,
+        });
         if (!deep) {
           paper.writerVersion = PAPER_WRITER_VERSION - 1;
           return false;

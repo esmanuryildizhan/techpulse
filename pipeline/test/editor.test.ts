@@ -248,14 +248,18 @@ describe('yapay zekâ editörü', () => {
     assert.match(hnRequest.user, /Haber metnine ulaşılamadı/);
     // Teknik derinlik ayrı istekte, sade anlatımın başlıklarıyla birlikte istenir.
     const deepRequest = requests.find((r) => r.schema === DEEP_SCHEMA && r.user.includes('seven billion'))!;
-    assert.match(deepRequest.user, /Sade anlatımın bölüm başlıkları \(bunları KULLANMA\): "Küçük model nasıl akıl yürütüyor\?"/);
+    // Önemli haberde teknik yazı iki yarıda istenir; ikinci yarı birinci yarının başlıklarını bilir.
+    assert.match(deepRequest.user, /BİRİNCİ yarıyı yaz/);
+    const secondHalf = requests.find((r) => r.schema === DEEP_SCHEMA && r.user.includes('İKİNCİ yarıyı') && r.user.includes('seven billion'))!;
+    assert.match(secondHalf.user, /Birinci yarının bölüm başlıkları: "Mimari ve eğitim verisi"/);
+    assert.equal(story.technical?.sections.length, 2);
     assert.equal(deepRequest.maxTokens, 16_000);
 
     const papers = await readEnvelope<Paper>(out, 'papers');
     assert.ok(papers.items.every((p) => p.writer === 'ai' && p.writerVersion === PAPER_WRITER_VERSION && p.article?.sections.length === 1));
     // Makalenin arXiv tam metni okunur ve teknik inceleme yazılır.
     assert.equal(papers.items[0].story!.basis, 'full');
-    assert.equal(papers.items[0].story!.technical?.sections.length, 1);
+    assert.equal(papers.items[0].story!.technical?.sections.length, 2);
     assert.match(requests.find((r) => r.schema === PAPER_SCHEMA)!.user, /Makale metni \(/);
     assert.match(papers.items[0].imageUrl ?? '', /^https:\/\/cdn-thumbnails\.huggingface\.co\//);
 
@@ -283,7 +287,7 @@ describe('yapay zekâ editörü', () => {
     const retry = (r: LlmRequest) => r.user.includes('Önceki denemende');
     const jobs = requests.filter((r) => r.schema !== DEEP_SCHEMA && !retry(r)).length;
     const again1 = requests.find((r) => retry(r) && r.schema === DEEP_SCHEMA)!;
-    assert.match(again1.user, /en az 2\.400 kelime|en az 1\.900 kelime|en az 1\.200 kelime/);
+    assert.match(again1.user, /en az \d\.\d{3} kelime/);
     assert.equal(meta.editor.written, jobs);
     assert.equal(meta.editor.inputTokens, requests.length * 1000);
     assert.equal(meta.translator.model, null);
