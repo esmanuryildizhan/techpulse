@@ -7,7 +7,7 @@ import '../../state/providers.dart';
 import '../widgets/common.dart';
 
 /// Haber anlatımı: giriş, "Neden önemli?" kutusu ve ara başlıklı bölümler. Metinde geçen teknik kavramların
-/// ilk geçtiği yerin altı noktalı çizilir; dokununca kavramın açıklaması alttan açılır.
+/// ilk geçtiği yerin altı çizilir; dokununca kavramın açıklaması alttan açılır.
 class StoryContent extends StatelessWidget {
   const StoryContent({super.key, required this.story, required this.level, required this.scale, this.whyTitle});
 
@@ -294,11 +294,12 @@ class _GlossaryParagraphState extends State<GlossaryParagraph> {
           text: text.substring(start, end),
           recognizer: _recognizers[entry.term],
           semanticsLabel: '${text.substring(start, end)}, açıklaması için dokunun',
+          // Düz, vurgu renginde ince çizgi: bağlantı gibi dokunulabilir olduğu anlaşılır; noktalı çizgi
+          // küçük ekranlarda yazım hatası işaretine benziyordu.
           style: TextStyle(
             decoration: TextDecoration.underline,
-            decorationStyle: TextDecorationStyle.dotted,
-            decorationColor: tp.accent,
-            decorationThickness: 2,
+            decorationColor: tp.accent.withValues(alpha: 0.75),
+            decorationThickness: 1.6,
           ),
         ),
       );

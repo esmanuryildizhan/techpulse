@@ -166,7 +166,7 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text('Görsel: ${item.sourceName}', style: context.text.labelSmall),
+                  Text('Görsel: ${item.domain}', style: context.text.labelSmall),
                 ],
                 const SizedBox(height: 22),
                 if (story == null)
@@ -197,7 +197,7 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
                     const SizedBox(height: Tp.section - 8),
                     const SectionHeader(
                       title: 'Bu haberdeki kavramlar',
-                      subtitle: 'Metinde altı noktalı çizili kelimelere dokunarak da açabilirsiniz.',
+                      subtitle: 'Metinde altı çizili kelimelere dokunarak da açabilirsiniz.',
                       padding: EdgeInsets.only(bottom: 12),
                     ),
                     GlossaryList(entries: story.glossary),
