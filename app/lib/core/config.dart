@@ -15,15 +15,14 @@ abstract final class AppConfig {
   /// Veri bu süreden eskiyse kullanıcıya "güncellenemiyor" notu gösterilir.
   static const Duration staleAfter = Duration(hours: 6);
 
+  /// Yükleme bu süreyi aşarsa "bağlantı yavaş" notu gösterilir.
+  static const Duration slowLoadingAfter = Duration(seconds: 8);
+
   /// Haber görselleri ağdan yüklensin mi? Testler bunu kapatır; görsel yerine konuya özel kapak çizilir.
   static bool networkImages = true;
 
   static const String appName = 'TechPulse';
-  static const String slogan = 'Teknolojinin nabzı, cebinizde.';
-  static const String appVersion = '2.0.0';
+  static const String slogan = 'Teknoloji gündemi, anlaşılır Türkçeyle.';
+  static const String appVersion = '3.0.0';
   static const String repositoryUrl = 'https://github.com/esmanuryildizhan/techpulse';
-  static const String university = 'İstanbul Beykent Üniversitesi';
-  static const String course = 'Mobil Uygulama Programlama';
-  static const String instructor = 'Fuat Candan';
-  static const List<String> authors = ['Esma Nur Yıldızhan', 'Zeynep Yaren Dalgıç'];
 }

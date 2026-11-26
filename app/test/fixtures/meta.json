@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-11-25T18:03:34.764Z",
+ "generatedAt": "2026-11-26T05:39:27.678Z",
  "translator": {
   "model": null,
   "requests": 0,
@@ -10,17 +10,17 @@
  },
  "editor": {
   "model": "claude-haiku-5-5",
-  "written": 375,
+  "written": 6,
   "failed": 0,
-  "pending": 0,
-  "inputTokens": 1432444,
-  "outputTokens": 402656,
-  "note": null
+  "pending": 249,
+  "inputTokens": 43523,
+  "outputTokens": 18819,
+  "note": "249 kayıt sonraki çalışmalarda yazılacak"
  },
  "counts": {
-  "news": 163,
+  "news": 218,
   "models": 40,
-  "papers": 51,
+  "papers": 80,
   "repos": 30,
   "security": 120
  },
@@ -33,7 +33,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.641Z"
+   "checkedAt": "2026-11-26T05:39:28.282Z"
   },
   {
    "id": "android-developers",
@@ -43,7 +43,7 @@
    "ok": true,
    "count": 4,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.466Z"
+   "checkedAt": "2026-11-26T05:39:28.207Z"
   },
   {
    "id": "apple-developer",
@@ -53,7 +53,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.498Z"
+   "checkedAt": "2026-11-26T05:39:28.272Z"
   },
   {
    "id": "apple-ml",
@@ -61,9 +61,9 @@
    "kind": "official",
    "homepage": "https://machinelearning.apple.com/",
    "ok": true,
-   "count": 2,
+   "count": 1,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.235Z"
+   "checkedAt": "2026-11-26T05:39:28.055Z"
   },
   {
    "id": "ars-technica",
@@ -73,7 +73,7 @@
    "ok": true,
    "count": 6,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:36.044Z"
+   "checkedAt": "2026-11-26T05:39:28.615Z"
   },
   {
    "id": "aws-ml",
@@ -83,7 +83,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.255Z"
+   "checkedAt": "2026-11-26T05:39:28.072Z"
   },
   {
    "id": "aws-news",
@@ -93,7 +93,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.717Z"
+   "checkedAt": "2026-11-26T05:39:28.294Z"
   },
   {
    "id": "bleepingcomputer",
@@ -103,7 +103,7 @@
    "ok": true,
    "count": 6,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:36.205Z"
+   "checkedAt": "2026-11-26T05:39:28.726Z"
   },
   {
    "id": "cisa-kev",
@@ -113,7 +113,7 @@
    "ok": true,
    "count": 120,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:37.273Z"
+   "checkedAt": "2026-11-26T05:39:29.532Z"
   },
   {
    "id": "cloudflare",
@@ -123,7 +123,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.815Z"
+   "checkedAt": "2026-11-26T05:39:28.370Z"
   },
   {
    "id": "databricks",
@@ -133,7 +133,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.914Z"
+   "checkedAt": "2026-11-26T05:39:28.490Z"
   },
   {
    "id": "meta-engineering",
@@ -143,7 +143,7 @@
    "ok": true,
    "count": 2,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.337Z"
+   "checkedAt": "2026-11-26T05:39:28.127Z"
   },
   {
    "id": "flutter",
@@ -153,7 +153,7 @@
    "ok": true,
    "count": 0,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.481Z"
+   "checkedAt": "2026-11-26T05:39:28.212Z"
   },
   {
    "id": "github-trending",
@@ -163,7 +163,7 @@
    "ok": true,
    "count": 30,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:37.272Z"
+   "checkedAt": "2026-11-26T05:39:29.532Z"
   },
   {
    "id": "github-blog",
@@ -173,7 +173,7 @@
    "ok": true,
    "count": 5,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.327Z"
+   "checkedAt": "2026-11-26T05:39:28.119Z"
   },
   {
    "id": "google-ai",
@@ -183,7 +183,7 @@
    "ok": true,
    "count": 5,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:34.965Z"
+   "checkedAt": "2026-11-26T05:39:27.810Z"
   },
   {
    "id": "google-cloud",
@@ -193,7 +193,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.743Z"
+   "checkedAt": "2026-11-26T05:39:28.343Z"
   },
   {
    "id": "deepmind",
@@ -203,7 +203,7 @@
    "ok": true,
    "count": 4,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:34.967Z"
+   "checkedAt": "2026-11-26T05:39:27.812Z"
   },
   {
    "id": "google-research",
@@ -213,7 +213,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:34.968Z"
+   "checkedAt": "2026-11-26T05:39:27.813Z"
   },
   {
    "id": "hacker-news",
@@ -223,7 +223,7 @@
    "ok": true,
    "count": 15,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:36.990Z"
+   "checkedAt": "2026-11-26T05:39:29.263Z"
   },
   {
    "id": "hf-models",
@@ -233,7 +233,7 @@
    "ok": true,
    "count": 40,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:37.271Z"
+   "checkedAt": "2026-11-26T05:39:29.531Z"
   },
   {
    "id": "huggingface-blog",
@@ -243,7 +243,7 @@
    "ok": true,
    "count": 5,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:34.970Z"
+   "checkedAt": "2026-11-26T05:39:27.815Z"
   },
   {
    "id": "hf-papers",
@@ -253,7 +253,7 @@
    "ok": true,
    "count": 50,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:37.271Z"
+   "checkedAt": "2026-11-26T05:39:29.531Z"
   },
   {
    "id": "infoq",
@@ -263,7 +263,7 @@
    "ok": true,
    "count": 4,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.447Z"
+   "checkedAt": "2026-11-26T05:39:28.199Z"
   },
   {
    "id": "jetbrains",
@@ -273,7 +273,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.421Z"
+   "checkedAt": "2026-11-26T05:39:28.186Z"
   },
   {
    "id": "kdnuggets",
@@ -283,7 +283,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.905Z"
+   "checkedAt": "2026-11-26T05:39:28.474Z"
   },
   {
    "id": "kubernetes",
@@ -293,7 +293,7 @@
    "ok": true,
    "count": 2,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.770Z"
+   "checkedAt": "2026-11-26T05:39:28.358Z"
   },
   {
    "id": "mit-tech-review",
@@ -303,7 +303,7 @@
    "ok": true,
    "count": 4,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:36.153Z"
+   "checkedAt": "2026-11-26T05:39:28.687Z"
   },
   {
    "id": "microsoft-research",
@@ -313,7 +313,7 @@
    "ok": true,
    "count": 2,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:34.969Z"
+   "checkedAt": "2026-11-26T05:39:27.814Z"
   },
   {
    "id": "nasa",
@@ -323,7 +323,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.925Z"
+   "checkedAt": "2026-11-26T05:39:28.506Z"
   },
   {
    "id": "new-scientist",
@@ -333,7 +333,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.982Z"
+   "checkedAt": "2026-11-26T05:39:28.535Z"
   },
   {
    "id": "nvidia-developer",
@@ -343,7 +343,7 @@
    "ok": true,
    "count": 4,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.177Z"
+   "checkedAt": "2026-11-26T05:39:28.025Z"
   },
   {
    "id": "openai",
@@ -353,7 +353,7 @@
    "ok": true,
    "count": 5,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:34.963Z"
+   "checkedAt": "2026-11-26T05:39:27.809Z"
   },
   {
    "id": "quanta",
@@ -363,7 +363,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.959Z"
+   "checkedAt": "2026-11-26T05:39:28.517Z"
   },
   {
    "id": "simon-willison",
@@ -373,7 +373,7 @@
    "ok": true,
    "count": 4,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:36.240Z"
+   "checkedAt": "2026-11-26T05:39:28.811Z"
   },
   {
    "id": "stackoverflow-blog",
@@ -383,7 +383,7 @@
    "ok": true,
    "count": 3,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.386Z"
+   "checkedAt": "2026-11-26T05:39:28.161Z"
   },
   {
    "id": "techcrunch",
@@ -393,7 +393,7 @@
    "ok": true,
    "count": 6,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:36.014Z"
+   "checkedAt": "2026-11-26T05:39:28.550Z"
   },
   {
    "id": "the-hacker-news",
@@ -403,7 +403,7 @@
    "ok": true,
    "count": 5,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:36.217Z"
+   "checkedAt": "2026-11-26T05:39:28.745Z"
   },
   {
    "id": "the-verge",
@@ -413,7 +413,7 @@
    "ok": true,
    "count": 6,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:35.999Z"
+   "checkedAt": "2026-11-26T05:39:28.543Z"
   },
   {
    "id": "toms-hardware",
@@ -423,7 +423,7 @@
    "ok": true,
    "count": 5,
    "error": null,
-   "checkedAt": "2026-11-25T18:03:36.169Z"
+   "checkedAt": "2026-11-26T05:39:28.717Z"
   }
  ]
 }

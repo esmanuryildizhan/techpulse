@@ -40,8 +40,8 @@ class Snapshot<T> {
 /// 4. Ağ hatasında önbellekteki veri, hata bilgisiyle birlikte gösterilmeye devam eder.
 class TechPulseRepository {
   TechPulseRepository(this._source, this._store, {Duration? freshFor, DateTime Function()? clock})
-      : _freshFor = freshFor ?? AppConfig.cacheFreshness,
-        _clock = clock ?? DateTime.now;
+    : _freshFor = freshFor ?? AppConfig.cacheFreshness,
+      _clock = clock ?? DateTime.now;
 
   final DataSource _source;
   final LocalStore _store;

@@ -1,7 +1,140 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-11-25T18:03:34.764Z",
+ "generatedAt": "2026-11-26T05:39:27.678Z",
  "items": [
+  {
+   "id": "CVE-2026-133469",
+   "cveId": "CVE-2026-133469",
+   "vendor": "Vates",
+   "product": "Xen Orchestra",
+   "nameOriginal": "Vates Xen Orchestra Improper Validation of Specified Type of Input Vulnerability",
+   "descriptionOriginal": "Vates Xen Orchestra contains an improper validation of specified type of input vulnerability that could allow an unauthenticated attacker to bypass authentication and perform actions with administrative privileges via a specially crafted authentication token containing an empty JSON object.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Vates Xen Orchestra kimlik doğrulama atlatma açığı",
+   "descriptionTr": "Vates Xen Orchestra'da girdinin belirtilen türde doğrulanmamasından kaynaklanan bir güvenlik açığı bulunuyor. Açık, boş bir JSON nesnesi içeren özel hazırlanmış bir kimlik doğrulama belirteci aracılığıyla, kimlik doğrulaması yapılmamış bir saldırganın kimlik doğrulamasını atlatmasına ve yönetici yetkisiyle işlem yapmasına imkân tanıyabilir. CISA bu açığı aktif olarak istismar edilen açıklar kataloğuna 25 Kasım tarihinde ekledi. Açığın CVE kodu CVE-2026-133469, zayıflık sınıfları ise CWE-287 ve CWE-1287 olarak belirtildi.",
+   "actionTr": "Üreticinin Xen Orchestra için belirttiği önlemleri hemen uygulayın ve CISA'nın BOD 26-04 kapsamındaki güncelleme önceliklendirme yönergelerine uyun. Bulut hizmetleri için BOD 26-04 kapsamındaki ilgili yönergeleri izleyin; önlem bulunmuyorsa ürünün kullanımına son verin.",
+   "dateAdded": "2026-11-25",
+   "dueDate": "2026-11-28",
+   "ransomware": false,
+   "cwes": [
+    "CWE-287",
+    "CWE-1287"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-133469",
+   "translated": true,
+   "explanationTr": "Bu açık, kimlik doğrulaması yapılmamış bir saldırganın yönetici ayrıcalıklarıyla işlem yapmasına olanak tanıyabildiği için son derece ciddidir. Xen Orchestra, sanallaştırma altyapısını yöneten bir araç olduğundan saldırganın eline geçmesi sanal makinelerin tamamını etkileyebilir. Kamu kurumlarının bu açığı 28 Kasım tarihine kadar kapatması gerekiyor; her varlığın internete açık olup olmadığının ayrıca değerlendirilmesi önerilir. Fidye yazılımı saldırılarında kullanılıp kullanılmadığı şu an bilinmiyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2026-133324",
+   "cveId": "CVE-2026-133324",
+   "vendor": "Mitel",
+   "product": "MiCollab",
+   "nameOriginal": "Mitel MiCollab Not Failing Securely Vulnerability",
+   "descriptionOriginal": "Mitel MiCollab contains a not failing securely vulnerability in the Audio, Web and Video Conferencing (AWV) component that could allow an unauthenticated attacker to bypass authentication controls and perform unauthorized actions.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Mitel MiCollab güvenli başarısızlık yapmama açığı",
+   "descriptionTr": "Mitel MiCollab ürününün Ses, Web ve Video Konferansı (AWV) bileşeninde, hatalı durumlarda güvenli biçimde başarısız olmayan bir güvenlik açığı bulunuyor. Kimlik doğrulaması yapılmamış bir saldırgan, kimlik denetimlerini aşarak yetkisiz işlemler gerçekleştirebiliyor. Açık, CISA'nın aktif olarak istismar edilen açıklar kataloğuna 25 Kasım tarihinde eklendi ve bu kayıt CWE-636 olarak sınıflandırılıyor.",
+   "actionTr": "Üreticinin talimatlarına uygun önlemleri uygulayın ve CISA'nın BOD 26-04 kapsamındaki risk temelli güncelleme önceliklendirme rehberine uyun. Önlem bulunmuyorsa ürünün kullanımına son vermeyi değerlendirin.",
+   "dateAdded": "2026-11-25",
+   "dueDate": "2026-11-28",
+   "ransomware": false,
+   "cwes": [
+    "CWE-636"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-133324",
+   "translated": true,
+   "explanationTr": "Bu açık, saldırganın oturum açmadan sistemdeki kimlik denetimlerini atlatmasına ve yetkisiz işlemler yapmasına olanak tanıyabiliyor. Kamu kurumları için son uygulama tarihi 28 Kasım olarak belirlendi, bu nedenle MiCollab kullanan kuruluşların internete açık sistemlerini öncelikli olarak değerlendirmesi gerekiyor. Açığın fidye yazılımı saldırılarında kullanılıp kullanılmadığı ise bilinmiyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2026-133323",
+   "cveId": "CVE-2026-133323",
+   "vendor": "Mitel",
+   "product": "MiCollab",
+   "nameOriginal": "Mitel MiCollab OS Command Injection Vulnerability",
+   "descriptionOriginal": "Mitel MiCollab contains an improper neutralization of special elements used in an OS command (OS command injection) vulnerability in its Audio, Web, and Video Conferencing (AWV) component that could allow an unauthenticated attacker to execute arbitrary system commands.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Mitel MiCollab işletim sistemi komut enjeksiyonu açığı",
+   "descriptionTr": "Mitel MiCollab ürününün Ses, Web ve Video Konferans (AWV) bileşeninde, işletim sistemi komutlarında kullanılan özel karakterlerin yeterince etkisiz hale getirilmemesinden kaynaklanan bir komut enjeksiyonu açığı bulunuyor. Açık, kimlik doğrulaması yapılmamış bir saldırganın sistemde keyfi komutlar çalıştırmasına imkân verebiliyor. Açık CWE-78 sınıfında yer alıyor ve CVE-2026-133323 numarasıyla izleniyor.",
+   "actionTr": "Üreticinin talimatları doğrultusunda önlemleri uygulayın ve CISA'nın BOD 26-04 kapsamındaki güncelleme önceliklendirme rehberine uyun. Önlem bulunmuyorsa ürünün kullanımına son verin; bulut hizmetleri için geçerli BOD 26-04 yönergelerini uygulayın.",
+   "dateAdded": "2026-11-25",
+   "dueDate": "2026-11-28",
+   "ransomware": false,
+   "cwes": [
+    "CWE-78"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-133323",
+   "translated": true,
+   "explanationTr": "Açık, saldırganın kimlik doğrulaması olmadan sunucuda işletim sistemi komutları çalıştırmasına olanak tanıyabiliyor; bu da sistemin tamamen ele geçirilmesi anlamına gelebilir. Kamu kurumları için son uygulama tarihi 28 Kasım 2026 olarak belirlenmiş ve açığın fidye yazılımı saldırılarında kullanıldığına dair bir bilgi bulunmuyor. Her varlığın internete açıklık derecesini değerlendirmek ve bu açığı öncelikli olarak kapatmak gerekiyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2026-133311",
+   "cveId": "CVE-2026-133311",
+   "vendor": "Mitel",
+   "product": "MiCollab",
+   "nameOriginal": "Mitel MiCollab Weak Authentication Vulnerability",
+   "descriptionOriginal": "Mitel MiCollab contains a weak authentication vulnerability in the Audio, Web and Video Conferencing (AWV) component that could allow an unauthenticated attacker to access sensitive information using a specific system-generated random identifier or pre-staged content.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Mitel MiCollab zayıf kimlik doğrulama açığı",
+   "descriptionTr": "Mitel MiCollab ürününün Ses, Web ve Video Konferans (AWV) bileşeninde zayıf kimlik doğrulama açığı bulunuyor. Bu açık, kimlik doğrulaması yapılmamış bir saldırganın sistemin ürettiği belirli bir rastgele tanımlayıcıyı ya da önceden hazırlanmış içeriği kullanarak hassas bilgilere erişmesine olanak tanıyabilir. Açık CWE-1390 (zayıf kimlik doğrulama) sınıfında yer alıyor.",
+   "actionTr": "Mitel'in yayımladığı talimatlara uygun olarak önlemleri uygulayın ve CISA'nın BOD 26-04 kapsamındaki güvenlik güncellemelerine öncelik verme rehberine uyun. Önlemler kullanılamıyorsa bulut hizmetleri için BOD 26-04 kılavuzunu izleyin veya ürünün kullanımını durdurun.",
+   "dateAdded": "2026-11-25",
+   "dueDate": "2026-12-09",
+   "ransomware": false,
+   "cwes": [
+    "CWE-1390"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-133311",
+   "translated": true,
+   "explanationTr": "Saldırgan, kimlik doğrulaması yapmadan hassas bilgilere ulaşabildiği için bu açık veri sızıntısına yol açabilir. Açığın, kamu kurumlarının kullandığı iletişim altyapısını etkilemesi nedeniyle kurumların varlıklarının internete açık olup olmadığını hemen değerlendirmesi gerekiyor. Kamu kurumları için son uyum tarihi 9 Aralık 2026.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2026-133303",
+   "cveId": "CVE-2026-133303",
+   "vendor": "Mitel",
+   "product": "MiCollab",
+   "nameOriginal": "Mitel MiCollab XML Injection Vulnerability",
+   "descriptionOriginal": "Mitel MiCollab contains an XML injection vulnerability in its Audio, Web, and Video Conferencing (AWV) component that could allow an unauthenticated attacker to execute arbitrary commands using pre-staged malicious content.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Mitel MiCollab XML enjeksiyon açığı",
+   "descriptionTr": "Mitel MiCollab ürününün Ses, Web ve Video Konferans (AWV) bileşeninde bir XML enjeksiyon açığı bulunuyor. Kimlik doğrulaması yapılmamış bir saldırgan, önceden hazırlanmış kötü amaçlı içeriği kullanarak keyfi komutlar çalıştırabilir. Açık, CWE-91 (XML enjeksiyonu) sınıfına giriyor ve CISA'nın aktif olarak istismar edilen açıklar kataloğuna 25 Kasım tarihinde eklendi.",
+   "actionTr": "Üreticinin talimatlarına uygun önlemleri uygulayın ve CISA'nın BOD 26-04 kapsamındaki risk temelli güvenlik güncellemesi önceliklendirme rehberine uyun. Önlem bulunmuyorsa ürünü kullanmayı bırakın; bulut hizmetleri için geçerli BOD 26-04 talimatlarını izleyin.",
+   "dateAdded": "2026-11-25",
+   "dueDate": "2026-11-28",
+   "ransomware": false,
+   "cwes": [
+    "CWE-91"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-133303",
+   "translated": true,
+   "explanationTr": "Saldırgan, kimlik doğrulaması olmadan hazırlanmış kötü amaçlı içerik göndererek sistemde komut çalıştırabilir, bu da sunucunun ele geçirilmesi anlamına gelebilir. Kamu kurumlarının bu açığı 28 Kasım 2026'ya kadar kapatması gerekiyor. Fidye yazılımı saldırılarında kullanıldığına dair bilgi bulunmuyor, ancak internete açık sistemler için acil öncelik taşıyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2026-133275",
+   "cveId": "CVE-2026-133275",
+   "vendor": "Mitel",
+   "product": "MiCollab",
+   "nameOriginal": "Mitel MiCollab Unrestricted Upload of File with Dangerous Type Vulnerability",
+   "descriptionOriginal": "Mitel MiCollab contains an unrestricted upload of file with dangerous type vulnerability in the Audio, Web and Video Conferencing (AWV) component due to insufficient file type validation that could allow an unauthenticated attacker to upload arbitrary files.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Mitel MiCollab tehlikeli türde dosya yükleme kısıtlamasız açığı",
+   "descriptionTr": "Mitel MiCollab ürününün Ses, Web ve Video Konferans (AWV) bileşenindeki dosya türü doğrulaması yetersiz olduğundan bu açık oluşuyor. Kimlik doğrulaması yapmamış bir saldırgan bu sayede keyfi dosyalar yükleyebiliyor. Açık CWE-434 (tehlikeli türde dosyanın kısıtlamasız yüklenmesi) sınıfında yer alıyor ve CVE-2026-133275 numarasıyla kayıtlı.",
+   "actionTr": "Üreticinin talimatlarına uygun önlemleri uygulayın ve CISA'nın BOD 26-04 kapsamındaki risk temelli güvenlik güncelleme önceliklendirmesi ile “Adli Analiz (Forensics Triage) Gereksinimleri” rehberine uyun. Önlem bulunmadığı durumda ürünün kullanımına son verin; bulut hizmetleri için geçerli BOD 26-04 yönergelerini izleyin.",
+   "dateAdded": "2026-11-25",
+   "dueDate": "2026-11-28",
+   "ransomware": false,
+   "cwes": [
+    "CWE-434"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-133275",
+   "translated": true,
+   "explanationTr": "Kimlik doğrulaması gerektirmediği için saldırganın sisteme erişim sağlayıp zararlı dosya yüklemesi mümkün olabilir. Kaydın CISA kataloğuna 25 Kasım 2026'da eklendiği ve kamu kurumları için son tarihin 28 Kasım 2026 olduğu belirtiliyor. Açığın fidye yazılımı saldırılarında kullanılıp kullanılmadığı ise bilinmiyor.",
+   "writer": "ai"
+  },
   {
    "id": "CVE-2026-103406",
    "cveId": "CVE-2026-103406",
@@ -22,6 +155,72 @@
    "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-103406",
    "translated": true,
    "explanationTr": "Saldırgan, hazırlanmış bir kimlik değeriyle sistemde root yetkisiyle komut çalıştırabilir ve cihazın tamamını ele geçirebilir. Kamu kurumlarının 28 Kasım 2026 tarihine kadar bu açığı kapatması gerekiyor; her varlığın internete açık olup olmadığının ayrıca değerlendirilmesi öneriliyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2025-41450",
+   "cveId": "CVE-2025-41450",
+   "vendor": "Danfoss",
+   "product": "AK-SM 800A Series",
+   "nameOriginal": "Danfoss AK-SM 800A Series Improper Authentication Vulnerability",
+   "descriptionOriginal": "Danfoss AK-SM 800A Series contains an improper authentication vulnerability that could allow an attacker to generate a web report exposing sensitive information, including internal IP addresses, usernames, and store names.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Danfoss AK-SM 800A Serisi kimlik doğrulama açığı",
+   "descriptionTr": "Danfoss'un AK-SM 800A serisi ürünlerinde, kimlik doğrulamanın yetersiz yapılmasından kaynaklanan bir güvenlik açığı bulunuyor. Bu açık, bir saldırganın iç IP adresleri, kullanıcı adları ve mağaza adları gibi hassas bilgileri içeren bir web raporu üretmesine olanak tanıyabiliyor. Açık, CISA'nın aktif olarak istismar edilen açıklar kataloğuna 25 Kasım tarihinde eklendi. Kamu kurumları için son uygulama tarihi 9 Aralık olarak belirlendi.",
+   "actionTr": "Üreticinin talimatlarına uygun önlemleri uygulayın ve CISA'nın BOD 26-04 kapsamındaki güncelleme önceliklendirme rehberine uyun. Önlem bulunmuyorsa ürünün kullanımına son verin; bulut hizmetleri için geçerli BOD 26-04 yönergelerini de izleyin.",
+   "dateAdded": "2026-11-25",
+   "dueDate": "2026-12-09",
+   "ransomware": false,
+   "cwes": [
+    "CWE-305"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2025-41450",
+   "translated": true,
+   "explanationTr": "Bu açık, saldırganın kimlik doğrulamadan geçerek cihazın hassas bilgilerini içeren bir rapor almasını sağlayabiliyor. Ortaya çıkan iç IP adresleri ve kullanıcı adları, saldırganın ağa yönelik sonraki hamlelerini kolaylaştırabilir. Ürünün internete ne ölçüde açık olduğunu her kuruluşun ayrıca değerlendirmesi gerekiyor. Kaynakta fidye yazılımı saldırılarında kullanıldığına dair bir bilgi bulunmuyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2023-25915",
+   "cveId": "CVE-2023-25915",
+   "vendor": "Danfoss",
+   "product": "AK-SM 800A Series",
+   "nameOriginal": "Danfoss AK-SM 800A Series Improper Input Validation Vulnerability",
+   "descriptionOriginal": "Danfoss AK-SM 800A Series contains an improper input validation vulnerability that could allow a remote attacker to run arbitrary commands on the affected system.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Danfoss AK-SM 800A Serisi uzaktan komut çalıştırma açığı",
+   "descriptionTr": "CISA'nın açıklamasına göre Danfoss AK-SM 800A serisinde girdi doğrulamasındaki bir hata (CWE-20) bulunuyor. Bu açık, uzaktan bir saldırganın etkilenen sistemde rastgele komutlar çalıştırmasına olanak tanıyabilir. Açık, CISA'nın aktif olarak istismar edilen açıklar kataloğuna 25 Kasım 2026'da eklendi.",
+   "actionTr": "Üreticinin talimatlarına uygun olarak önlemleri uygulayın ve CISA'nın BOD 26-04 kapsamındaki risk temelli güncelleme önceliklendirme yönergesine uyun. Önlem bulunmuyorsa ürünün kullanımını durdurun.",
+   "dateAdded": "2026-11-25",
+   "dueDate": "2026-11-28",
+   "ransomware": false,
+   "cwes": [
+    "CWE-20"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2023-25915",
+   "translated": true,
+   "explanationTr": "Bu açık, saldırganın cihaz üzerinde kendi komutlarını çalıştırmasına izin verebilir; bu da sistemin ele geçirilmesi anlamına gelir. CISA, kamu kurumları için son tarihi 28 Kasım 2026 olarak belirledi. Fidye yazılımı saldırılarında kullanılıp kullanılmadığı ise bilinmiyor.",
+   "writer": "ai"
+  },
+  {
+   "id": "CVE-2023-25914",
+   "cveId": "CVE-2023-25914",
+   "vendor": "Danfoss",
+   "product": "AK-SM 800A Series",
+   "nameOriginal": "Danfoss AK-SM 800A Series Path Traversal Vulnerability",
+   "descriptionOriginal": "Danfoss AK-SM 800A Series contains a path traversal vulnerability that could allow an attacker to access and read underlying server system files via the XML interface.",
+   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+   "nameTr": "Danfoss AK-SM 800A Serisi dizin geçişi açığı",
+   "descriptionTr": "Danfoss'un AK-SM 800A serisinde, XML arayüzü üzerinden yapılan istekler kullanılarak sunucu sistemindeki temel dosyalara erişilmesine ve bunların okunmasına izin veren bir dizin geçişi (path traversal) açığı bulunuyor. Bu açık CWE-22 sınıfında yer alıyor ve CVE-2023-25914 kimliğiyle takip ediliyor.",
+   "actionTr": "Üreticinin talimatlarına uygun olarak önlemleri uygulayın ve CISA'nın BOD 26-04 kapsamındaki risk temelli güvenlik güncellemesi önceliklendirme rehberine uyun. Önlem bulunmuyorsa ürünün kullanımını durdurmayı değerlendirin.",
+   "dateAdded": "2026-11-25",
+   "dueDate": "2026-11-28",
+   "ransomware": false,
+   "cwes": [
+    "CWE-22"
+   ],
+   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2023-25914",
+   "translated": true,
+   "explanationTr": "Bu açık, saldırganın sunucudaki sistem dosyalarını okumasına olanak tanıyabiliyor. CISA, kataloğa 25 Kasım'da eklediği bu açık için kamu kurumlarına 28 Kasım'a kadar işlem yapma süresi tanıdı. Fidye yazılımı saldırılarında kullanıldığına dair bilgi bulunmuyor.",
    "writer": "ai"
   },
   {
@@ -154,28 +353,6 @@
    "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-76466",
    "translated": true,
    "explanationTr": "Saldırgan kimlik doğrulaması olmadan cihazda root yetkisiyle komut çalıştırabilirse, cihazın tamamını ele geçirebilir. Açığın, kümelenmiş cihazlarda çalışan veritabanı servisini hedef alması, etkisinin birden fazla cihaza yayılabileceği anlamına geliyor. CISA kataloğu kamu kurumları için 23 Kasım 2026 son tarihini verdiği için bu açığa acilen bakılması gerekiyor.",
-   "writer": "ai"
-  },
-  {
-   "id": "CVE-2026-129448",
-   "cveId": "CVE-2026-129448",
-   "vendor": "Apache",
-   "product": "Roller",
-   "nameOriginal": "Apache Roller Deserialization of Untrusted Data Vulnerability",
-   "descriptionOriginal": "Apache Roller contains a deserialization of untrusted data vulnerability that allows an unauthenticated remote attacker to execute arbitrary code via the XML-RPC endpoint, which accepts and deserializes vendor extension types before authentication. This CVE covers the same underlying vulnerability as CVE-2026-82384 but applies to a broader range of affected versions.",
-   "actionOriginal": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
-   "nameTr": "Apache Roller güvenilmeyen veriyi serileştirme açığı",
-   "descriptionTr": "Apache Roller, güvenilmeyen verilerin seri halden çıkarılmasıyla ilgili bir açık içeriyor. Bu açık, kimlik doğrulaması yapılmamış uzak bir saldırganın XML-RPC uç noktası üzerinden keyfi kod çalıştırmasına olanak tanıyor; çünkü uç nokta, kimlik doğrulamadan önce satıcı uzantısı türlerini kabul edip seri halden çıkarıyor. CISA'ya göre bu kayıt, CVE-2026-82384 ile aynı temel açığı kapsıyor ancak etkilenen sürüm aralığı daha geniş.",
-   "actionTr": "Üreticinin talimatlarına uygun önlemleri uygulayın ve her varlığın internete açıklık durumunu değerlendirin. Önlem bulunmuyorsa, CISA'nın BOD 26-04 kapsamındaki rehberine göre ürünün kullanımını durdurun.",
-   "dateAdded": "2026-11-20",
-   "dueDate": "2026-11-23",
-   "ransomware": false,
-   "cwes": [
-    "CWE-502"
-   ],
-   "nvdUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-129448",
-   "translated": true,
-   "explanationTr": "Açık, saldırganın kimlik doğrulaması olmadan sunucuda kendi kodunu çalıştırmasına izin verdiği için sunucuyu tamamen ele geçirme riski taşıyor. Internete açık Apache Roller kurulumları en büyük risk altında; kamu kurumları için son tarih 23 Kasım 2026 olarak belirlendi.}",
    "writer": "ai"
   }
  ]

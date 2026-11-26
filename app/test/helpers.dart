@@ -18,8 +18,8 @@ import 'package:techpulse/state/providers.dart';
 String fixture(String name) => File('test/fixtures/$name').readAsStringSync();
 
 Map<String, String> allFixtures() => {
-      for (final name in ['news', 'models', 'papers', 'repos', 'security', 'meta']) '$name.json': fixture('$name.json'),
-    };
+  for (final name in ['news', 'models', 'papers', 'repos', 'security', 'meta']) '$name.json': fixture('$name.json'),
+};
 
 /// Sahte veri kaynağı: ağ yerine test/fixtures klasöründeki dosyaları döndürür.
 class FakeSource implements DataSource {
@@ -32,9 +32,9 @@ class FakeSource implements DataSource {
   @override
   Future<String> getText(String path) async {
     calls++;
-    if (offline) throw const AppException('İnternet bağlantısı kurulamadı.', offline: true);
+    if (offline) throw const AppException('İnternet bağlantısı kurulamadı.', kind: ErrorKind.offline);
     final body = files[path];
-    if (body == null) throw const AppException('Veri henüz yayınlanmamış (404).');
+    if (body == null) throw const AppException('Veri henüz yayınlanmamış (404).', kind: ErrorKind.notFound);
     return body;
   }
 }
@@ -45,7 +45,7 @@ Future<void> initTestLocale() async {
 }
 
 /// Test verisinin üretildiği ana yakın sabit bir "şimdi": sıralama ve yenilikler her çalıştırmada aynı olsun.
-final testNow = DateTime.utc(2026, 11, 25, 20);
+final testNow = DateTime.utc(2026, 11, 26, 7);
 
 /// Uygulamayı sahte veriyle kurar. Varsayılan olarak ilk açılış ekranı geçilmiş sayılır.
 Future<Widget> buildTestApp({
@@ -88,7 +88,7 @@ Future<void> settle(WidgetTester tester, {int frames = 12}) async {
   }
 }
 
-/// Uygulamayla gelen yazı tiplerini (Inter, JetBrains Mono, Material ikonları) test ortamına yükler;
+/// Uygulamayla gelen yazı tiplerini (Inter, Source Serif 4, JetBrains Mono, Material ikonları) test ortamına yükler;
 /// yoksa ekran görüntülerinde yazılar kutucuk olarak çizilir.
 Future<void> loadAppFonts() async {
   final manifest = jsonDecode(await rootBundle.loadString('FontManifest.json')) as List<dynamic>;

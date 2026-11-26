@@ -15,14 +15,19 @@ Ayrıntılı kurulum, bilgisayarda çalıştırma ve sorun giderme: [docs/KURULU
 
 ## Ne yapar?
 
-| Bölüm | İçerik | Kaynak |
-|---|---|---|
-| **Gündem** | Türkçeye çevrilmiş başlıklar ve kaynağın kısa açıklaması; konu filtresi (Yapay Zekâ, Yazılım, Donanım, Güvenlik, Sektör) | OpenAI, Google AI, Google DeepMind, Microsoft Research, NVIDIA, Hugging Face, GitHub, AWS, Android ve Flutter blogları; The Verge, TechCrunch, Ars Technica, Tom's Hardware, BleepingComputer, The Hacker News; Hacker News |
-| **YZ Radarı** | Hugging Face'te trend olan modeller (görev, beğeni, indirme, parametre), günün öne çıkan makaleleri (Türkçe özet), GitHub'da son 7 günün yükselen projeleri | Hugging Face Hub API, Hugging Face Daily Papers, GitHub Search API |
-| **Güvenlik** | Saldırganların şu an kullandığı açıklar | CISA Known Exploited Vulnerabilities (KEV) |
-| **Kaydedilenler** | İnternetsiz de açılan yer imleri | Telefondaki SQLite |
+| Sekme | İçerik |
+|---|---|
+| **Akış** | "Sizin İçin" (seçilen ilgi alanları) ve "Tüm Gündem" görünümleri; konu, zaman (son 1 saat – 30 gün) ve sıralama filtresi; günün manşeti, "Kısaca" şeridi, zamana göre "Son gelişmeler" |
+| **Keşfet** | Arama, şu an popüler haberler, gündemdeki konular, dokuz konu |
+| **Radar** | Hugging Face'te öne çıkan modeller ve makaleler, GitHub'da yükselen yeni projeler (README'ye dayanan Türkçe tanıtımla), CISA'nın aktif istismar listesindeki açıklar |
+| **Kaydedilen** | İnternetsiz de açılan kayıtlar |
+| **Profil** | Ad, ilgi alanları, tema (Sistem/Açık/Koyu), uygulama rengi, yazı boyutu, okuma geçmişi, veri silme |
 
-Telif: Uygulama haberin tamamını yayımlamaz; yalnızca başlık, kaynağın kısa açıklamasından üretilen Türkçe özet, kaynak adı ve bağlantı gösterir. Haberin tamamı her zaman yayıncının sitesinde açılır.
+Her haberde: 30 saniyelik özet, "Bu gelişme neden önemli?", sade anlatım / teknik derinlik geçişi, metinde altı çizili kavramların açıklaması (tanım, benzetme, kullanım alanı, geliştiren), okuma ilerlemesi, yazı boyutu, kaynak bağlantısını açmadan görme ve kopyalama.
+
+Kaynaklar: OpenAI, Google AI, Google DeepMind, Microsoft Research, NVIDIA, Hugging Face, GitHub, AWS, Android ve Flutter blogları; The Verge, TechCrunch, Ars Technica, Tom's Hardware, BleepingComputer, The Hacker News; Hacker News; Hugging Face Hub ve Daily Papers; GitHub Search API; CISA KEV.
+
+Telif: Uygulama haberi kopyalamaz; kaynağı okuyup kendi cümleleriyle Türkçe anlatır, yayıncıyı ve bağlantıyı her zaman gösterir. Kaynak yalnızca kısa bir bölüm yayımlıyorsa bu, haber sayfasında belirtilir.
 
 ## Mimari
 
@@ -31,18 +36,19 @@ Kaynaklar (RSS/Atom, Hacker News, Hugging Face, GitHub, CISA)
         │  saatte bir
         ▼
 GitHub Actions: pipeline/ (Node.js 24 + TypeScript)
-  topla → temizle → tekilleştir → konu belirle → OPUS-MT ile Türkçeye çevir → doğrula
+  topla → temizle → tekilleştir → konu belirle → haber metnini / README'yi oku
+  → yapay zekâ editörü (Claude Haiku 5.5, yapılandırılmış çıktı) Türkçe yazar → doğrula
         │
         ▼
 GitHub Pages: statik JSON API (v1/news.json, models.json, papers.json, repos.json, security.json, meta.json)
         │  HTTPS
         ▼
 Flutter uygulaması: app/ (Riverpod 3, dio, sqflite)
-  önce önbellek, sonra ağ · çevrimdışı çalışma · yer imleri
+  önce önbellek, sonra ağ · çevrimdışı çalışma · kaydedilenler ve okuma geçmişi telefonda
 ```
 
-* Uygulamada hiçbir API anahtarı yoktur. Çeviri, Helsinki Üniversitesi'nin açık kaynaklı İngilizce→Türkçe modeliyle ([OPUS-MT, opus-mt-tc-big-en-tr](https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-tr), CC BY 4.0) doğrudan GitHub Actions sunucusunda yapılır; dış bir yapay zekâ servisine bağımlı değildir.
-* Bir kaynak çökerse diğerleri çalışmaya devam eder; çeviri yapılamazsa kayıtlar özgün başlıklarıyla yayımlanır ve bir sonraki saatte yeniden denenir.
+* Uygulamada hiçbir API anahtarı yoktur. Anahtar yalnızca GitHub Actions'ın şifreli sırlarında (`ANTHROPIC_API_KEY`) durur.
+* Editör her kaydı bir kez yazar; yazılan metin bir sonraki çalışmada yeniden kullanılır. Bir kaynak çökerse diğerleri çalışmaya devam eder; editör bir kaydı yazamazsa kayıt kısa özetiyle yayımlanır ve sonraki saatte yeniden denenir.
 * Yayımlanan her kayıt şemaya göre doğrulanır; bozuk veri uygulamaya ulaşmaz.
 
 ## Klasörler

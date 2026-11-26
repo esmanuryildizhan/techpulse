@@ -8,7 +8,7 @@ class CachedBody {
   final DateTime savedAt;
 }
 
-/// Telefonda saklanan bir içerik kaydı: kaydedilenler, favoriler ve okuma geçmişi aynı biçimi kullanır.
+/// Telefonda saklanan bir içerik kaydı: kaydedilenler ve okuma geçmişi aynı biçimi kullanır.
 class BookmarkRecord {
   const BookmarkRecord({required this.key, required this.kind, required this.payload, required this.savedAt});
 
@@ -30,10 +30,7 @@ enum UserList {
   /// Daha sonra okumak için kaydedilenler.
   bookmarks,
 
-  /// Beğenilen (favori) içerikler.
-  favorites,
-
-  /// Okunan haberler; en yeni 300 kayıt tutulur.
+  /// Okunan haberler; son 90 günün en fazla 200 kaydı tutulur.
   history,
 }
 
@@ -46,10 +43,16 @@ abstract interface class LocalStore {
   Future<void> saveRecord(UserList list, BookmarkRecord record);
   Future<void> deleteRecord(UserList list, String key);
   Future<void> clearList(UserList list);
+
+  /// Bu telefondaki bütün kişisel verileri siler: kaydedilenler, okuma geçmişi ve önbellek.
+  Future<void> clearAll();
 }
 
 /// Okuma geçmişinde tutulan en fazla kayıt.
-const int historyLimit = 300;
+const int historyLimit = 200;
+
+/// Okuma geçmişinin saklanma süresi; daha eski kayıtlar silinir.
+const Duration historyRetention = Duration(days: 90);
 
 /// Platform deposunu açar; açılamazsa uygulama bellek deposuyla çalışmaya devam eder.
 Future<LocalStore> openLocalStore() async {
@@ -85,9 +88,13 @@ class MemoryStore implements LocalStore {
   Future<void> saveRecord(UserList list, BookmarkRecord record) async {
     final map = _lists[list]!;
     map[record.key] = record;
-    if (list == UserList.history && map.length > historyLimit) {
-      final oldest = map.values.reduce((a, b) => a.savedAt.isBefore(b.savedAt) ? a : b);
-      map.remove(oldest.key);
+    if (list == UserList.history) {
+      final cutoff = record.savedAt.subtract(historyRetention);
+      map.removeWhere((_, r) => r.savedAt.isBefore(cutoff));
+      final sorted = map.values.toList()..sort((a, b) => b.savedAt.compareTo(a.savedAt));
+      for (final old in sorted.skip(historyLimit)) {
+        map.remove(old.key);
+      }
     }
   }
 
@@ -99,5 +106,13 @@ class MemoryStore implements LocalStore {
   @override
   Future<void> clearList(UserList list) async {
     _lists[list]!.clear();
+  }
+
+  @override
+  Future<void> clearAll() async {
+    _cache.clear();
+    for (final map in _lists.values) {
+      map.clear();
+    }
   }
 }

@@ -17,20 +17,24 @@ class TechPulseApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(settingsProvider.select((s) => s.themeMode));
+    final accent = ref.watch(settingsProvider.select((s) => s.accent));
     final onboarded = ref.watch(profileProvider.select((p) => p.onboarded));
     return MaterialApp(
       title: AppConfig.appName,
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
+      theme: AppTheme.light(accent),
+      darkTheme: AppTheme.dark(accent),
       themeMode: themeMode,
       locale: const Locale('tr', 'TR'),
       supportedLocales: const [Locale('tr', 'TR')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      home: home ??
+      home:
+          home ??
           AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-            child: onboarded ? const AppShell(key: ValueKey('shell')) : const OnboardingScreen(key: ValueKey('onboarding')),
+            duration: const Duration(milliseconds: 300),
+            child: onboarded
+                ? const AppShell(key: ValueKey('shell'))
+                : const OnboardingScreen(key: ValueKey('onboarding')),
           ),
     );
   }

@@ -19,7 +19,11 @@ Future<void> main() async {
 
   // Paketle gelen yazı tiplerinin lisanslarını "Lisanslar" sayfasına ekle.
   LicenseRegistry.addLicense(() async* {
-    for (final (family, file) in const [('Inter', 'OFL-Inter.txt'), ('JetBrains Mono', 'OFL-JetBrainsMono.txt')]) {
+    for (final (family, file) in const [
+      ('Inter', 'OFL-Inter.txt'),
+      ('Source Serif 4', 'OFL-SourceSerif4.txt'),
+      ('JetBrains Mono', 'OFL-JetBrainsMono.txt'),
+    ]) {
       final text = await rootBundle.loadString('assets/fonts/$file');
       yield LicenseEntryWithLineBreaks([family], text);
     }
@@ -32,10 +36,7 @@ Future<void> main() async {
     ProviderScope(
       // Ağ hatasında en fazla 3 kez, artan aralıklarla (1, 2, 4 sn) kendiliğinden yeniden dener.
       retry: (retryCount, error) => retryCount >= 3 ? null : Duration(seconds: 1 << retryCount),
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-        localStoreProvider.overrideWithValue(store),
-      ],
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs), localStoreProvider.overrideWithValue(store)],
       child: const TechPulseApp(),
     ),
   );

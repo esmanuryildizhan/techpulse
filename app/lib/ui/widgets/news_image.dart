@@ -57,7 +57,10 @@ class NewsImage extends StatelessWidget {
               );
             },
           );
-    return ClipRRect(borderRadius: borderRadius, child: SizedBox.expand(child: child));
+    return ClipRRect(
+      borderRadius: borderRadius,
+      child: SizedBox.expand(child: child),
+    );
   }
 }
 
@@ -75,8 +78,8 @@ class ProceduralCover extends StatelessWidget {
     final hash = seed.codeUnits.fold<int>(17, (h, c) => (h * 31 + c) & 0x7fffffff);
     final base = category.color;
     final dark = context.brightness == Brightness.dark;
-    final deep = Color.lerp(base, const Color(0xFF0B0D17), dark ? 0.72 : 0.55)!;
-    final mid = Color.lerp(base, const Color(0xFF151827), dark ? 0.35 : 0.2)!;
+    final deep = Color.lerp(base, const Color(0xFF181713), dark ? 0.70 : 0.50)!;
+    final mid = Color.lerp(base, const Color(0xFF23211C), dark ? 0.32 : 0.15)!;
     return LayoutBuilder(
       builder: (context, constraints) {
         final size = math.min(constraints.maxWidth, constraints.maxHeight);
@@ -91,10 +94,16 @@ class ProceduralCover extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              CustomPaint(painter: _PatternPainter(hash: hash, color: Colors.white)),
+              CustomPaint(
+                painter: _PatternPainter(hash: hash, color: Colors.white),
+              ),
               Align(
                 alignment: Alignment(0.7 - (hash % 3) * 0.2, 0.1),
-                child: Icon(icon ?? category.icon, size: size.isFinite ? size * 0.42 : 64, color: Colors.white.withValues(alpha: 0.22)),
+                child: Icon(
+                  icon ?? category.icon,
+                  size: size.isFinite ? size * 0.42 : 64,
+                  color: Colors.white.withValues(alpha: 0.22),
+                ),
               ),
               if (label != null && size > 90)
                 Positioned(
@@ -105,7 +114,12 @@ class ProceduralCover extends StatelessWidget {
                     label!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontFamily: 'Inter', fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.white70),
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white70,
+                    ),
                   ),
                 ),
             ],

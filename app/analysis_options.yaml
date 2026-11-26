@@ -7,6 +7,10 @@ analyzer:
   errors:
     # Kullanımdan kalkan API'ler derlemeyi durdurmasın; ayrı olarak raporlanır.
     deprecated_member_use: info
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
 
 linter:
   rules:

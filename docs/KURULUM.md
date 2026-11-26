@@ -9,9 +9,9 @@ Bu rehber, hiç mobil programlama bilmeyen biri için adım adım yazıldı.
 3. İndirme bitince bildirimden veya **Dosyalar → İndirilenler** klasöründen **TechPulse.apk** dosyasına dokunun.
 4. Telefon "Bilinmeyen uygulamalar yüklenemez" ya da "Bu kaynaktan yüklemeye izin ver" derse **Ayarlar**'a dokunun, açılan sayfadaki anahtarı açın ve geri dönün.
 5. **Yükle**'ye dokunun. Google Play Protect bir uyarı gösterirse **Yine de yükle** deyin. Uyarının nedeni uygulamanın Google Play'den değil, bizim derlememizden gelmesidir.
-6. Uygulamayı açın. İlk açılışta adınızı (isteğe bağlı) ve takip etmek istediğiniz konuları seçin; seçtiğiniz konular Ana Sayfa'da öne gelir. İlk açılışta internet gerekir; sonraki açılışlarda son veriler internetsiz de görünür.
+6. Uygulamayı açın. İlk açılışta adınızı (isteğe bağlı) ve takip etmek istediğiniz konuları seçin; seçtiğiniz konular Akış'taki "Sizin İçin" görünümünü oluşturur. İlk açılışta internet gerekir; sonraki açılışlarda son veriler internetsiz de görünür.
 
-**Nerede ne var?** Alt çubukta dört sekme vardır: **Ana Sayfa** (haberler ve konu filtreleri), **Keşfet** (konular, trendler, Yapay Zekâ Radarı ve Aktif Siber Tehditler), **Kaydedilenler** (kaydet simgesine dokunduğunuz her şey; telefonda saklanır) ve **Profil** (adınız, ilgi alanlarınız, okuma geçmişiniz, favorileriniz ve ayarlar). Ana Sayfa'daki zil simgesi, ilgi alanlarınızdaki yeni gelişmeleri toplar.
+**Nerede ne var?** Alt çubukta beş sekme vardır: **Akış** ("Sizin İçin" / "Tüm Gündem", filtre düğmesiyle konu, zaman ve sıralama), **Keşfet** (arama, popüler haberler, gündemdeki konular, bütün konular), **Radar** (yapay zekâ modelleri, makaleler, GitHub projeleri ve aktif siber tehditler), **Kaydedilen** (kaydet simgesine dokunduğunuz her şey; telefonda saklanır) ve **Profil** (adınız, ilgi alanlarınız, görünüm ve okuma ayarları, okuma geçmişi, verileri silme). Logoya dokunmak sayfanın başına döner; zaten baştaysanız haberleri yeniler.
 
 **Güncelleme:** Yeni bir sürüm çıktığında aynı adımları tekrarlayın. Yeni APK eskisinin üstüne kurulur ve kaydedilenler silinmez.
 

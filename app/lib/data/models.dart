@@ -18,10 +18,10 @@ enum SourceKind {
   final String label;
 
   static SourceKind fromKey(Object? key) => switch (key) {
-        'official' => SourceKind.official,
-        'community' => SourceKind.community,
-        _ => SourceKind.news,
-      };
+    'official' => SourceKind.official,
+    'community' => SourceKind.community,
+    _ => SourceKind.news,
+  };
 }
 
 enum Modality {
@@ -37,12 +37,12 @@ enum Modality {
   final IconData icon;
 
   static Modality fromKey(Object? key) => switch (key) {
-        'text' => Modality.text,
-        'vision' => Modality.vision,
-        'audio' => Modality.audio,
-        'multimodal' => Modality.multimodal,
-        _ => Modality.other,
-      };
+    'text' => Modality.text,
+    'vision' => Modality.vision,
+    'audio' => Modality.audio,
+    'multimodal' => Modality.multimodal,
+    _ => Modality.other,
+  };
 }
 
 // ---- Hoşgörülü okuma yardımcıları ----
@@ -119,7 +119,8 @@ class ArticleSection {
   /// Paragraflar boş satırla ayrılmıştır.
   final String body;
 
-  List<String> get paragraphs => body.split(RegExp(r'\n\s*\n')).map((p) => p.trim()).where((p) => p.isNotEmpty).toList();
+  List<String> get paragraphs =>
+      body.split(RegExp(r'\n\s*\n')).map((p) => p.trim()).where((p) => p.isNotEmpty).toList();
 }
 
 /// Yapay zekâ editörünün kaynak haberden yazdığı özgün Türkçe anlatım.
@@ -153,6 +154,160 @@ class Article {
   }
 }
 
+/// Metindeki altı çizili kavrama dokununca açılan sade açıklama. Boş alanlar gösterilmez.
+class GlossaryEntry {
+  const GlossaryEntry({
+    required this.term,
+    required this.definition,
+    this.analogy = '',
+    this.usage = '',
+    this.origin = '',
+  });
+
+  final String term;
+
+  /// Nedir?
+  final String definition;
+
+  /// Günlük hayattan benzetme.
+  final String analogy;
+
+  /// Nerede, ne için kullanılır?
+  final String usage;
+
+  /// Kim geliştirdi, nereden çıktı?
+  final String origin;
+
+  static GlossaryEntry? fromJson(Object? value) {
+    if (value is! Map<String, dynamic>) return null;
+    final term = _strOrNull(value['term']);
+    final definition = _strOrNull(value['definition']) ?? _strOrNull(value['explanation']);
+    if (term == null || definition == null) return null;
+    return GlossaryEntry(
+      term: term,
+      definition: definition,
+      analogy: _str(value['analogy']).trim(),
+      usage: _str(value['usage']).trim(),
+      origin: _str(value['origin']).trim(),
+    );
+  }
+}
+
+/// Bir anlatım seviyesi: giriş ve bölümler.
+class StoryVersion {
+  const StoryVersion({required this.intro, required this.sections});
+
+  final String intro;
+  final List<ArticleSection> sections;
+
+  int get wordCount => [
+    intro,
+    for (final s in sections) '${s.heading} ${s.body}',
+  ].join(' ').split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length;
+
+  static StoryVersion? fromJson(Object? value) {
+    if (value is! Map<String, dynamic>) return null;
+    final intro = _strOrNull(value['intro']);
+    final sections = _sections(value['sections']);
+    if (intro == null || sections.isEmpty) return null;
+    return StoryVersion(intro: intro, sections: sections);
+  }
+}
+
+List<ArticleSection> _sections(Object? value) => [
+  if (value is List<dynamic>)
+    for (final s in value)
+      if (s is Map<String, dynamic> && _strOrNull(s['heading']) != null && _strOrNull(s['body']) != null)
+        ArticleSection(_strOrNull(s['heading'])!, _strOrNull(s['body'])!),
+];
+
+/// Haberin iki seviyeli anlatımı: "30 saniyede", "neden önemli", sade ve teknik anlatım, kavramlar.
+class Story {
+  const Story({
+    required this.tldr,
+    required this.why,
+    required this.simple,
+    required this.technical,
+    required this.glossary,
+    required this.fromExcerpt,
+  });
+
+  /// "30 saniyede" maddeleri (eski biçimdeki kayıtlarda boş).
+  final List<String> tldr;
+
+  /// "Bu gelişme neden önemli?" (eski biçimdeki kayıtlarda boş).
+  final String why;
+  final StoryVersion simple;
+
+  /// Teknik derinlik; kaynak yeterli ayrıntı vermiyorsa null.
+  final StoryVersion? technical;
+  final List<GlossaryEntry> glossary;
+
+  /// Anlatım haberin tam metnine değil, yalnızca kaynağın kısa açıklamasına dayanıyor.
+  final bool fromExcerpt;
+
+  static Story? fromJson(Object? value) {
+    if (value is! Map<String, dynamic>) return null;
+    final simple = StoryVersion.fromJson(value['simple']);
+    if (simple == null) return null;
+    return Story(
+      tldr: _strings(value['tldr']),
+      why: _str(value['why']).trim(),
+      simple: simple,
+      technical: StoryVersion.fromJson(value['technical']),
+      glossary: [
+        if (value['glossary'] case final List<dynamic> list)
+          for (final g in list) ?GlossaryEntry.fromJson(g),
+      ],
+      fromExcerpt: value['basis'] == 'excerpt',
+    );
+  }
+
+  /// Önceki biçimde (article) yazılmış haberler aynı ekranda gösterilebilsin diye.
+  static Story fromArticle(Article article) => Story(
+    tldr: const [],
+    why: '',
+    simple: StoryVersion(intro: article.intro, sections: article.sections),
+    technical: null,
+    glossary: [for (final p in article.primer) GlossaryEntry(term: p.term, definition: p.explanation)],
+    fromExcerpt: false,
+  );
+}
+
+/// GitHub projesinin README'ye dayanan kısa tanıtımı.
+class RepoStory {
+  const RepoStory({
+    required this.what,
+    required this.why,
+    required this.useCases,
+    required this.audience,
+    required this.caution,
+    required this.fromReadme,
+  });
+
+  final String what;
+  final String why;
+  final List<String> useCases;
+  final String audience;
+  final String caution;
+  final bool fromReadme;
+
+  static RepoStory? fromJson(Object? value) {
+    if (value is! Map<String, dynamic>) return null;
+    final what = _strOrNull(value['what']);
+    final why = _strOrNull(value['why']);
+    if (what == null || why == null) return null;
+    return RepoStory(
+      what: what,
+      why: why,
+      useCases: _strings(value['useCases']),
+      audience: _str(value['audience']).trim(),
+      caution: _str(value['caution']).trim(),
+      fromReadme: value['basis'] == 'readme',
+    );
+  }
+}
+
 class NewsItem implements Entry {
   NewsItem({
     required this.id,
@@ -172,7 +327,7 @@ class NewsItem implements Entry {
     required this.comments,
     required this.discussionUrl,
     required this.imageUrl,
-    required this.article,
+    required this.story,
     required this.topics,
     required this.importance,
     required this.readingMinutes,
@@ -182,31 +337,31 @@ class NewsItem implements Entry {
   });
 
   factory NewsItem.fromJson(Map<String, dynamic> json) => NewsItem(
-        id: _required(json, 'id'),
-        url: _https(json, 'url'),
-        sourceId: _required(json, 'sourceId'),
-        sourceName: _required(json, 'sourceName'),
-        sourceKind: SourceKind.fromKey(json['sourceKind']),
-        publishedAt: _date(json['publishedAt']) ?? _date(json['firstSeenAt']) ?? DateTime.now(),
-        titleOriginal: _required(json, 'titleOriginal'),
-        excerptOriginal: _str(json['excerptOriginal']),
-        titleTr: _strOrNull(json['titleTr']),
-        summaryTr: _strOrNull(json['summaryTr']),
-        category: TechCategory.fromKey(json['category']),
-        tags: _strings(json['tags']),
-        translated: json['translated'] == true,
-        points: _intOrNull(json['points']),
-        comments: _intOrNull(json['comments']),
-        discussionUrl: _httpsOrNull(json['discussionUrl']),
-        imageUrl: _httpsOrNull(json['imageUrl']),
-        article: Article.fromJson(json['article']),
-        topics: _strings(json['topics']),
-        importance: _intOrNull(json['importance']),
-        readingMinutes: _intOrNull(json['readingMinutes']),
-        aiWritten: json['writer'] == 'ai',
-        hidden: json['hidden'] == true,
-        raw: json,
-      );
+    id: _required(json, 'id'),
+    url: _https(json, 'url'),
+    sourceId: _required(json, 'sourceId'),
+    sourceName: _required(json, 'sourceName'),
+    sourceKind: SourceKind.fromKey(json['sourceKind']),
+    publishedAt: _date(json['publishedAt']) ?? _date(json['firstSeenAt']) ?? DateTime.now(),
+    titleOriginal: _required(json, 'titleOriginal'),
+    excerptOriginal: _str(json['excerptOriginal']),
+    titleTr: _strOrNull(json['titleTr']),
+    summaryTr: _strOrNull(json['summaryTr']),
+    category: TechCategory.fromKey(json['category']),
+    tags: _strings(json['tags']),
+    translated: json['translated'] == true,
+    points: _intOrNull(json['points']),
+    comments: _intOrNull(json['comments']),
+    discussionUrl: _httpsOrNull(json['discussionUrl']),
+    imageUrl: _httpsOrNull(json['imageUrl']),
+    story: Story.fromJson(json['story']) ?? _storyFromArticle(json['article']),
+    topics: _strings(json['topics']),
+    importance: _intOrNull(json['importance']),
+    readingMinutes: _intOrNull(json['readingMinutes']),
+    aiWritten: json['writer'] == 'ai',
+    hidden: json['hidden'] == true,
+    raw: json,
+  );
 
   @override
   final String id;
@@ -228,7 +383,9 @@ class NewsItem implements Entry {
   final String? discussionUrl;
   @override
   final String? imageUrl;
-  final Article? article;
+
+  /// Editörün anlatımı; makine çevirisinde ve henüz yazılmamış haberde null.
+  final Story? story;
   final List<String> topics;
   final int? importance;
   final int? readingMinutes;
@@ -251,6 +408,27 @@ class NewsItem implements Entry {
   String? get displaySummary => summaryTr ?? (excerptOriginal.isEmpty ? null : excerptOriginal);
 
   bool get hasDifferentOriginal => titleTr != null && titleTr != titleOriginal;
+
+  /// Kaynağın internet adresindeki alan adı (ör. "techcrunch.com").
+  String get domain => hostOf(url);
+
+  /// Hacker News puanları uygulamaya değil Hacker News topluluğuna aittir; bu yüzden kaynağıyla yazılır.
+  String? get communityLabel {
+    if (points == null) return null;
+    final c = comments ?? 0;
+    return "Hacker News'te $points puan · $c yorum";
+  }
+}
+
+Story? _storyFromArticle(Object? value) {
+  final article = Article.fromJson(value);
+  return article == null ? null : Story.fromArticle(article);
+}
+
+/// "https://www.example.com/a/b" → "example.com"
+String hostOf(String url) {
+  final host = Uri.tryParse(url)?.host ?? '';
+  return host.startsWith('www.') ? host.substring(4) : host;
 }
 
 class AiModel implements Entry {
@@ -275,24 +453,24 @@ class AiModel implements Entry {
   });
 
   factory AiModel.fromJson(Map<String, dynamic> json) => AiModel(
-        id: _required(json, 'id'),
-        author: _required(json, 'author'),
-        name: _required(json, 'name'),
-        url: _https(json, 'url'),
-        pipelineTag: _strOrNull(json['pipelineTag']),
-        task: _strOrNull(json['task']) ?? 'Görev belirtilmemiş',
-        modality: Modality.fromKey(json['modality']),
-        likes: _int(json['likes']),
-        downloads: _int(json['downloads']),
-        rank: _int(json['rank']),
-        createdAt: _date(json['createdAt']),
-        library: _strOrNull(json['library']),
-        license: _strOrNull(json['license']),
-        parameters: _intOrNull(json['parameters']),
-        summaryTr: _strOrNull(json['summaryTr']),
-        highlights: _strings(json['highlights']),
-        raw: json,
-      );
+    id: _required(json, 'id'),
+    author: _required(json, 'author'),
+    name: _required(json, 'name'),
+    url: _https(json, 'url'),
+    pipelineTag: _strOrNull(json['pipelineTag']),
+    task: _strOrNull(json['task']) ?? 'Görev belirtilmemiş',
+    modality: Modality.fromKey(json['modality']),
+    likes: _int(json['likes']),
+    downloads: _int(json['downloads']),
+    rank: _int(json['rank']),
+    createdAt: _date(json['createdAt']),
+    library: _strOrNull(json['library']),
+    license: _strOrNull(json['license']),
+    parameters: _intOrNull(json['parameters']),
+    summaryTr: _strOrNull(json['summaryTr']),
+    highlights: _strings(json['highlights']),
+    raw: json,
+  );
 
   @override
   final String id;
@@ -348,25 +526,25 @@ class Paper implements Entry {
   });
 
   factory Paper.fromJson(Map<String, dynamic> json) => Paper(
-        id: _required(json, 'id'),
-        url: _https(json, 'url'),
-        arxivUrl: _httpsOrNull(json['arxivUrl']) ?? _https(json, 'url'),
-        titleOriginal: _required(json, 'titleOriginal'),
-        abstractOriginal: _str(json['abstractOriginal']),
-        titleTr: _strOrNull(json['titleTr']),
-        summaryTr: _strOrNull(json['summaryTr']),
-        upvotes: _int(json['upvotes']),
-        comments: _int(json['comments']),
-        publishedAt: _date(json['publishedAt']) ?? DateTime.now(),
-        authors: _strings(json['authors']),
-        githubUrl: _httpsOrNull(json['githubUrl']),
-        tags: _strings(json['tags']),
-        imageUrl: _httpsOrNull(json['imageUrl']),
-        article: Article.fromJson(json['article']),
-        topics: _strings(json['topics']),
-        readingMinutes: _intOrNull(json['readingMinutes']),
-        raw: json,
-      );
+    id: _required(json, 'id'),
+    url: _https(json, 'url'),
+    arxivUrl: _httpsOrNull(json['arxivUrl']) ?? _https(json, 'url'),
+    titleOriginal: _required(json, 'titleOriginal'),
+    abstractOriginal: _str(json['abstractOriginal']),
+    titleTr: _strOrNull(json['titleTr']),
+    summaryTr: _strOrNull(json['summaryTr']),
+    upvotes: _int(json['upvotes']),
+    comments: _int(json['comments']),
+    publishedAt: _date(json['publishedAt']) ?? DateTime.now(),
+    authors: _strings(json['authors']),
+    githubUrl: _httpsOrNull(json['githubUrl']),
+    tags: _strings(json['tags']),
+    imageUrl: _httpsOrNull(json['imageUrl']),
+    article: Article.fromJson(json['article']),
+    topics: _strings(json['topics']),
+    readingMinutes: _intOrNull(json['readingMinutes']),
+    raw: json,
+  );
 
   @override
   final String id;
@@ -416,25 +594,27 @@ class Repo implements Entry {
     required this.topics,
     required this.isAi,
     required this.imageUrl,
+    required this.story,
     required this.raw,
   });
 
   factory Repo.fromJson(Map<String, dynamic> json) => Repo(
-        id: _required(json, 'id'),
-        owner: _required(json, 'owner'),
-        name: _required(json, 'name'),
-        url: _https(json, 'url'),
-        descriptionOriginal: _str(json['descriptionOriginal']),
-        descriptionTr: _strOrNull(json['descriptionTr']),
-        language: _strOrNull(json['language']),
-        stars: _int(json['stars']),
-        forks: _int(json['forks']),
-        createdAt: _date(json['createdAt']) ?? DateTime.now(),
-        topics: _strings(json['topics']),
-        isAi: json['isAi'] == true,
-        imageUrl: _httpsOrNull(json['imageUrl']),
-        raw: json,
-      );
+    id: _required(json, 'id'),
+    owner: _required(json, 'owner'),
+    name: _required(json, 'name'),
+    url: _https(json, 'url'),
+    descriptionOriginal: _str(json['descriptionOriginal']),
+    descriptionTr: _strOrNull(json['descriptionTr']),
+    language: _strOrNull(json['language']),
+    stars: _int(json['stars']),
+    forks: _int(json['forks']),
+    createdAt: _date(json['createdAt']) ?? DateTime.now(),
+    topics: _strings(json['topics']),
+    isAi: json['isAi'] == true,
+    imageUrl: _httpsOrNull(json['imageUrl']),
+    story: RepoStory.fromJson(json['story']),
+    raw: json,
+  );
 
   @override
   final String id;
@@ -452,6 +632,9 @@ class Repo implements Entry {
   final bool isAi;
   @override
   final String? imageUrl;
+
+  /// README'ye dayanan kısa tanıtım; henüz yazılmadıysa null.
+  final RepoStory? story;
   @override
   final Map<String, dynamic> raw;
 
@@ -551,14 +734,14 @@ class SourceStatus {
   });
 
   factory SourceStatus.fromJson(Map<String, dynamic> json) => SourceStatus(
-        id: _required(json, 'id'),
-        name: _required(json, 'name'),
-        kind: _str(json['kind']),
-        homepage: _httpsOrNull(json['homepage']),
-        ok: json['ok'] == true,
-        count: _int(json['count']),
-        error: _strOrNull(json['error']),
-      );
+    id: _required(json, 'id'),
+    name: _required(json, 'name'),
+    kind: _str(json['kind']),
+    homepage: _httpsOrNull(json['homepage']),
+    ok: json['ok'] == true,
+    count: _int(json['count']),
+    error: _strOrNull(json['error']),
+  );
 
   final String id;
   final String name;

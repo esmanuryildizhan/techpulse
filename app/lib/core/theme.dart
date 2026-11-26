@@ -3,301 +3,432 @@ import 'package:flutter/material.dart';
 
 /// TechPulse tasarım sistemi.
 ///
-/// Varsayılan tema koyu: çok koyu lacivert zemin, antrasit-lacivert kartlar, elektrik moru marka rengi.
-/// Mor yalnızca vurgularda (aktif sekme, seçili kategori, ana düğme, küçük ikonlar) kullanılır.
-/// Açık tema aynı hiyerarşiyi korur.
+/// Kimlik: "kâğıt ve mürekkep". Açık temada sıcak kâğıt beyazı zemin ve koyu mürekkep metin, koyu temada
+/// lacivert değil sıcak kömür grisi. Tek bir vurgu rengi vardır ve kullanıcı Profil → Görünüm'den
+/// değiştirebilir. Başlıklar ve haber metni serif (Source Serif 4), arayüz yazıları Inter'dir.
+
+/// Kullanıcının seçebildiği vurgu renkleri.
+enum AccentColor {
+  orange('Turuncu', Color(0xFFCF4520), Color(0xFFFF8A66)),
+  blue('Mavi', Color(0xFF2B66D1), Color(0xFF79A6FF)),
+  green('Yeşil', Color(0xFF1B8556), Color(0xFF55C58C)),
+  purple('Mor', Color(0xFF7246D2), Color(0xFFAE93FF)),
+  pink('Pembe', Color(0xFFCC3368), Color(0xFFFF7FA9)),
+  graphite('Grafit', Color(0xFF3A414D), Color(0xFFC7CDD8));
+
+  const AccentColor(this.label, this.light, this.dark);
+
+  final String label;
+  final Color light;
+  final Color dark;
+
+  Color tone(Brightness brightness) => brightness == Brightness.dark ? dark : light;
+
+  static AccentColor fromName(String? name) => values.where((c) => c.name == name).firstOrNull ?? AccentColor.orange;
+}
+
 @immutable
 class TpColors extends ThemeExtension<TpColors> {
   const TpColors({
-    required this.background,
-    required this.card,
-    required this.cardHigh,
+    required this.bg,
+    required this.surface,
+    required this.surfaceAlt,
     required this.border,
-    required this.textPrimary,
+    required this.text,
     required this.textSecondary,
-    required this.textMuted,
-    required this.primary,
-    required this.primarySoft,
-    required this.secondary,
+    required this.textTertiary,
+    required this.accent,
+    required this.onAccent,
+    required this.accentSoft,
+    required this.brand,
     required this.success,
     required this.warning,
     required this.danger,
     required this.skeleton,
   });
 
-  final Color background;
-  final Color card;
-  final Color cardHigh;
-  final Color border;
-  final Color textPrimary;
-  final Color textSecondary;
-  final Color textMuted;
-  final Color primary;
+  factory TpColors.of(Brightness brightness, AccentColor accentColor) {
+    final accent = accentColor.tone(brightness);
+    // Düğme yazısı: beyaz yeterince okunuyorsa (WCAG 4.5:1) beyaz, değilse hangisi daha okunursa o.
+    const ink = Color(0xFF16150F);
+    final onAccent = _contrast(Colors.white, accent) >= 4.5 || _contrast(Colors.white, accent) >= _contrast(ink, accent)
+        ? Colors.white
+        : ink;
+    if (brightness == Brightness.dark) {
+      return TpColors(
+        bg: const Color(0xFF141311),
+        surface: const Color(0xFF1C1B18),
+        surfaceAlt: const Color(0xFF262420),
+        border: const Color(0xFF302D28),
+        text: const Color(0xFFEEEBE4),
+        textSecondary: const Color(0xFFB0ABA1),
+        textTertiary: const Color(0xFF807B72),
+        accent: accent,
+        onAccent: onAccent,
+        accentSoft: accent.withValues(alpha: 0.16),
+        brand: accentColor.light,
+        success: const Color(0xFF5CC48D),
+        warning: const Color(0xFFE5A846),
+        danger: const Color(0xFFFF7468),
+        skeleton: const Color(0xFF26241F),
+      );
+    }
+    return TpColors(
+      bg: const Color(0xFFF6F4EF),
+      surface: Colors.white,
+      surfaceAlt: const Color(0xFFEEEBE4),
+      border: const Color(0xFFE3DFD6),
+      text: const Color(0xFF1B1A16),
+      textSecondary: const Color(0xFF5D5A52),
+      textTertiary: const Color(0xFF8B877D),
+      accent: accent,
+      onAccent: onAccent,
+      accentSoft: accent.withValues(alpha: 0.10),
+      brand: accentColor.light,
+      success: const Color(0xFF237A4B),
+      warning: const Color(0xFFB0670A),
+      danger: const Color(0xFFC2352B),
+      skeleton: const Color(0xFFE9E6DF),
+    );
+  }
 
-  /// Mor vurgunun saydam zemini (seçili çip, bilgi kutusu).
-  final Color primarySoft;
-  final Color secondary;
+  /// Sayfa zemini.
+  final Color bg;
+
+  /// Kartlar ve alt çubuk.
+  final Color surface;
+
+  /// Arama kutusu, çipler, kutucuklar.
+  final Color surfaceAlt;
+  final Color border;
+  final Color text;
+  final Color textSecondary;
+  final Color textTertiary;
+  final Color accent;
+  final Color onAccent;
+  final Color accentSoft;
+
+  /// Logonun zemini: iki temada da aynı (uygulama simgesiyle birebir), beyaz balonla okunur.
+  final Color brand;
   final Color success;
   final Color warning;
   final Color danger;
   final Color skeleton;
 
-  static const dark = TpColors(
-    background: Color(0xFF0B0D17),
-    card: Color(0xFF151827),
-    cardHigh: Color(0xFF1D2233),
-    border: Color(0xFF262B3D),
-    textPrimary: Color(0xFFF4F5FA),
-    textSecondary: Color(0xFFA5A9BA),
-    textMuted: Color(0xFF74798D),
-    primary: Color(0xFF7047F5),
-    primarySoft: Color(0x297047F5),
-    secondary: Color(0xFF3988FF),
-    success: Color(0xFF34D399),
-    warning: Color(0xFFFB923C),
-    danger: Color(0xFFFF6B86),
-    skeleton: Color(0xFF1D2233),
-  );
-
-  static const light = TpColors(
-    background: Color(0xFFF4F5FA),
-    card: Color(0xFFFFFFFF),
-    cardHigh: Color(0xFFEDEFF6),
-    border: Color(0xFFE1E4EE),
-    textPrimary: Color(0xFF12142A),
-    textSecondary: Color(0xFF4D5268),
-    textMuted: Color(0xFF7C8197),
-    primary: Color(0xFF6A3FF0),
-    primarySoft: Color(0x1F6A3FF0),
-    secondary: Color(0xFF2F7BF5),
-    success: Color(0xFF15803D),
-    warning: Color(0xFFC2410C),
-    danger: Color(0xFFD12A4D),
-    skeleton: Color(0xFFE6E9F2),
-  );
-
   @override
   TpColors copyWith() => this;
 
   @override
-  TpColors lerp(ThemeExtension<TpColors>? other, double t) {
-    if (other is! TpColors) return this;
-    Color l(Color a, Color b) => Color.lerp(a, b, t)!;
+  TpColors lerp(covariant TpColors? other, double t) {
+    if (other == null) return this;
+    Color c(Color a, Color b) => Color.lerp(a, b, t)!;
     return TpColors(
-      background: l(background, other.background),
-      card: l(card, other.card),
-      cardHigh: l(cardHigh, other.cardHigh),
-      border: l(border, other.border),
-      textPrimary: l(textPrimary, other.textPrimary),
-      textSecondary: l(textSecondary, other.textSecondary),
-      textMuted: l(textMuted, other.textMuted),
-      primary: l(primary, other.primary),
-      primarySoft: l(primarySoft, other.primarySoft),
-      secondary: l(secondary, other.secondary),
-      success: l(success, other.success),
-      warning: l(warning, other.warning),
-      danger: l(danger, other.danger),
-      skeleton: l(skeleton, other.skeleton),
+      bg: c(bg, other.bg),
+      surface: c(surface, other.surface),
+      surfaceAlt: c(surfaceAlt, other.surfaceAlt),
+      border: c(border, other.border),
+      text: c(text, other.text),
+      textSecondary: c(textSecondary, other.textSecondary),
+      textTertiary: c(textTertiary, other.textTertiary),
+      accent: c(accent, other.accent),
+      onAccent: c(onAccent, other.onAccent),
+      accentSoft: c(accentSoft, other.accentSoft),
+      brand: c(brand, other.brand),
+      success: c(success, other.success),
+      warning: c(warning, other.warning),
+      danger: c(danger, other.danger),
+      skeleton: c(skeleton, other.skeleton),
     );
   }
 }
 
-extension TpThemeX on BuildContext {
-  TpColors get tp => Theme.of(this).extension<TpColors>() ?? TpColors.dark;
+double _contrast(Color a, Color b) {
+  final la = a.computeLuminance();
+  final lb = b.computeLuminance();
+  return (la > lb ? la + 0.05 : lb + 0.05) / (la > lb ? lb + 0.05 : la + 0.05);
+}
+
+extension ThemeX on BuildContext {
+  TpColors get tp => Theme.of(this).extension<TpColors>()!;
   TextTheme get text => Theme.of(this).textTheme;
   Brightness get brightness => Theme.of(this).brightness;
 }
 
-/// Ölçüler: 4'ün katları; kart köşeleri 16.
+/// Ölçüler ve yazı stilleri.
 abstract final class Tp {
-  static const double radius = 16;
-  static const double radiusSmall = 12;
+  static const double radius = 14;
+  static const double radiusSmall = 10;
+
+  /// Sayfa kenar boşluğu.
   static const double page = 20;
+
+  /// Bölümler arası dikey boşluk.
+  static const double section = 32;
+
+  static const String sans = 'Inter';
+  static const String serif = 'SourceSerif4';
   static const String monoFont = 'JetBrainsMono';
+
+  /// Haber metni (serif). [scale]: kullanıcının yazı boyutu tercihi.
+  static TextStyle article(BuildContext context, double scale) =>
+      TextStyle(fontFamily: serif, fontSize: 17.5 * scale, height: 1.62, color: context.tp.text, letterSpacing: 0.05);
+
+  /// Haber başlıkları (serif).
+  static TextStyle headline(
+    BuildContext context, {
+    double size = 19,
+    FontWeight weight = FontWeight.w600,
+    double height = 1.28,
+  }) => TextStyle(
+    fontFamily: serif,
+    fontSize: size,
+    fontWeight: weight,
+    height: height,
+    color: context.tp.text,
+    letterSpacing: -0.1,
+  );
 }
 
 abstract final class AppTheme {
-  static ThemeData dark() => _build(Brightness.dark, TpColors.dark);
-  static ThemeData light() => _build(Brightness.light, TpColors.light);
+  static ThemeData light(AccentColor accent) => _build(Brightness.light, accent);
+  static ThemeData dark(AccentColor accent) => _build(Brightness.dark, accent);
 
-  static ThemeData _build(Brightness brightness, TpColors c) {
-    final scheme = ColorScheme(
+  static ThemeData _build(Brightness brightness, AccentColor accentColor) {
+    final tp = TpColors.of(brightness, accentColor);
+    final scheme = ColorScheme.fromSeed(seedColor: tp.accent, brightness: brightness).copyWith(
+      primary: tp.accent,
+      onPrimary: tp.onAccent,
+      secondary: tp.accent,
+      onSecondary: tp.onAccent,
+      error: tp.danger,
+      surface: tp.surface,
+      onSurface: tp.text,
+      onSurfaceVariant: tp.textSecondary,
+      surfaceContainerHighest: tp.surfaceAlt,
+      surfaceContainerHigh: tp.surfaceAlt,
+      surfaceContainer: tp.surface,
+      surfaceContainerLow: tp.surface,
+      outline: tp.border,
+      outlineVariant: tp.border,
+    );
+
+    TextStyle sans(double size, FontWeight weight, {double height = 1.4, Color? color, double spacing = 0}) =>
+        TextStyle(
+          fontFamily: Tp.sans,
+          fontSize: size,
+          fontWeight: weight,
+          height: height,
+          color: color ?? tp.text,
+          letterSpacing: spacing,
+        );
+    TextStyle serif(double size, FontWeight weight, {double height = 1.25}) => TextStyle(
+      fontFamily: Tp.serif,
+      fontSize: size,
+      fontWeight: weight,
+      height: height,
+      color: tp.text,
+      letterSpacing: -0.2,
+    );
+
+    final textTheme = TextTheme(
+      displaySmall: serif(30, FontWeight.w700, height: 1.15),
+      headlineMedium: serif(27, FontWeight.w700, height: 1.18),
+      headlineSmall: serif(23, FontWeight.w700, height: 1.22),
+      titleLarge: serif(20, FontWeight.w600),
+      titleMedium: serif(17, FontWeight.w600, height: 1.3),
+      titleSmall: sans(15, FontWeight.w600, height: 1.35),
+      bodyLarge: sans(16, FontWeight.w400, height: 1.5),
+      bodyMedium: sans(14.5, FontWeight.w400, height: 1.5, color: tp.textSecondary),
+      bodySmall: sans(13, FontWeight.w400, height: 1.45, color: tp.textSecondary),
+      labelLarge: sans(14.5, FontWeight.w600, height: 1.2),
+      labelMedium: sans(12.5, FontWeight.w600, height: 1.2, color: tp.textSecondary),
+      labelSmall: sans(11.5, FontWeight.w500, height: 1.2, color: tp.textTertiary, spacing: 0.1),
+    );
+
+    final rounded = RoundedRectangleBorder(borderRadius: BorderRadius.circular(Tp.radiusSmall));
+    return ThemeData(
+      useMaterial3: true,
       brightness: brightness,
-      primary: c.primary,
-      onPrimary: Colors.white,
-      primaryContainer: c.primarySoft,
-      onPrimaryContainer: c.textPrimary,
-      secondary: c.secondary,
-      onSecondary: Colors.white,
-      secondaryContainer: c.cardHigh,
-      onSecondaryContainer: c.textPrimary,
-      tertiary: c.secondary,
-      onTertiary: Colors.white,
-      error: c.danger,
-      onError: Colors.white,
-      surface: c.background,
-      onSurface: c.textPrimary,
-      onSurfaceVariant: c.textSecondary,
-      surfaceContainerLowest: c.background,
-      surfaceContainerLow: c.card,
-      surfaceContainer: c.card,
-      surfaceContainerHigh: c.cardHigh,
-      surfaceContainerHighest: c.cardHigh,
-      outline: c.border,
-      outlineVariant: c.border,
-      inverseSurface: c.textPrimary,
-      onInverseSurface: c.background,
-      shadow: Colors.black,
-      scrim: Colors.black,
-    );
-
-    final base = ThemeData(colorScheme: scheme, fontFamily: 'Inter', useMaterial3: true, brightness: brightness);
-    final t = base.textTheme;
-    TextStyle? s(TextStyle? style, double size, FontWeight weight, {double? height, double spacing = 0, Color? color}) =>
-        style?.copyWith(fontSize: size, fontWeight: weight, height: height, letterSpacing: spacing, color: color ?? c.textPrimary);
-
-    final textTheme = t.copyWith(
-      headlineMedium: s(t.headlineMedium, 26, FontWeight.w700, height: 1.2, spacing: -0.6),
-      headlineSmall: s(t.headlineSmall, 22, FontWeight.w700, height: 1.25, spacing: -0.4),
-      titleLarge: s(t.titleLarge, 19, FontWeight.w700, height: 1.3, spacing: -0.3),
-      titleMedium: s(t.titleMedium, 16, FontWeight.w600, height: 1.35, spacing: -0.1),
-      titleSmall: s(t.titleSmall, 14, FontWeight.w600, height: 1.35),
-      bodyLarge: s(t.bodyLarge, 16, FontWeight.w400, height: 1.65, color: c.textPrimary),
-      bodyMedium: s(t.bodyMedium, 14, FontWeight.w400, height: 1.5, color: c.textSecondary),
-      bodySmall: s(t.bodySmall, 12.5, FontWeight.w400, height: 1.4, color: c.textMuted),
-      labelLarge: s(t.labelLarge, 14, FontWeight.w600, color: c.textPrimary),
-      labelMedium: s(t.labelMedium, 12.5, FontWeight.w600, color: c.textSecondary),
-      labelSmall: s(t.labelSmall, 11, FontWeight.w600, spacing: 0.6, color: c.textMuted),
-    );
-
-    return base.copyWith(
-      scaffoldBackgroundColor: c.background,
-      canvasColor: c.background,
+      colorScheme: scheme,
+      fontFamily: Tp.sans,
       textTheme: textTheme,
-      extensions: [c],
-      splashFactory: InkSparkle.splashFactory,
+      scaffoldBackgroundColor: tp.bg,
+      canvasColor: tp.bg,
+      extensions: [tp],
+      splashFactory: InkRipple.splashFactory,
+      dividerTheme: DividerThemeData(color: tp.border, thickness: 1, space: 1),
       appBarTheme: AppBarTheme(
-        backgroundColor: c.background,
-        surfaceTintColor: Colors.transparent,
-        foregroundColor: c.textPrimary,
+        backgroundColor: tp.bg,
+        foregroundColor: tp.text,
         elevation: 0,
         scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         centerTitle: false,
-        titleTextStyle: textTheme.titleLarge,
+        titleTextStyle: sans(17, FontWeight.w600),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        height: 68,
-        elevation: 0,
-        backgroundColor: c.card,
+        backgroundColor: tp.surface,
         surfaceTintColor: Colors.transparent,
-        indicatorColor: c.primarySoft,
+        elevation: 0,
+        height: 66,
+        indicatorColor: tp.accentSoft,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         iconTheme: WidgetStateProperty.resolveWith(
-          (states) => IconThemeData(color: states.contains(WidgetState.selected) ? c.primary : c.textMuted, size: 24),
+          (states) =>
+              IconThemeData(size: 23, color: states.contains(WidgetState.selected) ? tp.accent : tp.textTertiary),
         ),
         labelTextStyle: WidgetStateProperty.resolveWith(
-          (states) => TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 12,
-            fontWeight: states.contains(WidgetState.selected) ? FontWeight.w700 : FontWeight.w500,
-            color: states.contains(WidgetState.selected) ? c.primary : c.textMuted,
+          (states) => sans(
+            11.5,
+            states.contains(WidgetState.selected) ? FontWeight.w600 : FontWeight.w500,
+            color: states.contains(WidgetState.selected) ? tp.text : tp.textTertiary,
           ),
         ),
       ),
       cardTheme: CardThemeData(
-        color: c.card,
-        surfaceTintColor: Colors.transparent,
+        color: tp.surface,
         elevation: 0,
         margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Tp.radius), side: BorderSide(color: c.border)),
-      ),
-      chipTheme: ChipThemeData(
-        backgroundColor: c.card,
-        selectedColor: c.primary,
-        disabledColor: c.card,
-        side: BorderSide(color: c.border),
-        shape: const StadiumBorder(),
-        showCheckmark: false,
-        labelStyle: TextStyle(fontFamily: 'Inter', fontSize: 13.5, fontWeight: FontWeight.w600, color: c.textSecondary),
-        secondaryLabelStyle: const TextStyle(fontFamily: 'Inter', fontSize: 13.5, fontWeight: FontWeight.w600, color: Colors.white),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Tp.radius),
+          side: BorderSide(color: tp.border),
+        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: c.card,
-        hintStyle: TextStyle(fontFamily: 'Inter', color: c.textMuted, fontSize: 15),
+        fillColor: tp.surfaceAlt,
+        hintStyle: sans(15, FontWeight.w400, color: tp.textTertiary),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(Tp.radiusSmall), borderSide: BorderSide(color: c.border)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(Tp.radiusSmall), borderSide: BorderSide(color: c.border)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(Tp.radiusSmall), borderSide: BorderSide(color: c.primary, width: 1.5)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(Tp.radiusSmall), borderSide: BorderSide.none),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(Tp.radiusSmall),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(Tp.radiusSmall),
+          borderSide: BorderSide(color: tp.accent, width: 1.4),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: tp.surfaceAlt,
+        selectedColor: tp.accent,
+        disabledColor: tp.surfaceAlt,
+        side: BorderSide.none,
+        shape: StadiumBorder(side: BorderSide(color: tp.border.withValues(alpha: 0))),
+        labelStyle: sans(13.5, FontWeight.w500, color: tp.text),
+        secondaryLabelStyle: sans(13.5, FontWeight.w600, color: tp.onAccent),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        showCheckmark: false,
+        checkmarkColor: tp.onAccent,
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: c.primary,
-          foregroundColor: Colors.white,
-          minimumSize: const Size(48, 50),
-          textStyle: const TextStyle(fontFamily: 'Inter', fontSize: 15, fontWeight: FontWeight.w600),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Tp.radiusSmall)),
+          backgroundColor: tp.accent,
+          foregroundColor: tp.onAccent,
+          minimumSize: const Size(48, 48),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          shape: rounded,
+          textStyle: sans(15, FontWeight.w600),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: c.textPrimary,
+          foregroundColor: tp.text,
           minimumSize: const Size(48, 48),
-          side: BorderSide(color: c.border),
-          textStyle: const TextStyle(fontFamily: 'Inter', fontSize: 14.5, fontWeight: FontWeight.w600),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Tp.radiusSmall)),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          side: BorderSide(color: tp.border),
+          shape: rounded,
+          textStyle: sans(15, FontWeight.w600),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: c.primary,
-          textStyle: const TextStyle(fontFamily: 'Inter', fontSize: 14, fontWeight: FontWeight.w600),
-        ),
+        style: TextButton.styleFrom(foregroundColor: tp.accent, textStyle: sans(14, FontWeight.w600), shape: rounded),
       ),
+      iconButtonTheme: IconButtonThemeData(style: IconButton.styleFrom(foregroundColor: tp.text)),
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
-          side: WidgetStatePropertyAll(BorderSide(color: c.border)),
-          backgroundColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? c.primarySoft : c.card),
-          foregroundColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? c.textPrimary : c.textSecondary),
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (s) => s.contains(WidgetState.selected) ? tp.surface : tp.surfaceAlt,
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (s) => s.contains(WidgetState.selected) ? tp.text : tp.textSecondary,
+          ),
+          side: WidgetStatePropertyAll(BorderSide(color: tp.border)),
+          textStyle: WidgetStatePropertyAll(sans(13.5, FontWeight.w600)),
+          visualDensity: VisualDensity.compact,
         ),
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? Colors.white : c.textMuted),
-        trackColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? c.primary : c.cardHigh),
-        trackOutlineColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? c.primary : c.border),
+        thumbColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? tp.onAccent : tp.textTertiary,
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? tp.accent : tp.surfaceAlt,
+        ),
+        trackOutlineColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? tp.accent : tp.border,
+        ),
       ),
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? tp.accent : tp.textTertiary,
+        ),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? tp.accent : Colors.transparent,
+        ),
+        checkColor: WidgetStatePropertyAll(tp.onAccent),
+        side: BorderSide(color: tp.textTertiary, width: 1.5),
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(color: tp.accent, linearTrackColor: Colors.transparent),
       listTileTheme: ListTileThemeData(
-        iconColor: c.textSecondary,
-        textColor: c.textPrimary,
-        titleTextStyle: textTheme.titleSmall,
-        subtitleTextStyle: textTheme.bodySmall,
+        iconColor: tp.textSecondary,
+        textColor: tp.text,
+        titleTextStyle: sans(15.5, FontWeight.w500),
+        subtitleTextStyle: sans(13, FontWeight.w400, color: tp.textSecondary),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-      ),
-      tabBarTheme: TabBarThemeData(
-        labelColor: c.textPrimary,
-        unselectedLabelColor: c.textMuted,
-        indicatorColor: c.primary,
-        dividerColor: c.border,
-        labelStyle: const TextStyle(fontFamily: 'Inter', fontSize: 14, fontWeight: FontWeight.w700),
-        unselectedLabelStyle: const TextStyle(fontFamily: 'Inter', fontSize: 14, fontWeight: FontWeight.w500),
-        indicatorSize: TabBarIndicatorSize.label,
+        minVerticalPadding: 12,
       ),
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: c.card,
+        backgroundColor: tp.surface,
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
-        dragHandleColor: c.border,
+        dragHandleColor: tp.border,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
       ),
-      dialogTheme: DialogThemeData(backgroundColor: c.card, surfaceTintColor: Colors.transparent),
-      dividerTheme: DividerThemeData(color: c.border, space: 1, thickness: 1),
-      progressIndicatorTheme: ProgressIndicatorThemeData(color: c.primary),
+      dialogTheme: DialogThemeData(
+        backgroundColor: tp.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        titleTextStyle: sans(18, FontWeight.w700),
+        contentTextStyle: sans(15, FontWeight.w400, color: tp.textSecondary, height: 1.5),
+      ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: c.cardHigh,
-        contentTextStyle: TextStyle(fontFamily: 'Inter', color: c.textPrimary, fontSize: 14),
-        actionTextColor: c.primary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Tp.radiusSmall)),
+        backgroundColor: brightness == Brightness.dark ? const Color(0xFFEEEBE4) : const Color(0xFF23211D),
+        contentTextStyle: sans(
+          14,
+          FontWeight.w500,
+          color: brightness == Brightness.dark ? const Color(0xFF1B1A16) : Colors.white,
+        ),
+        actionTextColor: brightness == Brightness.dark ? accentColor.light : accentColor.dark,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      tooltipTheme: TooltipThemeData(
+        decoration: BoxDecoration(color: tp.text, borderRadius: BorderRadius.circular(8)),
+        textStyle: sans(12.5, FontWeight.w500, color: tp.bg),
+      ),
+      tabBarTheme: TabBarThemeData(
+        labelColor: tp.text,
+        unselectedLabelColor: tp.textTertiary,
+        labelStyle: sans(14.5, FontWeight.w600),
+        unselectedLabelStyle: sans(14.5, FontWeight.w500),
+        indicatorColor: tp.accent,
+        indicatorSize: TabBarIndicatorSize.label,
+        dividerColor: tp.border,
+        overlayColor: WidgetStatePropertyAll(tp.accentSoft),
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {

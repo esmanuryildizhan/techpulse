@@ -9,8 +9,9 @@ Future<LocalStore> openPlatformStore() => SqfliteStore.open();
 
 /// SQLite tabanlı depo.
 ///
-/// * `bookmarks`, `favorites`, `history` tabloları: kaydedilenler, favoriler ve okuma geçmişi
-///   (içeriğin tam JSON'u saklanır; internet yokken ve haber yayından kalktığında da açılabilir).
+/// * `bookmarks` ve `history` tabloları: kaydedilenler ve okuma geçmişi (içeriğin tam JSON'u saklanır;
+///   internet yokken ve haber yayından kalktığında da açılabilir). 2. sürümdeki "favoriler" kaydedilenlerle
+///   aynı işi gördüğü için 3. sürümde kaldırıldı; içindekiler kaydedilenlere taşınır.
 /// * `cache_index` tablosu: önbellekteki her uç noktanın kaydedilme zamanı ve boyutu.
 ///
 /// Uç noktaların gövdeleri (yüzlerce KB olabilir) satır yerine aynı klasördeki dosyalarda
@@ -23,8 +24,8 @@ class SqfliteStore implements LocalStore {
 
   static const _dbName = 'techpulse.db';
 
-  /// 1: kaydedilenler + önbellek. 2: favoriler ve okuma geçmişi eklendi.
-  static const _version = 2;
+  /// 1: kaydedilenler + önbellek. 2: favoriler ve okuma geçmişi eklendi. 3: favoriler kaydedilenlere taşındı.
+  static const _version = 3;
 
   static Future<void> _createList(DatabaseExecutor db, String table) async {
     await db.execute('''
@@ -55,11 +56,24 @@ class SqfliteStore implements LocalStore {
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
-          await _createList(db, UserList.favorites.name);
           await _createList(db, UserList.history.name);
+        }
+        final favorites = await db.rawQuery(
+          "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'favorites'",
+        );
+        if (favorites.isNotEmpty) {
+          // Favoriler kaydedilenlere eklenir (zaten kayıtlı olanlar korunur), sonra tablo silinir.
+          await db.execute(
+            'INSERT OR IGNORE INTO bookmarks (key, kind, payload, saved_at) '
+            'SELECT key, kind, payload, saved_at FROM favorites',
+          );
+          await db.execute('DROP TABLE IF EXISTS favorites');
         }
       },
     );
+    // Uygulama uzun süre açılmadıysa süresi dolan geçmiş kayıtları açılışta da silinir.
+    final cutoff = DateTime.now().subtract(historyRetention).millisecondsSinceEpoch;
+    await db.delete(UserList.history.name, where: 'saved_at < ?', whereArgs: [cutoff]);
     final cacheDir = Directory(p.join(dir, 'feed_cache'));
     if (!cacheDir.existsSync()) await cacheDir.create(recursive: true);
     return SqfliteStore._(db, cacheDir);
@@ -84,11 +98,11 @@ class SqfliteStore implements LocalStore {
     final temp = File('${target.path}.tmp');
     await temp.writeAsString(body, flush: true);
     await temp.rename(target.path);
-    await _db.insert(
-      'cache_index',
-      {'key': key, 'saved_at': DateTime.now().millisecondsSinceEpoch, 'bytes': body.length},
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _db.insert('cache_index', {
+      'key': key,
+      'saved_at': DateTime.now().millisecondsSinceEpoch,
+      'bytes': body.length,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   @override
@@ -122,18 +136,16 @@ class SqfliteStore implements LocalStore {
 
   @override
   Future<void> saveRecord(UserList list, BookmarkRecord record) async {
-    await _db.insert(
-      list.name,
-      {
-        'key': record.key,
-        'kind': record.kind.name,
-        'payload': record.payload,
-        'saved_at': record.savedAt.millisecondsSinceEpoch,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _db.insert(list.name, {
+      'key': record.key,
+      'kind': record.kind.name,
+      'payload': record.payload,
+      'saved_at': record.savedAt.millisecondsSinceEpoch,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
     if (list == UserList.history) {
-      // Geçmiş sınırsız büyümesin: en yeni kayıtlar kalır.
+      // Geçmiş sınırsız büyümesin: son 90 günün en yeni 200 kaydı kalır.
+      final cutoff = record.savedAt.subtract(historyRetention).millisecondsSinceEpoch;
+      await _db.delete('history', where: 'saved_at < ?', whereArgs: [cutoff]);
       await _db.execute(
         'DELETE FROM history WHERE key NOT IN (SELECT key FROM history ORDER BY saved_at DESC LIMIT $historyLimit)',
       );
@@ -148,5 +160,13 @@ class SqfliteStore implements LocalStore {
   @override
   Future<void> clearList(UserList list) async {
     await _db.delete(list.name);
+  }
+
+  @override
+  Future<void> clearAll() async {
+    for (final list in UserList.values) {
+      await _db.delete(list.name);
+    }
+    await clearCache();
   }
 }

@@ -36,6 +36,29 @@ abstract final class Fmt {
 
   static String clock(DateTime time) => _time.format(time.toLocal());
 
+  static final DateFormat _today = DateFormat('d MMMM EEEE', 'tr');
+
+  /// "26 Kasım Perşembe"
+  static String today(DateTime time) => _today.format(time.toLocal());
+
+  /// Günün saatine uygun selam.
+  static String greeting(DateTime time) {
+    final hour = time.toLocal().hour;
+    if (hour >= 5 && hour < 11) return 'Günaydın';
+    if (hour >= 11 && hour < 17) return 'İyi günler';
+    if (hour >= 17 && hour < 22) return 'İyi akşamlar';
+    return 'İyi geceler';
+  }
+
+  /// Bağlantıyı kullanıcıya gösterilecek kısa biçime çevirir: "techcrunch.com/2026/11/…".
+  static String prettyUrl(String url, {int max = 64}) {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return url;
+    final host = uri.host.startsWith('www.') ? uri.host.substring(4) : uri.host;
+    final text = '$host${uri.path == '/' ? '' : uri.path}';
+    return text.length <= max ? text : '${text.substring(0, max - 1)}…';
+  }
+
   /// 1234 → "1,2 B", 1234567 → "1,2 Mn".
   static String compact(int value) => _compact.format(value);
 
