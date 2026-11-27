@@ -2,7 +2,8 @@ name: Veri hattı
 
 # Saatte bir kaynakları toplar ve sonucu GitHub Pages'te statik JSON olarak yayımlar; uygulama bu dosyaları okur.
 # Türkçe metinler:
-#  - ANTHROPIC_API_KEY sırrı tanımlıysa yapay zekâ editörü (Claude Haiku 5.5) her kaydın kaynağını okuyup
+#  - GEMINI_API_KEY sırrı tanımlıysa yapay zekâ editörü Google Gemini (ücretsiz katman), yoksa ANTHROPIC_API_KEY
+#    tanımlıysa Claude Haiku 5.5 olur; editör her kaydın kaynağını okuyup
 #    özgün Türkçe başlık, spot ve ayrıntılı anlatım yazar.
 #  - Tanımlı değilse açık kaynaklı OPUS-MT modeli (Helsinki Üniversitesi) başlık ve kısa açıklamayı çevirir.
 
@@ -40,7 +41,7 @@ jobs:
     permissions:
       contents: write # ci-data dalına veri anlık görüntüsü göndermek için
     env:
-      HAS_AI_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+      HAS_AI_KEY: ${{ secrets.GEMINI_API_KEY != '' || secrets.ANTHROPIC_API_KEY != '' }}
     defaults:
       run:
         working-directory: pipeline
@@ -81,6 +82,7 @@ jobs:
       - name: Veriyi topla ve Türkçe metinleri yaz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           # Kod değişikliğiyle (push) başlayan çalışmalar deneme niteliğindedir: az sayıda kayıt yazılır, yayımlanmaz.
           AI_MAX_ITEMS: ${{ github.event_name == 'push' && '6' || inputs.ai_max }}

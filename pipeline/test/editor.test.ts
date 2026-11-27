@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
 import { extractArticle } from '../src/article.ts';
-import { anthropicClient, LlmFatalError, type LlmClient, type LlmRequest } from '../src/llm.ts';
+import { anthropicClient, geminiClient, geminiSchema, LlmFatalError, type LlmClient, type LlmRequest } from '../src/llm.ts';
 import { runPipeline, type Fetchers } from '../src/pipeline.ts';
 import { FEEDS } from '../src/sources/feeds.ts';
 import { cleanReadme, parseRepos } from '../src/sources/github.ts';
@@ -429,5 +429,81 @@ describe('Claude API istemcisi', () => {
     const { impl } = fakeFetch([{ status: 401, body: { error: { message: 'invalid x-api-key' } } }]);
     const client = anthropicClient({ apiKey: 'bad', fetchImpl: impl });
     await assert.rejects(client.complete(request), LlmFatalError);
+  });
+
+  describe('Gemini', () => {
+    const ok = (text = '{"description":"Açıklama"}', finishReason = 'STOP') => ({
+      candidates: [{ content: { parts: [{ text }] }, finishReason }],
+      usageMetadata: { promptTokenCount: 40, candidatesTokenCount: 12, thoughtsTokenCount: 3 },
+    });
+    const quota = (quotaId: string, retryDelay?: string) => ({
+      error: {
+        code: 429,
+        status: 'RESOURCE_EXHAUSTED',
+        message: 'Quota exceeded',
+        details: [
+          { '@type': 'type.googleapis.com/google.rpc.QuotaFailure', violations: [{ quotaId }] },
+          ...(retryDelay ? [{ '@type': 'type.googleapis.com/google.rpc.RetryInfo', retryDelay }] : []),
+        ],
+      },
+    });
+    const noSleep = async () => {};
+
+    it('JSON şemasıyla ister, yanıtı ve kullanımı çözer', async () => {
+      const { impl, calls } = fakeFetch([{ status: 200, body: ok() }]);
+      const client = geminiClient({ apiKey: 'g-key', fetchImpl: impl, minIntervalMs: 0, sleepImpl: noSleep });
+      const res = await client.complete<{ description: string }>(request);
+      assert.equal(res.data.description, 'Açıklama');
+      assert.deepEqual(res.usage, { inputTokens: 40, outputTokens: 15 });
+      assert.equal(calls[0].url, 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent');
+      assert.equal((calls[0].init.headers as Record<string, string>)['x-goog-api-key'], 'g-key');
+      const body = JSON.parse(String(calls[0].init.body));
+      assert.equal(body.systemInstruction.parts[0].text, 'Talimat');
+      assert.equal(body.generationConfig.responseMimeType, 'application/json');
+      assert.equal(JSON.stringify(body.generationConfig.responseJsonSchema).includes('additionalProperties'), false);
+      assert.equal(client.model, 'gemini-3.5-flash-lite');
+    });
+
+    it('dakika sınırında bekler, kesilen yanıtta sınırı büyütür', async () => {
+      const waits: number[] = [];
+      const { impl, calls } = fakeFetch([
+        { status: 429, body: quota('GenerateRequestsPerMinutePerProjectPerModel-FreeTier', '7s') },
+        { status: 200, body: ok('{"desc', 'MAX_TOKENS') },
+        { status: 200, body: ok() },
+      ]);
+      const client = geminiClient({ apiKey: 'k', fetchImpl: impl, minIntervalMs: 0, sleepImpl: async (ms) => void waits.push(ms) });
+      const res = await client.complete<{ description: string }>({ ...request, maxTokens: 9000 });
+      assert.equal(res.data.description, 'Açıklama');
+      assert.equal(calls.length, 3);
+      assert.ok(waits.includes(8000));
+      assert.equal(JSON.parse(String(calls[2].init.body)).generationConfig.maxOutputTokens, 18000);
+    });
+
+    it('günlük kota dolunca sıradaki modele geçer, hepsi dolunca durur', async () => {
+      const { impl, calls } = fakeFetch([
+        { status: 429, body: quota('GenerateRequestsPerDayPerProjectPerModel-FreeTier') },
+        { status: 200, body: ok() },
+        { status: 429, body: quota('GenerateRequestsPerDayPerProjectPerModel-FreeTier') },
+      ]);
+      const client = geminiClient({ apiKey: 'k', fetchImpl: impl, minIntervalMs: 0, sleepImpl: noSleep });
+      await client.complete(request);
+      assert.match(calls[1].url, /gemini-3\.1-flash-lite/);
+      assert.equal(client.model, 'gemini-3.1-flash-lite');
+      await assert.rejects(client.complete(request), LlmFatalError);
+    });
+
+    it('çalışma başına istek sınırını aşmaz', async () => {
+      const { impl } = fakeFetch([{ status: 200, body: ok() }, { status: 200, body: ok() }]);
+      const client = geminiClient({ apiKey: 'k', fetchImpl: impl, minIntervalMs: 0, sleepImpl: noSleep, maxRequests: 1 });
+      await client.complete(request);
+      await assert.rejects(client.complete(request), LlmFatalError);
+    });
+
+    it('şemadan desteklenmeyen anahtarları çıkarır', () => {
+      assert.deepEqual(geminiSchema({ type: 'object', additionalProperties: false, properties: { a: { type: 'array', items: { type: 'object', additionalProperties: false } } } }), {
+        type: 'object',
+        properties: { a: { type: 'array', items: { type: 'object' } } },
+      });
+    });
   });
 });

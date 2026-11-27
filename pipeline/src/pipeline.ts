@@ -235,7 +235,7 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRes
       pending: editor?.pending ?? 0,
       inputTokens: editor?.inputTokens ?? 0,
       outputTokens: editor?.outputTokens ?? 0,
-      note: editor ? editor.note : 'Yapay zekâ editörü kapalı (ANTHROPIC_API_KEY tanımlı değil)',
+      note: editor ? editor.note : 'Yapay zekâ editörü kapalı (GEMINI_API_KEY veya ANTHROPIC_API_KEY tanımlı değil)',
     },
     counts: {
       news: output.news.length,

@@ -1,4 +1,4 @@
-import { anthropicClient } from './llm.ts';
+import { anthropicClient, geminiClient, type LlmClient } from './llm.ts';
 import { pythonTranslator } from './mt.ts';
 import { runPipeline } from './pipeline.ts';
 import { log } from './util.ts';
@@ -12,15 +12,34 @@ import { log } from './util.ts';
  *   MAX_TRANSLATION_TEXTS Bir çalışmada çevrilecek en fazla metin (varsayılan: 600)
  *   MT_DISABLED=1         Çeviriyi kapatır (ör. Python kurulu olmayan bir bilgisayarda deneme)
  *   MT_PYTHON, MT_MODEL   Python yorumlayıcısı ve çeviri modeli
- *   ANTHROPIC_API_KEY     Varsa Türkçe metinleri yapay zekâ editörü (Claude) yazar; yoksa OPUS-MT çevirir
- *   AI_MODEL              Editör modeli (varsayılan: claude-haiku-5-5)
+ *   GEMINI_API_KEY        Varsa Türkçe metinleri Google Gemini yazar (Google AI Studio ücretsiz katmanı)
+ *   GEMINI_MODELS         Sırayla kullanılacak Gemini modelleri, virgülle (varsayılan: gemini-3.5-flash-lite,gemini-3.1-flash-lite)
+ *   AI_MAX_REQUESTS       Bir çalışmada Gemini'ye gönderilecek en fazla istek (varsayılan: 150)
+ *   ANTHROPIC_API_KEY     Gemini anahtarı yoksa Türkçe metinleri Claude yazar; ikisi de yoksa OPUS-MT çevirir
+ *   AI_PROVIDER           İkisi de tanımlıysa hangisi kullanılsın: gemini (varsayılan) veya anthropic
+ *   AI_MODEL              Claude modeli (varsayılan: claude-haiku-5-5)
  *   AI_MAX_ITEMS          Bir çalışmada yazılacak en fazla kayıt (varsayılan: 150)
  *   AI_CONCURRENCY        Aynı anda yapılan istek sayısı (varsayılan: 4)
  */
+/** Editörün dil modeli: Gemini anahtarı varsa Gemini (ücretsiz katman), yoksa Claude, ikisi de yoksa editör kapalı. */
+function editorClient(): LlmClient | null {
+  const gemini = process.env.GEMINI_API_KEY?.trim();
+  const anthropic = process.env.ANTHROPIC_API_KEY?.trim();
+  const preferAnthropic = process.env.AI_PROVIDER === 'anthropic';
+  if (gemini && !(preferAnthropic && anthropic)) {
+    const models = (process.env.GEMINI_MODELS ?? '').split(',').map((m) => m.trim()).filter(Boolean);
+    return geminiClient({
+      apiKey: gemini,
+      models: models.length > 0 ? models : undefined,
+      maxRequests: Number.parseInt(process.env.AI_MAX_REQUESTS || '150', 10),
+    });
+  }
+  return anthropic ? anthropicClient({ apiKey: anthropic, model: process.env.AI_MODEL || undefined }) : null;
+}
+
 async function main(): Promise<void> {
   const started = Date.now();
-  const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
-  const llm = apiKey ? anthropicClient({ apiKey, model: process.env.AI_MODEL || undefined }) : null;
+  const llm = editorClient();
   const useMt = !llm && process.env.MT_DISABLED !== '1';
   const { meta } = await runPipeline({
     outDir: process.env.OUT_DIR ?? 'dist',
