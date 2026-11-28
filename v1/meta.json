@@ -1,0 +1,429 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-28T16:58:04.357Z",
+  "translator": {
+    "model": null,
+    "requests": 0,
+    "translatedItems": 0,
+    "pendingItems": 0,
+    "note": null
+  },
+  "editor": {
+    "model": "gemini-3.5-flash-lite",
+    "written": 37,
+    "failed": 0,
+    "pending": 0,
+    "inputTokens": 375298,
+    "outputTokens": 226391,
+    "note": null
+  },
+  "counts": {
+    "news": 376,
+    "models": 40,
+    "papers": 140,
+    "repos": 30,
+    "security": 120
+  },
+  "sources": [
+    {
+      "id": "9to5google",
+      "name": "9to5Google",
+      "kind": "news",
+      "homepage": "https://9to5google.com/",
+      "ok": true,
+      "count": 3,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.821Z"
+    },
+    {
+      "id": "android-developers",
+      "name": "Android Developers",
+      "kind": "official",
+      "homepage": "https://android-developers.googleblog.com/",
+      "ok": true,
+      "count": 1,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.633Z"
+    },
+    {
+      "id": "apple-developer",
+      "name": "Apple Developer",
+      "kind": "official",
+      "homepage": "https://developer.apple.com/news/",
+      "ok": true,
+      "count": 0,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.705Z"
+    },
+    {
+      "id": "apple-ml",
+      "name": "Apple Machine Learning",
+      "kind": "official",
+      "homepage": "https://machinelearning.apple.com/",
+      "ok": true,
+      "count": 1,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.429Z"
+    },
+    {
+      "id": "ars-technica",
+      "name": "Ars Technica",
+      "kind": "news",
+      "homepage": "https://arstechnica.com/",
+      "ok": true,
+      "count": 6,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.221Z"
+    },
+    {
+      "id": "aws-ml",
+      "name": "AWS Machine Learning",
+      "kind": "official",
+      "homepage": "https://aws.amazon.com/blogs/machine-learning/",
+      "ok": true,
+      "count": 3,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.437Z"
+    },
+    {
+      "id": "aws-news",
+      "name": "AWS News Blog",
+      "kind": "official",
+      "homepage": "https://aws.amazon.com/blogs/aws/",
+      "ok": true,
+      "count": 2,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.828Z"
+    },
+    {
+      "id": "bleepingcomputer",
+      "name": "BleepingComputer",
+      "kind": "news",
+      "homepage": "https://www.bleepingcomputer.com/",
+      "ok": true,
+      "count": 6,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.328Z"
+    },
+    {
+      "id": "cisa-kev",
+      "name": "CISA KEV",
+      "kind": "data",
+      "homepage": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+      "ok": true,
+      "count": 120,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:07.028Z"
+    },
+    {
+      "id": "cloudflare",
+      "name": "Cloudflare Blog",
+      "kind": "official",
+      "homepage": "https://blog.cloudflare.com/",
+      "ok": true,
+      "count": 3,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.993Z"
+    },
+    {
+      "id": "databricks",
+      "name": "Databricks Blog",
+      "kind": "official",
+      "homepage": "https://www.databricks.com/blog",
+      "ok": true,
+      "count": 3,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.056Z"
+    },
+    {
+      "id": "meta-engineering",
+      "name": "Engineering at Meta",
+      "kind": "official",
+      "homepage": "https://engineering.fb.com/",
+      "ok": true,
+      "count": 2,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.481Z"
+    },
+    {
+      "id": "flutter",
+      "name": "Flutter Blog",
+      "kind": "official",
+      "homepage": "https://blog.flutter.dev/",
+      "ok": true,
+      "count": 0,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.670Z"
+    },
+    {
+      "id": "github-trending",
+      "name": "GitHub (yükselen projeler)",
+      "kind": "data",
+      "homepage": "https://github.com/",
+      "ok": true,
+      "count": 30,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:07.027Z"
+    },
+    {
+      "id": "github-blog",
+      "name": "GitHub Blog",
+      "kind": "official",
+      "homepage": "https://github.blog/",
+      "ok": true,
+      "count": 4,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.453Z"
+    },
+    {
+      "id": "google-ai",
+      "name": "Google AI",
+      "kind": "official",
+      "homepage": "https://blog.google/technology/ai/",
+      "ok": true,
+      "count": 5,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.045Z"
+    },
+    {
+      "id": "google-cloud",
+      "name": "Google Cloud Blog",
+      "kind": "official",
+      "homepage": "https://cloud.google.com/blog",
+      "ok": true,
+      "count": 3,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.871Z"
+    },
+    {
+      "id": "deepmind",
+      "name": "Google DeepMind",
+      "kind": "official",
+      "homepage": "https://deepmind.google/discover/blog/",
+      "ok": true,
+      "count": 4,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.046Z"
+    },
+    {
+      "id": "google-research",
+      "name": "Google Research",
+      "kind": "official",
+      "homepage": "https://research.google/blog/",
+      "ok": true,
+      "count": 3,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.047Z"
+    },
+    {
+      "id": "hacker-news",
+      "name": "Hacker News",
+      "kind": "community",
+      "homepage": "https://news.ycombinator.com/",
+      "ok": true,
+      "count": 15,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.726Z"
+    },
+    {
+      "id": "hf-models",
+      "name": "Hugging Face (trend modeller)",
+      "kind": "data",
+      "homepage": "https://huggingface.co/models",
+      "ok": true,
+      "count": 40,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:07.026Z"
+    },
+    {
+      "id": "huggingface-blog",
+      "name": "Hugging Face Blog",
+      "kind": "official",
+      "homepage": "https://huggingface.co/blog",
+      "ok": true,
+      "count": 5,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.049Z"
+    },
+    {
+      "id": "hf-papers",
+      "name": "Hugging Face Daily Papers",
+      "kind": "data",
+      "homepage": "https://huggingface.co/papers",
+      "ok": true,
+      "count": 50,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:07.027Z"
+    },
+    {
+      "id": "infoq",
+      "name": "InfoQ",
+      "kind": "news",
+      "homepage": "https://www.infoq.com/",
+      "ok": true,
+      "count": 4,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.606Z"
+    },
+    {
+      "id": "jetbrains",
+      "name": "JetBrains Blog",
+      "kind": "official",
+      "homepage": "https://blog.jetbrains.com/",
+      "ok": true,
+      "count": 3,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.596Z"
+    },
+    {
+      "id": "kdnuggets",
+      "name": "KDnuggets",
+      "kind": "news",
+      "homepage": "https://www.kdnuggets.com/",
+      "ok": true,
+      "count": 3,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.005Z"
+    },
+    {
+      "id": "kubernetes",
+      "name": "Kubernetes Blog",
+      "kind": "official",
+      "homepage": "https://kubernetes.io/blog/",
+      "ok": true,
+      "count": 1,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.892Z"
+    },
+    {
+      "id": "mit-tech-review",
+      "name": "MIT Technology Review",
+      "kind": "news",
+      "homepage": "https://www.technologyreview.com/",
+      "ok": true,
+      "count": 3,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.237Z"
+    },
+    {
+      "id": "microsoft-research",
+      "name": "Microsoft Research",
+      "kind": "official",
+      "homepage": "https://www.microsoft.com/en-us/research/blog/",
+      "ok": true,
+      "count": 0,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.048Z"
+    },
+    {
+      "id": "nasa",
+      "name": "NASA",
+      "kind": "official",
+      "homepage": "https://www.nasa.gov/news/",
+      "ok": true,
+      "count": 3,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.080Z"
+    },
+    {
+      "id": "new-scientist",
+      "name": "New Scientist",
+      "kind": "news",
+      "homepage": "https://www.newscientist.com/subject/technology/",
+      "ok": true,
+      "count": 3,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.169Z"
+    },
+    {
+      "id": "nvidia-developer",
+      "name": "NVIDIA Developer",
+      "kind": "official",
+      "homepage": "https://developer.nvidia.com/blog/",
+      "ok": true,
+      "count": 4,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.364Z"
+    },
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "kind": "official",
+      "homepage": "https://openai.com/news",
+      "ok": true,
+      "count": 5,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.043Z"
+    },
+    {
+      "id": "quanta",
+      "name": "Quanta Magazine",
+      "kind": "news",
+      "homepage": "https://www.quantamagazine.org/",
+      "ok": true,
+      "count": 3,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.163Z"
+    },
+    {
+      "id": "simon-willison",
+      "name": "Simon Willison",
+      "kind": "community",
+      "homepage": "https://simonwillison.net/",
+      "ok": true,
+      "count": 4,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.380Z"
+    },
+    {
+      "id": "stackoverflow-blog",
+      "name": "Stack Overflow Blog",
+      "kind": "official",
+      "homepage": "https://stackoverflow.blog/",
+      "ok": true,
+      "count": 3,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:05.536Z"
+    },
+    {
+      "id": "techcrunch",
+      "name": "TechCrunch",
+      "kind": "news",
+      "homepage": "https://techcrunch.com/",
+      "ok": true,
+      "count": 6,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.186Z"
+    },
+    {
+      "id": "the-hacker-news",
+      "name": "The Hacker News",
+      "kind": "news",
+      "homepage": "https://thehackernews.com/",
+      "ok": true,
+      "count": 5,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.356Z"
+    },
+    {
+      "id": "the-verge",
+      "name": "The Verge",
+      "kind": "news",
+      "homepage": "https://www.theverge.com/",
+      "ok": true,
+      "count": 6,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.170Z"
+    },
+    {
+      "id": "toms-hardware",
+      "name": "Tom's Hardware",
+      "kind": "news",
+      "homepage": "https://www.tomshardware.com/",
+      "ok": true,
+      "count": 5,
+      "error": null,
+      "checkedAt": "2026-11-28T16:58:06.285Z"
+    }
+  ]
+}
